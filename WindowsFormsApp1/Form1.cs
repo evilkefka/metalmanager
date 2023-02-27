@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 using System.Text;
 
 
 namespace WindowsFormsApp1
 {
-
 
     public partial class Form1 : Form
     {
@@ -71,7 +71,7 @@ namespace WindowsFormsApp1
                 //testFindJson.Text += songList[i] + "'s supported levels: " + csSupportString;
             }
         }
-
+        /* Deprecated, storeModListInfo is used instead
         private void storeModListInfoNoSubs()
         {
             //this is used by Set List page. We're storing hidden information regarding each Mod's supported level
@@ -97,7 +97,7 @@ namespace WindowsFormsApp1
                 csSupLvls.Add(csSupportString);
                 testFindJson.Text += songList[i] + "'s supported levels: " + csSupportString;
             }
-        }
+        }*/
 
         private string getModSupportedLevels(string mod)
         {
@@ -182,10 +182,20 @@ namespace WindowsFormsApp1
             return result;
         }
 
+        private void getOldInfo_PostLoad()
+        {
+            //this set our old JSON info into our SetList
+            //if the user already started making some selections, let's not throw them away—anything that has a checkmark, don't fill
+
+        }
+
+
         DirectoryInfo gameDir = new DirectoryInfo(@"R:\SteamLibrary\steamapps\common\Metal Hellsinger\Metal_Data\StreamingAssets");
         private string getCurrentCustomsongsJson()
         {
             //with this function, we're returning a string of the information from our actual customsongs.json that the game reads (in the StreamingAssets folder)
+            if (!Directory.Exists(gameDir.ToString())) return "-1";
+            if (!File.Exists(gameDir + "\\customsongs.json")) return "-2";
 
             string currentJSONString = gameDir + "\\customsongs.json";
             using (StreamReader sr = File.OpenText(@currentJSONString))
@@ -210,53 +220,7 @@ namespace WindowsFormsApp1
 
         //di is the directory where we store our mods
         DirectoryInfo di = new DirectoryInfo(@"R:\SteamLibrary\steamapps\common\Metal Hellsinger\MODS");
-        private string loadModList(ListBox lBox, bool storeCustomMusicBank = false)
-        {
-            //this returns a string that says the names of all Mod selections
 
-            lBox.Items.Clear();
-            string modListString = "";
-
-            if (di.Exists)
-            {
-                // Indicate that the directory already exists.
-                DirectoryInfo[] songs = di.GetDirectories();
-                //string[] songs = { "Hey Jude", "Yesterday", "Obladi Oblada" };
-                for (int i = 0; i < songs.Length; i++)
-                {
-                    //first we store the custom Music.banks (Low Health banks) of whatever we can find
-
-                    if (storeCustomMusicBank)
-                    {
-                        string thisSongsDirectoryStr = di + "\\" + songs[i];
-                        DirectoryInfo thisSongsDirectory = new DirectoryInfo(@thisSongsDirectoryStr);
-                        bool hasCustomBank = Directory.GetFiles(thisSongsDirectoryStr, "Music.bank").Length > 0;
-                        if (hasCustomBank)
-                        {
-                            modsWithCustomMusicBank.Add(songs[i].Name);
-                        }
-                    }
-                    //exclude from our ModList any folder with a _ in front
-                    if (songs[i].Name.Substring(0, 1) == "_")
-                    {
-                        continue;//we want to exclude any files that start with _. For example, _TheLibrary
-                    }
-
-                    lBox.Items.Add(songs[i]); //adds an item to our list
-                    modListString += songs[i] + "::";//i forgot why we use this string
-
-                }
-
-
-
-                return modListString;
-            }
-            else
-            {
-                //Alert! No Mods folder!
-                return "";
-            }
-        }
 
         string[] defaultMainSongNames = { "This Is the End", "Stygia", "Burial At Night", "This Devastation", "Poetry of Cinder", "Dissolution", "Acheron", "Silent No More" };
         string[] defaultBossSongNames = { "Blood and Law", "Infernal Invocation I", "Infernal Invocation II", "Infernal Invocation III", "Infernal Invocation II", "Infernal Invocation I", "Infernal Invocation III" };
@@ -283,6 +247,149 @@ namespace WindowsFormsApp1
 
         }
 
+        private void GetGameDir()
+        {
+            //This SETS our Game directory!
+            //di is modpath, gameDir is game directory
+            string gamePath = string.Empty;
+
+            using (FolderBrowserDialog openFileDialog = new FolderBrowserDialog())
+            {
+                //openFileDialog.InitialDirectory = "c:\\";
+                //openFileDialog.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
+                //openFileDialog.FilterIndex = 2;
+                //openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+
+                    gamePath = openFileDialog.SelectedPath;
+                    string streamingAssetsDir = FindGameAndGetStreamingAssets(gamePath);
+                    if (streamingAssetsDir != null)
+                    {
+                        gameDir = new DirectoryInfo(@streamingAssetsDir);
+
+                        //we're going to reset these too, since it wasn't available before
+                        setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
+                        loadOldInfoIntoSetList(false); //this loads the array from the previous line into the fields
+
+                        gameDirInfo.Text = "Game Directory Found!";
+                    } else
+                    {
+                        MessageBox.Show("Please select Metal Hellsinger's game directory or its StreamingAssets folder.");
+                        gameDirInfo.Text = "No game directory found!";
+                    }
+
+                }
+            }
+        }
+
+
+        private string FindGameAndGetStreamingAssets(string givenPath)
+        {
+            //this function takes our path and verifies we can find our game EXE. It then returns the StreamingAssets folder
+
+            //whatever path our user gave us, we're going to analyze it and link StreamingAssets, which has our main JSON file
+            //we can always go back two directories if we need to access game folder (which would just be to have a "Start Game" button)
+            string[] dirs = givenPath.Split('\\');
+            if (dirs.Length == 1) { return null; }
+
+            string exeVerifyPath = ""; //we're just verifying the Metal.exe is there
+            string returnString = "";
+
+            if (dirs.Last() == "StreamingAssets")
+            {
+                for (int i = 0; i < dirs.Length - 2; i++)
+                {
+                    exeVerifyPath += dirs[i] + "\\";
+                }
+            } else if (dirs.Last() == "Metal_Data")
+            {
+                for (int i = 0; i < dirs.Length - 1; i++)
+                {
+                    exeVerifyPath += dirs[i] + "\\";
+                }
+            } else if (dirs.Last() == "Metal Hellsinger")
+            {
+                exeVerifyPath = String.Join("\\", dirs);
+            }
+
+            if (Directory.Exists(@exeVerifyPath))
+            {
+                string look4Game = exeVerifyPath + "\\Metal.exe";
+                string look4Ignore = exeVerifyPath + "\\ignore.txt";
+                if (File.Exists(@look4Game))
+                {
+                    returnString = exeVerifyPath + "\\Metal_Data\\StreamingAssets";
+                    return returnString;
+                }
+                if (File.Exists(@look4Ignore))
+                {
+                    returnString = exeVerifyPath;
+                    return returnString;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            //if we got this far, something goofed
+            return null;
+
+
+
+
+
+        }
+
+        private void OpenDir(string dirPath)
+        {
+            if (Directory.Exists(dirPath))
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    Arguments = dirPath,
+                    FileName = "explorer.exe"
+                };
+                Process.Start(startInfo);
+
+            } else
+            {
+                MessageBox.Show("Error: Directory could not be found.");
+            }
+        }
+
+        //I should have named it something besides get
+        private void GetModsFolder()
+        {
+            //di is ModPath, gameDir is gamedirectory
+            var fileContent = string.Empty;
+            var modPath = string.Empty;
+
+            using (FolderBrowserDialog openFileDialog = new FolderBrowserDialog())
+            {
+                //openFileDialog.InitialDirectory = "c:\\";
+                //openFileDialog.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
+                //openFileDialog.FilterIndex = 2;
+                //openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    modPath = openFileDialog.SelectedPath;
+                    di = new DirectoryInfo(@modPath);
+
+                    string modListDir = di.ToString();
+                    modListDir = modListDir.Replace("\\\\", "\\");
+                    modListDir = pathShortener(modListDir, 40);
+                    ModDirLabel.Text = modListDir;
+                }
+            }
+        }
+
+
 
         private string loadModListWithSubs(ListBox lBox, bool storeCustomMusicBank = false)
         {
@@ -293,7 +400,12 @@ namespace WindowsFormsApp1
 
             if (di.Exists)
             {
-                // Indicate that the directory already exists.
+                //since we know it, change the label:
+                string modListDir = di.ToString();
+                modListDir = modListDir.Replace("\\\\", "\\");
+                modListDir = pathShortener(modListDir, 40);
+                ModDirLabel.Text = modListDir;
+
                 DirectoryInfo[] directoriesInModFolder = di.GetDirectories();
                 //string[] songs = { "Hey Jude", "Yesterday", "Obladi Oblada" };
 
@@ -349,6 +461,7 @@ namespace WindowsFormsApp1
             else
             {
                 //Alert! No Mods folder!
+                ModDirLabel.Text = "No Mod directory set!";
                 return "";
             }
         }
@@ -1180,40 +1293,7 @@ namespace WindowsFormsApp1
         }
 
 
-        public string Injector_GetModJsonNoSubs()
-        {
-            //this gives us the JSON in its full, unaltered form
-            string selectedSong = "";
 
-            //Open Json file and retrieve info
-            //check what we're opening
-            string currentGameJsonIndicator = ""; //we will change this if we see we're accessing the game's current customsongs.json
-            if (listBox1.SelectedItem.ToString() == "Current customsongs.json")
-            {
-                //we want the current custom song
-                selectedSong = gameDir + "\\customsongs.json";
-                currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
-            }
-            else
-            {
-                //we chose an actual song
-                selectedSong = "\\" + listBox1.SelectedItem.ToString();
-                selectedSong = di + selectedSong + "\\customsongs.json";
-            }
-
-
-            using (StreamReader sr = File.OpenText(@selectedSong))
-            {
-                string s = "";
-                string fullText = sr.ReadToEnd();
-
-                //string trimmedLine = NormalizeWhiteSpace(fullText);
-                s = currentGameJsonIndicator + fullText;
-
-                return s;
-            }
-
-        }
 
         string[] allLevelNames = { "voke", "stygia", "yhelm", "incaustis", "gehenna", "nihil", "acheron", "sheol", "tutorial" };
 
@@ -1242,6 +1322,8 @@ namespace WindowsFormsApp1
             selectedSong = ((ListItem)listBox1.SelectedItem).Path; //we now store our path in the listbox with the modname, so we'll just grab that
 
 
+            if (!File.Exists(selectedSong)) return "-1";
+
             using (StreamReader sr = File.OpenText(@selectedSong))
             {
                 string s = "";
@@ -1256,38 +1338,6 @@ namespace WindowsFormsApp1
 
         }
 
-        public string Organizer_GetModJsonNoSubs()
-        {
-            string selectedSong = "";
-
-            //Open Json file and retrieve info
-            //check what we're opening
-            string currentGameJsonIndicator = ""; //we will change this if we see we're accessing the game's current customsongs.json
-            if (listBox1.SelectedItem.ToString() == "Current customsongs.json")
-            {
-                //we want the current custom song
-                selectedSong = gameDir + "\\customsongs.json";
-                currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
-            } else
-            {
-                //we chose an actual song
-                selectedSong = "\\" + listBox1.SelectedItem.ToString();
-                selectedSong = di + selectedSong + "\\customsongs.json";
-            }
-
-
-            using (StreamReader sr = File.OpenText(@selectedSong))
-            {
-                string s = "";
-                string fullText = sr.ReadToEnd();
-                testFindJson.Text = fullText;
-                string trimmedLine = NormalizeWhiteSpace(fullText);
-                s = currentGameJsonIndicator + trimmedLine;
-
-                return s;
-            }
-
-        }
 
         public string GetRealBankPath_GetModJson(string modName)
         {
@@ -1311,24 +1361,6 @@ namespace WindowsFormsApp1
 
         }
 
-        public string GetRealBankPath_GetModJsonNoSubs(string modName)
-        {
-            //until I figure out what to do with sub directories, this is an exact copy and paste of SetList_GetModJsonNoSubs
-            string selectedSong = "\\" + modName;
-            selectedSong = di + selectedSong + "\\customsongs.json";
-            using (StreamReader sr = File.OpenText(@selectedSong))
-            {
-                string s = "";
-
-                string fullText = sr.ReadToEnd();
-                string trimmedLine = NormalizeWhiteSpace(fullText);
-                s = trimmedLine;
-
-                return s;
-            }
-
-        }
-
         public string SetList_GetModJson(string modDirectory)
         {
             //Open Json file and retrieve info
@@ -1337,26 +1369,6 @@ namespace WindowsFormsApp1
             int modIndex = setListCatalog.FindStringExact(modDirectory); //this has proven safer than selectedIndex
 
             string selectedSong = ((ListItem)setListCatalog.Items[modIndex]).Path; //we now store our path in the listbox with the modname, so we'll just grab that
-            using (StreamReader sr = File.OpenText(@selectedSong))
-            {
-                string s = "";
-
-                string fullText = sr.ReadToEnd();
-                string trimmedLine = NormalizeWhiteSpace(fullText);
-                s = trimmedLine;
-
-                return s;
-            }
-
-        }
-
-        public string SetList_GetModJsonNoSubs(string modDirectory)
-        {
-            //Open Json file and retrieve info
-            //it wants "modDirectory", meaning just the folder name, aka the mod name
-            //if (modDirectory == "Current customsongs.json") return "";
-            string selectedSong = "\\" + modDirectory;
-            selectedSong = di + selectedSong + "\\customsongs.json";
             using (StreamReader sr = File.OpenText(@selectedSong))
             {
                 string s = "";
@@ -1536,7 +1548,11 @@ namespace WindowsFormsApp1
         private void setOldSongsArray()
         {
             string fullModString = getCurrentCustomsongsJson();
-
+            if (fullModString == "-2" || fullModString == "-1")
+            {
+                gameDirInfo.Text = "No game directory found!";
+                return;
+            }
 
             for (int m = 0; m < currentSetListName_m.Length; m++)
             {
@@ -1593,7 +1609,9 @@ namespace WindowsFormsApp1
 
                 string debug_lvlName = levelNames[levelNum].Substring(0, 1).ToUpper() + levelNames[levelNum].Substring(1); //turns "voke" into "Voke"
                 string debug_mSongName = mainCBox[levelNum].Text;
+                if (debug_mSongName.Length > 25) debug_mSongName = "Main Level";
                 string debug_bSongName = bossCBox[levelNum].Text;
+                //if (debug_bSongName.Length > 25) debug_bSongName = "Main Level"; meh, this is fine
                 SetList_DebugLabel1.Text = debug_lvlName + "'s custom songs have different names, but their files have the same Event ID. This will result in ";
                 SetList_DebugLabel2.Text = debug_mSongName + "'s song being played during the boss as well, instead of " + debug_bSongName + ". Only the";
                 SetList_DebugLabel3.Text = "creator of the mod can set a new Event ID. We recommend choosing different selections for " + debug_lvlName + ".";
@@ -2449,6 +2467,26 @@ namespace WindowsFormsApp1
                     bSaveLevelInfo.Enabled = false;
                 }
             }
+        }
+
+        //I didn't finish this because I still need to figure out why there's invisible characters in my strings
+        private string[] isolateLabelAndValue(string originalLine)
+        {
+            string[] returnString = { "error", "error" };
+            if (!originalLine.Contains(":"))
+            {
+                //we can't split it
+                
+                return returnString;
+            }
+
+            string[] originalLSplit = originalLine.Split(':');
+
+            //trim left side
+            //original
+
+            
+            return returnString;
         }
 
         /*
@@ -5390,8 +5428,10 @@ namespace WindowsFormsApp1
                     }
 
                     string lineErrors = getLineErrors(fixedJsonLines[i], fixedJsonLines[i + 1], currPlaceInExpctdEntry);
-
-                    linesWithErrors.Add(i + ":" + lineErrors + "curP: " + currPlaceInExpctdEntry + "...\n\r");
+                    if (lineErrors.Length > 0)
+                    {
+                        linesWithErrors.Add(i + 1 + ":" + lineErrors + "\n\r"); //i+1 because we don't start on line 0
+                    }
 
                     currPlaceInExpctdEntry++;
                 }
@@ -5468,8 +5508,12 @@ namespace WindowsFormsApp1
                     }
 
 
-                    string labelMissing = "labelmissing ending wanted: " + endingWeWant;
+                    string labelMissing = "labelmissing_Musiclabel";
                     return labelMissing;
+                } else
+                {
+                    //we don't have two options, and we can't find the label
+                    errorsOnLine.Add("labelmissing");
                 }
             }
 
@@ -5481,6 +5525,7 @@ namespace WindowsFormsApp1
                 if (finalCharOnLine != endingWeWant)
                 {
                     errorsOnLine.Add("unexpectedEnd-Wanted_" + endingWeWant);
+                    //this might not be neccessary
                 }
             } else
             {
@@ -5502,7 +5547,7 @@ namespace WindowsFormsApp1
                         }
                     } else
                     {
-                        //the next line doesn't have a bankPath
+                        //the next line doesn't have a bankPath, we want a number on this line's final char
 
                         if (Int32.TryParse(finalCharOnLine, out int yo))
                         {
@@ -5511,7 +5556,8 @@ namespace WindowsFormsApp1
                         } else
                         {
                             //the last character on the line is not a number
-                            errorsOnLine.Add("unexpectedEnd");
+
+                            errorsOnLine.Add("unexpectedEnd-Wanted_Num");
                         }
                     }
                 } else if (indexOfLabelWeWant == 8)
@@ -5611,20 +5657,20 @@ namespace WindowsFormsApp1
             } else if (indexOfLabelWeWant == 9 || indexOfLabelWeWant == 10)
             {
                 //either a level-closing or music-closing }
-                string unexpectedCharacters = line.Replace(" ", "");
-                if(unexpectedCharacters.Substring(unexpectedCharacters.Length-1, 1) == ",")
+                string unexpectedCharacters = lineNS;
+                if (unexpectedCharacters.Substring(unexpectedCharacters.Length - 1, 1) == ",")
                 {
                     unexpectedCharacters = unexpectedCharacters.Substring(0, unexpectedCharacters.Length - 1);
                 }
                 unexpectedCharacters = unexpectedCharacters.Replace("}", "").Replace("\r", "").Replace("\n", "");//why is this not working!?!!!
-                //removing control characters. I'm about to throw something through my wall
-                string output = new string(unexpectedCharacters.Where(c => !char.IsControl(c)).ToArray());
+                                                                                                                 //removing control characters. I'm about to throw something through my wall
+
+                // Get the integral value of the character.
 
                 if (!string.IsNullOrEmpty(unexpectedCharacters))
                 {
-                    byte[] ba = Encoding.Default.GetBytes(unexpectedCharacters);
-                    string hexString = BitConverter.ToString(ba);
-                    formatErrors.Add("unexpectedCharsB_" + hexString);
+
+                    formatErrors.Add("unexpectedCharsB_" + unexpectedCharacters);
                 }
 
             } else
@@ -5641,7 +5687,7 @@ namespace WindowsFormsApp1
             return formatErrors.ToArray();
         }
 
-       private string[] checkFormatLineWithLabel(string[] splitInfo, int indexOfLabel)
+        private string[] checkFormatLineWithLabel(string[] splitInfo, int indexOfLabel)
         {
             string labelStr = splitInfo[0];
             string valueStr = splitInfo[1];
@@ -5659,7 +5705,7 @@ namespace WindowsFormsApp1
 
 
             //Label check; we already checked for if it has the exact label name with quotes around it
-            
+
             if (indexOfLabel == 2)
             {
                 string checkMainMusic = labelNS.Replace("\"MainMusic\"", "");
@@ -5677,38 +5723,38 @@ namespace WindowsFormsApp1
                     lineFormatErrors.Add("unexpectedCharsLOfC_" + unexpectedCharsInLabel);
                 }
             }
-            
+
 
             if (indexOfLabel == 6 || indexOfLabel == 7 || indexOfLabel == 2) goto ValueNoQuoteCheck;
 
             ValueWithQuoteCheck:
 
-            if(numberOfQuotesInValue > 2)
+            if (numberOfQuotesInValue > 2)
             {
                 lineFormatErrors.Add("2mqVal");
-            } else if(numberOfQuotesInValue < 2)
+            } else if (numberOfQuotesInValue < 2)
             {
                 lineFormatErrors.Add("neqVal");
             } else
             {
                 //we have only two quotes in the value, which is what we want
-                if(indexOfLabel == 4 || indexOfLabel == 5)
+                if (indexOfLabel == 4 || indexOfLabel == 5)
                 {
                     //we're checking an event
                     string checkEvent = shaveSurroundingQuotesAndSpaces(valueNS); //getting rid of the spaces, then quotes
-                    if(checkEvent.Length != valueNS.Length - 2)
+                    if (checkEvent.Length != valueNS.Length - 2)
                     {
                         //the two quotes we found weren't surrounding
-                        lineFormatErrors.Add(":evF");
+                        lineFormatErrors.Add("evF1");
                         return lineFormatErrors.ToArray();
 
                     }
                     checkEvent = checkEvent.TrimStart('{').TrimEnd('}');
 
-                    if (checkEvent.Length != valueNS.Length - 2 || checkEvent.Length != 36)
+                    if (checkEvent.Length != valueNS.Length - 4 || checkEvent.Length != 36)
                     {
                         //Event string does NOT have { and }, OR it does not have the full 36-digit ID
-                        lineFormatErrors.Add(":evF");
+                        lineFormatErrors.Add("evF2");
                         return lineFormatErrors.ToArray();
                     }
                 }
@@ -5717,24 +5763,24 @@ namespace WindowsFormsApp1
 
             return lineFormatErrors.ToArray();
 
-            // We've stopped if we were expecting quotes
+        // We've stopped if we were expecting quotes
 
-            ValueNoQuoteCheck:
+        ValueNoQuoteCheck:
             if (numberOfQuotesInValue > 0)
             {
-                lineFormatErrors.Add("unwantedquotes(value: " + valueNS + ")");
+                lineFormatErrors.Add("unwantedquotes");
             }
             else
             {
                 //we don't have any quotes, which is what we want
                 if (indexOfLabel == 2)
                 {
-                    if(valueNS.Trim() != "{")
+                    if (valueNS.Trim() != "{")
                     {
                         lineFormatErrors.Add("unexpectedCharsROfC_" + labelNS.Replace("{", ""));
                     }
                 }
-                 else
+                else
                 {
                     //if we're here, then we're looking at BeatInputOffset or BPM, both are number-only variables
                     if (Decimal.TryParse(valueNS.Trim(), out decimal hi))
@@ -5744,7 +5790,7 @@ namespace WindowsFormsApp1
                     else
                     {
                         //the value is NOT a number
-                        lineFormatErrors.Add(":numFormat");
+                        lineFormatErrors.Add("numFormat");
                     }
                 }
             }
@@ -5763,6 +5809,7 @@ namespace WindowsFormsApp1
         //this doesn't work
         //i'm a bad programmer
         //this will return an array of numbers representing the 0-based line numbers that had a problem with the JSON somehow
+        #region DeprecatedDebugger
         private string[] getJsonErrors(string fullJson)
         {
             string fixedJson = fullJson;
@@ -5818,9 +5865,9 @@ namespace WindowsFormsApp1
             //right now, we're going to find our last line that isn't blank
             //we'll start at the end, and work backwards until what we find isn't 
             string chekd = "";
-            for(int i = fixedJsonLines.Length-1; i>0; i--)
+            for (int i = fixedJsonLines.Length - 1; i > 0; i--)
             {
-                chekd += i ;
+                chekd += i;
                 string finalLinesChk_ns = NormalizeWhiteSpace(fixedJsonLines[i], true);
                 finalLinesChk_ns = finalLinesChk_ns.Replace("\r", "").Replace("\n", "");
                 if (finalLinesChk_ns != null || finalLinesChk_ns != "")
@@ -5831,25 +5878,25 @@ namespace WindowsFormsApp1
                         //we're golden
                         lastLineNum = i;
                         chekd += "}";
-                        
+
                         break;
-                    } else if(finalLinesChk_ns == "]")
+                    } else if (finalLinesChk_ns == "]")
                     {
                         //JSON doesn't have final }, but the ] is there
-                        lastLineNum = i+1; //we're going to handle everything once we see the ]
+                        lastLineNum = i + 1; //we're going to handle everything once we see the ]
                         chekd += "]";
-                        
+
                         break;
-                    } else if(finalLinesChk_ns.Length > 0)
+                    } else if (finalLinesChk_ns.Length > 0)
                     {
                         //the final character in the JSON is something wacky...
-                        chekd += "sad("+ lastLineNum + ")";
+                        chekd += "sad(" + lastLineNum + ")";
                         lastLineNum = -1;//if we see this is a negative, it means we couldn't find the lastLineNum
                         //if we can't know that we're on the last few lines because this failed, our code should keep running and returning "42: empty line, 43: empty line" until the end, where
                         // we should mention "Json is not closed correctly; Expected } on last line, with ] on previous line
                     }
 
-                    
+
                 }
 
             }
@@ -5860,8 +5907,8 @@ namespace WindowsFormsApp1
 
             //int currentPlaceInExpEndLoop = 0; //we're going to use this to route where to be looking for punctuation in our expectedEndings
             int currentPlaceInExpFldLoop = 0; //we're going to use this to route where to be looking for our actual label fields
-            //we don't need two of these anymore, since we have the same length on the arrays
-            
+                                              //we don't need two of these anymore, since we have the same length on the arrays
+
             //this is about to get stupid
             //
             for (int i = 0; i < fixedJsonLines.Length; i++)
@@ -5870,7 +5917,7 @@ namespace WindowsFormsApp1
                 if (currentPlaceInExpFldLoop >= expectedFields.Length) currentPlaceInExpFldLoop = 0;
                 //if (currentPlaceInExpEndLoop >= expectedEndings.Length) currentPlaceInExpEndLoop = 0;
 
-                
+
 
 
                 //after preliminaries...
@@ -5981,7 +6028,7 @@ namespace WindowsFormsApp1
                 else if (currentPlaceInExpFldLoop == 9)
                 {
                     MessageBox.Show("[Ln" + i + ":" + line_nospaces + "]");
-                   
+
                 } else if (currentPlaceInExpFldLoop == 10)
                 {
                     //we're here if our expectedField is supposed to be a Level-Closing } — if we had MainMusic and BossMusic, though, this could be opening back up again
@@ -5992,7 +6039,7 @@ namespace WindowsFormsApp1
                     if (fixedJsonLines[i].Contains("\"BossMusic\""))
                     {
                         currentPlaceInExpFldLoop = 10;
-                    } else if(fixedJsonLines[i].Contains("}"))
+                    } else if (fixedJsonLines[i].Contains("}"))
                     {
                         //we let it go
                     }
@@ -6093,9 +6140,9 @@ namespace WindowsFormsApp1
                         //we'll return a string saying what line, and what was expected
                         linesWithErrors.Add(i + ":" + openersAndClosers[i]);
                     }
-                    
 
-                } else if (i >= lastLineNum-1 && lastLineNum != -1)
+
+                } else if (i >= lastLineNum - 1 && lastLineNum != -1)
                 {
                     MessageBox.Show("LastLinenum: " + lastLineNum);
                     //we're at the 2nd-to-last line, we should be expecting a ]
@@ -6106,11 +6153,11 @@ namespace WindowsFormsApp1
                         linesWithErrors.Add(i + ":]");
                     }
                     //we're also going to look for our next one
-                    string nextLine_ns = NormalizeWhiteSpace(fixedJsonLines[i+1], true);
+                    string nextLine_ns = NormalizeWhiteSpace(fixedJsonLines[i + 1], true);
                     if (nextLine_ns != "}")
                     {
                         //we don't see our expected ending
-                        linesWithErrors.Add(i+1 + ":j}");
+                        linesWithErrors.Add(i + 1 + ":j}");
                     }
                     break; //break out of this, we're done
 
@@ -6158,13 +6205,13 @@ namespace WindowsFormsApp1
                             string twoLnsDwn = NormalizeWhiteSpace(fixedJsonLines[i + 2]);
 
                             int nextPlaceInExpFldLoop = currentPlaceInExpFldLoop + 1;
-                            if(nextPlaceInExpFldLoop >= expectedFields.Length)
+                            if (nextPlaceInExpFldLoop >= expectedFields.Length)
                             {
                                 nextPlaceInExpFldLoop = 0;
                             }
                             string nxtMsngLabel = expectedFields[nextPlaceInExpFldLoop];
                             nxtMsngLabel = shaveSurroundingQuotesAndSpaces(nxtMsngLabel);
-                            
+
 
                             //does the next line have what we just looked for?
                             //if it does, we skip i to that number, before trying to fix our place in the currentPlaceInExpFld
@@ -6179,8 +6226,8 @@ namespace WindowsFormsApp1
                             {
                                 //no it doesn't, so we're checking the next line
                                 linesWithErrors.Add(i + ":lAn#");//line anomaly
-                                linesWithErrors.Add((i+1) + ":lAn#");//line anomaly
-                                currentPlaceInExpFldLoop+=2;
+                                linesWithErrors.Add((i + 1) + ":lAn#");//line anomaly
+                                currentPlaceInExpFldLoop += 2;
                                 i++; continue;
                             } else if (nextLn.Contains(nxtMsngLabel))
                             {
@@ -6193,7 +6240,7 @@ namespace WindowsFormsApp1
                                 //no it doesn't, let's check the next line if we have the NEXT label....
                                 linesWithErrors.Add(i + ":lAn%");//line anomaly
                                 linesWithErrors.Add((i + 1) + ":lAn%");//line anomaly
-                                currentPlaceInExpFldLoop+=2;
+                                currentPlaceInExpFldLoop += 2;
                                 i++; continue;
 
                             }
@@ -6220,7 +6267,7 @@ namespace WindowsFormsApp1
                     {
                         //there's multiple choices
                         string[] possibleFields = expectedFields[currentPlaceInExpFldLoop].Split('|');
-                        if(!line_nospaces.Contains(possibleFields[0]) && !line_nospaces.Contains(possibleFields[1]))
+                        if (!line_nospaces.Contains(possibleFields[0]) && !line_nospaces.Contains(possibleFields[1]))
                         {
                             //we don't have EITHER choices
                             linesWithErrors.Add(i + ":mb");
@@ -6229,16 +6276,16 @@ namespace WindowsFormsApp1
                         {
                             //we have one of the choices
 
-                            if (line_nospaces.Contains(possibleFields[0])){
+                            if (line_nospaces.Contains(possibleFields[0])) {
                                 //Main Music is in the line, check if the line before it is "LevelName"
-                                if(!fixedJsonLines[i-1].Contains("\"LevelName\"") && fixedJsonLines[i - 1] != null)
+                                if (!fixedJsonLines[i - 1].Contains("\"LevelName\"") && fixedJsonLines[i - 1] != null)
                                 {
                                     //we wee looking at something that contains 'MainMusic', and the line before us doesn't have "LevelName", (and wasn't blank)
                                     linesWithErrors.Add(i + ":mmp"); //main music placement
 
                                 }
 
-                            } else if (line_nospaces.Contains(possibleFields[1])){
+                            } else if (line_nospaces.Contains(possibleFields[1])) {
                                 //BossMusic is in the line, check if the line before it is "LevelName"
                                 //this should be able to work as just 'else'
                                 if (!fixedJsonLines[i - 1].Contains("\"LevelName\"") && fixedJsonLines[i - 1] != null)
@@ -6247,7 +6294,7 @@ namespace WindowsFormsApp1
                                     //verify that we actually appear after a MainMusic's info
 
                                     //immediately check if we're before the MainMusic
-                                    if(i < fixedJsonLines.Length - 8)
+                                    if (i < fixedJsonLines.Length - 8)
                                     {
                                         if ((fixedJsonLines[i + 7].Contains("\"MainMusic\"") || fixedJsonLines[i + 8].Contains("\"MainMusic\"")))
                                         {
@@ -6266,8 +6313,8 @@ namespace WindowsFormsApp1
                                             linesWithErrors.Add(i + ":bmp"); //boss music placement couldn't be verified
                                         }
                                     }
-                                    
-                                    
+
+
 
                                 }
 
@@ -6278,12 +6325,12 @@ namespace WindowsFormsApp1
 
 
                     }
-                    
+
 
                     //next, we handle the Colon, and the line's value (right of the colon)
 
 
-                    if(expectedFields[currentPlaceInExpFldLoop].Length>0 && line_nospaces.Contains(":"))
+                    if (expectedFields[currentPlaceInExpFldLoop].Length > 0 && line_nospaces.Contains(":"))
                     {
                         #region FoundColon
                         //if we're looking for a field such as Bank, Event, etc., and it has a colon
@@ -6313,14 +6360,14 @@ namespace WindowsFormsApp1
                             checkEvent = checkEvent.Replace("{", "");
                             checkEvent = checkEvent.Replace("}", "");
 
-                            if (checkEvent.Length != infoShaven.Length-2 || checkEvent.Length != 36)
+                            if (checkEvent.Length != infoShaven.Length - 2 || checkEvent.Length != 36)
                             {
                                 //Event string does NOT have { and }, OR it does not have the full 36-digit ID
                                 linesWithErrors.Add(i + ":evF");
                             } else
                             {
                                 //we haven't found a problem with our formatting yet here, make sure there's quotes around our info
-                                if(infoShaven.Length != infoAfterColon.Length - 2)
+                                if (infoShaven.Length != infoAfterColon.Length - 2)
                                 {
                                     linesWithErrors.Add(i + ":addq#");
                                 }
@@ -6337,10 +6384,10 @@ namespace WindowsFormsApp1
                         } else if (currentPlaceInExpFldLoop == 1)
                         {
                             //we're looking at LevelName
-                            for(int j=0; j < allLevelNames.Length; j++)
+                            for (int j = 0; j < allLevelNames.Length; j++)
                             {
                                 string capitalizeLevelName = allLevelNames[j].Substring(0, 1).ToUpper() + allLevelNames[j].Substring(1);
-                                if(infoShaven == capitalizeLevelName)
+                                if (infoShaven == capitalizeLevelName)
                                 {
                                     //we found the level, formatted correctly, we're fine
                                     instancesOfLevelInJson[j] = instancesOfLevelInJson[j] + 1;
@@ -6357,7 +6404,7 @@ namespace WindowsFormsApp1
                                 if (j == levelNames.Length - 1)
                                 {
                                     //we're at the end, and we didn't find anything
-                                    linesWithErrors.Add(i + ":LUr("+infoShaven+")"); //level unrecognized
+                                    linesWithErrors.Add(i + ":LUr(" + infoShaven + ")"); //level unrecognized
                                 }
                             }
 
@@ -6388,21 +6435,21 @@ namespace WindowsFormsApp1
                         {
                             //we have quotes around the info after our :
 
-                            if(expectedField == "BeatInputOffset" || expectedField == "BPM")
+                            if (expectedField == "BeatInputOffset" || expectedField == "BPM")
                             {
                                 //if we're looking for one of these two, then we DON'T want quotes, but we have them
-                                linesWithErrors.Add(i+":remq");
+                                linesWithErrors.Add(i + ":remq");
                             }
 
 
-                        } else if(infoShaven.Length == infoAfterColon.Length)
+                        } else if (infoShaven.Length == infoAfterColon.Length)
                         {
                             //we have no quotes in our info
 
                             if (currentPlaceInExpFldLoop != 6 && currentPlaceInExpFldLoop != 7 && currentPlaceInExpFldLoop != 2)
                             {
                                 //we're looking at something that isn't MainMusic/BossMusic, BeatInputOffset, or BPM, so we need quotes
-                                linesWithErrors.Add(i + ":addq"+currentPlaceInExpFldLoop+"$");
+                                linesWithErrors.Add(i + ":addq" + currentPlaceInExpFldLoop + "$");
                             }
                         }
 
@@ -6441,15 +6488,15 @@ namespace WindowsFormsApp1
                     if (finalChar != expectedEndings[currentPlaceInExpFldLoop])
                     {
                         //final character doesn't match the expectedEndings based on our array of what it should look like in the level
-                        
 
-                        if(expectedEndings[currentPlaceInExpFldLoop].Length == 1)
+
+                        if (expectedEndings[currentPlaceInExpFldLoop].Length == 1)
                         {
                             //there's only one thing we're expecting here
-                            MessageBox.Show("[Ln" + i + ":Missing " + expectedEndings[currentPlaceInExpFldLoop] + "(" +currentPlaceInExpFldLoop + ") in " + fixedJsonLines[i]);
+                            MessageBox.Show("[Ln" + i + ":Missing " + expectedEndings[currentPlaceInExpFldLoop] + "(" + currentPlaceInExpFldLoop + ") in " + fixedJsonLines[i]);
                             linesWithErrors.Add(i + ":" + expectedEndings[currentPlaceInExpFldLoop]);
 
-                        } else if(expectedEndings[currentPlaceInExpFldLoop].Length == 4)
+                        } else if (expectedEndings[currentPlaceInExpFldLoop].Length == 4)
                         {
                             //The following is what we run if the final character of our current line didn't match what we were expecting, but because it had 
                             //two possible options, and we haven't 
@@ -6485,7 +6532,7 @@ namespace WindowsFormsApp1
                                     }
                                 }
 
-                            } else if(currentPlaceInExpFldLoop == 8)
+                            } else if (currentPlaceInExpFldLoop == 8)
                             {
                                 //we're looking for BankPath info
 
@@ -6495,7 +6542,7 @@ namespace WindowsFormsApp1
                                     linesWithErrors.Add(i + 1 + ":nobpfile"); //bankpath points to a directory, but needs to include "[Filename].bank"
                                 }
 
-                                if(line_nospaces.Split('/').Length - 1 != 0)
+                                if (line_nospaces.Split('/').Length - 1 != 0)
                                 {
                                     //we have / in our bankpath, when we only want \'s
                                     linesWithErrors.Add(i + 1 + ":bpws"); //bank path wrong slash
@@ -6533,7 +6580,7 @@ namespace WindowsFormsApp1
                                     linesWithErrors.Add(i + 1 + ":bpFNF"); //bankpath file not found
                                 }
 
-                                CantVerifyBPFormat:
+                            CantVerifyBPFormat:
 
 
                                 if (finalChar == ",")
@@ -6547,7 +6594,7 @@ namespace WindowsFormsApp1
 
                                     linesWithErrors.Add(i + 1 + ":bP");
                                 }*/
-                            
+
 
                             } else if (currentPlaceInExpFldLoop == 9)
                             {
@@ -6555,20 +6602,20 @@ namespace WindowsFormsApp1
                                 //currentPlaceInExpFldLoop is currently looking for what's AFTER the bankPath, which is either the MainMusic or BossMusic closing, with a possible comma if there's another level info
 
                                 int nextLineWithBossMusic = nextValidLineContaining("\"BossMusic\"", fixedJsonLines, i + 1, 3);
-                                if(nextLineWithBossMusic == i + 1)
+                                if (nextLineWithBossMusic == i + 1)
                                 {
                                     //we have a BossMusic on the next line, we're expecting a ,
-                                } else if(nextLineWithBossMusic == -1)
+                                } else if (nextLineWithBossMusic == -1)
                                 {
                                     //we don't have BossMusic on the next line, we should not have a , nor anything else except }
-                                    if(finalChar == ",")
+                                    if (finalChar == ",")
                                     {
                                         linesWithErrors.Add(i + ":-," + line_nospaces); // comma shouldn't be here
                                     }
 
-                                    if(line_nospaces.Replace(",", "") != "}")
+                                    if (line_nospaces.Replace(",", "") != "}")
                                     {
-                                        if(line_nospaces.Replace(",", "").Length == 1)
+                                        if (line_nospaces.Replace(",", "").Length == 1)
                                         {
                                             linesWithErrors.Add(i + ":ue" + line_nospaces.Replace(",", "")); //unexpected encounter (+ what we found)
                                         } else
@@ -6616,7 +6663,7 @@ namespace WindowsFormsApp1
 
                                 }*/
 
-                 
+
                             }
                             else if (currentPlaceInExpFldLoop == 10)
                             {
@@ -6633,7 +6680,7 @@ namespace WindowsFormsApp1
                     //linesWithErrors.Add("(Line: " + i + "; CurrentPlaceInExpLoop: " + currentPlaceInExpFldLoop + "\n");
 
                     currentPlaceInExpFldLoop++; //add to both of these
-                   
+
 
                     //resetting them if they're over the mark
                     /* These get reset at the beginning now, because I feel safer doing that 
@@ -6646,7 +6693,7 @@ namespace WindowsFormsApp1
                         currentPlaceInExpEndLoop = 0;
                     }*/
 
-                    
+
                     //end of "if i is within range of levels"
                 }
 
@@ -6654,7 +6701,7 @@ namespace WindowsFormsApp1
                 //end of for loop single iteration
             }
 
-            if(lastLineNum == -1)
+            if (lastLineNum == -1)
             {
                 linesWithErrors.Add(fixedJsonLines.Length + ":]}"); //this appears if our last character in our JSON isn't a } or a ]
             }
@@ -6666,6 +6713,7 @@ namespace WindowsFormsApp1
 
 
         }
+        #endregion DeprecatedDebugger
 
         private int nextValidLineContaining(string needle, string[] allLines, int startingLine = 0, int maxAttempts = 5)
         {
@@ -6673,7 +6721,7 @@ namespace WindowsFormsApp1
             //maxAttempts is to stop us from going too far
             int curLine = startingLine;
             int attempts = 0; //if attempts is 1, this  ↓ should be '< or equal to'
-            while(curLine < allLines.Length && attempts < maxAttempts)
+            while (curLine < allLines.Length && attempts < maxAttempts)
             {
                 string nakedLine = NormalizeWhiteSpace(allLines[curLine], true);
                 if (nakedLine == null) continue;
@@ -6692,17 +6740,17 @@ namespace WindowsFormsApp1
         {
             //we either want 0, or 2 quotes. We shouldn't ever want ONE quote
 
-            if(howManyWeWant == 2)
+            if (howManyWeWant == 2)
             {
                 //we want 2
-                if(howManyWeHave > 2)
+                if (howManyWeHave > 2)
                 {
                     //we have more than 2 though
                     return "2mq"; //needs L or R still
-                } else if(howManyWeHave == 1)
+                } else if (howManyWeHave == 1)
                 {
                     return "msq"; //missing 1 quote
-                } else if(howManyWeHave == 0)
+                } else if (howManyWeHave == 0)
                 {
                     return "addq@";
                 }
@@ -6727,7 +6775,7 @@ namespace WindowsFormsApp1
             }
 
             return null; //there were no issues
-            
+
         }
 
         private string fixAnyLinesWithTabs(string fullJson)
@@ -6769,7 +6817,7 @@ namespace WindowsFormsApp1
             //boss music closer is 17
             //LEVEL music closer is 18
 
-            string[] uniqueKeywords = { "\"LevelName\"", "\"MainMusic\"", "\"BossMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\""};
+            string[] uniqueKeywords = { "\"LevelName\"", "\"MainMusic\"", "\"BossMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\"" };
             //uniqueKeywords are used to determine which line we might be on in the JSON
 
             //for uniqueKeywords string:
@@ -6782,7 +6830,7 @@ namespace WindowsFormsApp1
 
 
             fixedJson = ""; //reset this, we're going to use it to return the info
-            for(int i=0; i<fixedJsonLines.Length; i++)
+            for (int i = 0; i < fixedJsonLines.Length; i++)
             {
                 if (fixedJsonLines[i].Contains("\t"))
                 {
@@ -6794,9 +6842,9 @@ namespace WindowsFormsApp1
 
                     bool uniqueFound = false;
 
-                    if(hasStringWithColonAfterIt(fixedLine, "customLevelMusic"))
+                    if (hasStringWithColonAfterIt(fixedLine, "customLevelMusic"))
                     {
-                        fixedJson += "    \"customLevelMusic\" : [\n"; 
+                        fixedJson += "    \"customLevelMusic\" : [\n";
                         continue;
                     }
                     if (fixedLine.Contains("]") && i == fixedJsonLines.Length - 2)
@@ -6809,7 +6857,7 @@ namespace WindowsFormsApp1
                     }
 
 
-                        for (int z=0; z<uniqueKeywords.Length; z++)
+                    for (int z = 0; z < uniqueKeywords.Length; z++)
                     {
                         if (hasStringWithColonAfterIt(fixedLine, uniqueKeywords[z]))
                         {
@@ -6824,15 +6872,15 @@ namespace WindowsFormsApp1
                             string lineInfo = fixedLine.Substring(lineLabelAfterColon); //gets everything after the colon. could have a space, could have quotes (we're about to get rid of potential comma)
 
                             int indexOfComma = fixedLine.IndexOf(",");
-                            if(indexOfComma != -1)
+                            if (indexOfComma != -1)
                             {
                                 //there's a comma, make our line info only have what's before it
                                 int realInfoLength = indexOfComma - lineLabelAfterColon;
                                 lineInfo = fixedLine.Substring(realInfoLength);
                             }
 
-                            
-                            
+
+
                             lineInfo = shaveSurroundingQuotesAndSpaces(lineInfo); //now we only have the information
 
 
@@ -6841,7 +6889,7 @@ namespace WindowsFormsApp1
                             if (z == 0)
                             {
                                 //levelName
-                                
+
                                 rewrittenLine = "            \"" + lineLabel + " " + lineInfo + "\",\n";//+\n? //will return (spaces) "LevelName" : "Stygia",
                             } else if (z >= 2 && z <= 3)
                             {
@@ -6850,9 +6898,9 @@ namespace WindowsFormsApp1
                             } else
                             {
                                 //one of the labels
-                                if(uniqueKeywords[z] == "\"BeatInputOffset\"" || uniqueKeywords[z] == "\"BPM\"" )
+                                if (uniqueKeywords[z] == "\"BeatInputOffset\"" || uniqueKeywords[z] == "\"BPM\"")
                                 {
-                                    
+
                                     //we don't want to add quotes to info
                                     rewrittenLine = "                " + lineLabel + " " + lineInfo;
                                 } else
@@ -6861,7 +6909,7 @@ namespace WindowsFormsApp1
                                     rewrittenLine = "                " + lineLabel + " \"" + lineInfo + "\"";
                                 }
 
-                                if(uniqueKeywords[z] == "\"BPM\"")
+                                if (uniqueKeywords[z] == "\"BPM\"")
                                 {
                                     //we're doing a BPM line, we need to check to add a comma or not
 
@@ -6910,7 +6958,7 @@ namespace WindowsFormsApp1
                             //need to find out if we just closed the Main/BossMusic, or the Level
 
                             //we might be on the last line of the code
-                            if(i == fixedJsonLines.Length - 1)
+                            if (i == fixedJsonLines.Length - 1)
                             {
                                 //we're on the last line
                                 fixedJson += "}\n";
@@ -6926,16 +6974,16 @@ namespace WindowsFormsApp1
                                 {
                                     //the line underneath us has the bossMusic info, so put a comma
                                     fixedJson += "            },\n";
-                                    
+
                                     continue;
                                 } else if (fixedJsonLines[i + 1].Contains("}"))
                                 {
                                     //the line underneath us is closing out the level, don't put a comma
                                     fixedJson += "            }\n";
-                                    
+
                                     continue;
                                 }
-                            } else if(fixedJsonLines[i - 1].Contains("}"))
+                            } else if (fixedJsonLines[i - 1].Contains("}"))
                             {
                                 //the line before this is closing out the music, we need to close out the level
                                 rewrittenLine = "        }";
@@ -6958,14 +7006,14 @@ namespace WindowsFormsApp1
                         }
 
                     }
-                    
+
 
 
                 } else
                 {
                     //we didn't have a tab here, and that's this function's jurisdiction
                     fixedJson += fixedJsonLines[i] + '\n';
-                    
+
                 }
 
 
@@ -6985,7 +7033,7 @@ namespace WindowsFormsApp1
             int indexOfColon = hay.IndexOf(":");
             if (indexOfColon == -1) return false;//we don't have a colon at all in this label, which is weird
 
-            
+
 
             if (indexOfColon < hay.IndexOf(needle)) return false; //our colon is before our needle, return false
 
@@ -6999,7 +7047,7 @@ namespace WindowsFormsApp1
 
             return true; //our colon is directly after our needle, return true!
         }
-        
+
 
         private bool modSupportsLevel(int modIndex, int Level, string m_or_b)
         {
@@ -7007,7 +7055,7 @@ namespace WindowsFormsApp1
             bool result = false;
 
             //example of supported Lvl string is 0b1mb23mb4m567m
-            if(modIndex == -1)
+            if (modIndex == -1)
             {
                 //we're looking at the default level, just return true
                 return true;
@@ -7077,7 +7125,7 @@ namespace WindowsFormsApp1
                 I WAS GOING FUCKING INSANE. checkForNumStr was levelInfoIndex+2, and kept pulling the wrong information
                 */
 
-                if (Int32.TryParse(checkForNumStr, out int j)) 
+                if (Int32.TryParse(checkForNumStr, out int j))
                 {
                     //this should activate if our character after Level number was another number; meaning the Mod doesn't have info for either main music or boss on this level, ie. the 1 in 0mb12m3mb
                     testFindJson.Text += " B2 " + supportedLvlString + "; ";
@@ -7171,8 +7219,8 @@ namespace WindowsFormsApp1
             //this is ran whenever we change the selection of a Level's main music or boss music Combo box
             //this does not run when we TYPE it in though, (until we hit Enter)
             //setModGrabLvlSelection also enables the button
-            ComboBox changedComboBox = sender as ComboBox; 
-            
+            ComboBox changedComboBox = sender as ComboBox;
+
 
             if (changedComboBox == null) // just to be on the safe side
                 return;
@@ -7262,13 +7310,13 @@ namespace WindowsFormsApp1
 
         private void enableOrganizerFields()
         {
-            
+
             //the bankPaths will be told to not activate if MLNameBox isn't enabled
             if (MLNameBox.Enabled) return; //if we have our boxes already enabled, cancel this operation
-            TextBox[] organizerTextBoxes = { MLNameBox, MLEventBox, MLLHBEBox, MLOffsetBox, MLBPMBox, BFNameBox, BFEventBox, BFLHBEBox, BFOffsetBox, BFBPMBox,  };
+            TextBox[] organizerTextBoxes = { MLNameBox, MLEventBox, MLLHBEBox, MLOffsetBox, MLBPMBox, BFNameBox, BFEventBox, BFLHBEBox, BFOffsetBox, BFBPMBox, };
 
             int selectedLevel = getSelectedLevel_OrganizerInjector(); //gives us our currently selected level
-            
+
             for (int i = 0; i < organizerTextBoxes.Length; i++)
             {
                 //if (selectedLevel == 7 && organizerTextBoxes[i].Name == "BFNameBox") return;
@@ -7306,6 +7354,8 @@ namespace WindowsFormsApp1
             enableOrganizerFields(); //enables the text boxes; does nothing if they're already enabled
 
             string songJsonInfo = Organizer_GetModJson();
+
+            if (songJsonInfo == "-1") { MessageBox.Show("No customsongs.json found in directory"); return; }
             //testFindJson.Text = songJsonInfo;
             string displayText = "";
 
@@ -7336,6 +7386,68 @@ namespace WindowsFormsApp1
 
         }
 
+        int[] debugOriginalLoc = { 550, 18 };
+        public int[] randomJitter(int originalX, int originalY)
+        {
+            //i hate RNG...
+
+            int XDir = 1;
+            int YDir = 1;
+            if (debugLabel.Left > debugOriginalLoc[0])
+            {
+                XDir = -1;
+            }
+            if (debugLabel.Top > debugOriginalLoc[1])
+            {
+                YDir = -1;
+            }
+
+
+            Random rnd = new Random();
+            int randomNumX = rnd.Next(3);
+            int randomDirectionX = XDir;
+            int randomNumY = rnd.Next(2);
+            int randomDirectionY = YDir;
+
+            int[] resultingNums = new int[2];
+            resultingNums[0] = randomNumX * randomDirectionX;
+            resultingNums[1] = randomNumY * randomDirectionY;
+
+            return resultingNums;
+
+        }
+
+        public void JitterBugMove()
+        {
+            int[] newLoc = randomJitter(debugOriginalLoc[0], debugOriginalLoc[1]);
+            debugLabel.Left = debugOriginalLoc[0]+newLoc[0];
+            debugLabel.Top = debugOriginalLoc[1]+newLoc[1];
+        }
+        int maxJitterbugs = 7;
+        int currentJitterbugs = 0; 
+        public void JitterBug(object sender, EventArgs e)
+        {
+            JitterBugMove();
+            currentJitterbugs++;
+            if(currentJitterbugs >= maxJitterbugs)
+            {
+                Timer jitterTimer = sender as Timer;
+                jitterTimer.Stop();
+                jitterTimer.Dispose();
+                currentJitterbugs = 0;
+            }
+        }
+
+        private Timer timer1;
+        public void AngryText()
+        {
+            timer1 = new Timer();
+            timer1.Tick += new EventHandler(JitterBug);
+            timer1.Interval = 50; // in miliseconds
+            timer1.Start();
+        }
+
+
         /*
          * 
          * this is a code to shake the program's window
@@ -7361,7 +7473,7 @@ namespace WindowsFormsApp1
         }
         */
 
-            //The rest of this is not the code above. This code below is garbage that I need to delete
+        //The rest of this is not the code above. This code below is garbage that I need to delete
         /*
         private static System.Timers.Timer sTimer;
         private static void ActivateAngryTextLoop()
@@ -7521,6 +7633,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(0);
             getSpecificLevelInfo(songJsonInfo, "Voke");
             resetSongOriginalInfo("");
@@ -7533,6 +7647,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return;
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(1);
             getSpecificLevelInfo(songJsonInfo, "Stygia");
             resetSongOriginalInfo("");
@@ -7545,6 +7661,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(2);
             getSpecificLevelInfo(songJsonInfo, "Yhelm");
             resetSongOriginalInfo("");
@@ -7554,6 +7672,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(3);
             getSpecificLevelInfo(songJsonInfo, "Incaustis");
             resetSongOriginalInfo("");
@@ -7563,6 +7683,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(4);
             getSpecificLevelInfo(songJsonInfo, "Gehenna");
             resetSongOriginalInfo("");
@@ -7572,6 +7694,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(5);
             getSpecificLevelInfo(songJsonInfo, "Nihil");
             resetSongOriginalInfo("");
@@ -7581,6 +7705,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(6);
             getSpecificLevelInfo(songJsonInfo, "Acheron");
             resetSongOriginalInfo("");
@@ -7590,6 +7716,8 @@ namespace WindowsFormsApp1
             if (!Organizer_checkAndAlertUnsavedChanges()) return; //this returns false if we don't want to cancelChanges
 
             string songJsonInfo = Organizer_GetModJson();
+            if (songJsonInfo == "-1") { MessageBox.Show("Game directory not found"); return; }
+            if (songJsonInfo == "-2") { MessageBox.Show("No customsongs.json found in game directory"); return; }
             SetSelectedLevelColors(7);
             getSpecificLevelInfo(songJsonInfo, "Sheol");
             resetSongOriginalInfo("");
@@ -7622,7 +7750,7 @@ namespace WindowsFormsApp1
             e.DrawFocusRectangle();
         }*/
 
-            private void label1_Click(object sender, EventArgs e)
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }
@@ -8029,6 +8157,7 @@ namespace WindowsFormsApp1
                 //if (debugLabel.Text == "No song selected!" && debugLabel.Visible) ShakeLabel(debugLabel);
                 debugLabel.Text = "No song selected!";
                 debugLabel.Visible = true;
+                AngryText();
             }
         }
 
@@ -8039,6 +8168,7 @@ namespace WindowsFormsApp1
                 //if (debugLabel.Text == "No song selected!" && debugLabel.Visible) ShakeLabel(debugLabel);
                 debugLabel.Text = "No song selected!";
                 debugLabel.Visible = true;
+                AngryText();
             }
         }
 
@@ -8161,18 +8291,33 @@ namespace WindowsFormsApp1
 
         }
 
-        private void loadOldInfoIntoSetList()
+        private void loadOldInfoIntoSetList(bool clearExisting = true)
         {
+            //This function uses setOldSongsArray's information to load the selections of our SetList, based on what was there before (based on what's in game's Json)
+            //clearExisting will be set to false if we loaded our game folder AFTER the program loaded
+            //the reason we want this: the user doesn't have to link the game folder to use the program. They can just let the program make a new JSON using
+            //the Mods, then copy and paste everything if they want
+            //If for some reason they decide to do link the game after they started making their set list, we don't want to wipe their decisions
             ComboBox[] mainCBox = { mainCombo1, mainCombo2, mainCombo3, mainCombo4, mainCombo5, mainCombo6, mainCombo7, mainCombo8 };
             ComboBox[] bossCBox = { bossCombo1, bossCombo2, bossCombo3, bossCombo4, bossCombo5, bossCombo6, bossCombo7 };
+            CheckBox[] mainCheckBoxes = { checkm1, checkm2, checkm3, checkm4, checkm5, checkm6, checkm7, checkm8 };
+            CheckBox[] bossCheckBoxes = { checkb1, checkb2, checkb3, checkb4, checkb5, checkb6, checkb7 };
 
-            for(int m=0; m<mainCBox.Length; m++)
+            for (int m=0; m<mainCBox.Length; m++)
             {
-                mainCBox[m].Text = currentSetListName_m[m];
+                if (!mainCheckBoxes[m].Checked || clearExisting)
+                {
+                    //if clearExisting is false, and the checkbox was checked, we don't fill it
+                    //if clearExisting is true, we don't give a fuck if it's checked
+                    mainCBox[m].Text = currentSetListName_m[m];
+                }
             }
             for (int b = 0; b < bossCBox.Length; b++)
             {
-                bossCBox[b].Text = currentSetListName_b[b];
+                if (!bossCheckBoxes[b].Checked || clearExisting)
+                {
+                    bossCBox[b].Text = currentSetListName_b[b];
+                }
             }
 
         }
@@ -8615,21 +8760,46 @@ namespace WindowsFormsApp1
 
         }
 
+        public string TesterBoxValue
+        {
+
+            get { return testFindJson.Text; }
+        }
+
         private void debugButtonDialogueBox()
         {
             using (DebugForm debugger = new DebugForm())
             {
+                debugger.MyParentForm = this;
                 if (debugger.ShowDialog() == DialogResult.OK)
                 {
-                    testFindJson.Text = debugger.TheValue;
+                    //testFindJson.Text = debugger.TheValue; I don't think we need this
                 }
             }
         }
 
         private void debugButtonClick(object sender, EventArgs e)
         {
-            //debugButtonDialogueBox();
-            debugTest1();
+            debugButtonDialogueBox();
+            //debugTest1();
+        }
+
+        private void SetGameDir(object sender, EventArgs e)
+        {
+            GetGameDir();
+        }
+        private void SetModDir(object sender, EventArgs e)
+        {
+            GetModsFolder();
+        }
+
+        private void OpenGameDir(object sender, EventArgs e)
+        {
+            OpenDir(gameDir.ToString());
+        }
+        private void OpenModDir(object sender, EventArgs e)
+        {
+            OpenDir(di.ToString());
         }
     }
     //making this ListItem class to harbor a Name and a hidden Value for listbox selections

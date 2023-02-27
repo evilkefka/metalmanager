@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.createjson = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.getmodsdir = new System.Windows.Forms.Button();
@@ -97,7 +98,6 @@
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.setListCatalog = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.button2 = new System.Windows.Forms.Button();
             this.bSaveLevelInfo = new System.Windows.Forms.Button();
             this.bPasteLevelInfo = new System.Windows.Forms.Button();
             this.bCopyLevelButton = new System.Windows.Forms.Button();
@@ -154,6 +154,7 @@
             this.L4Settings = new System.Windows.Forms.Button();
             this.L3Settings = new System.Windows.Forms.Button();
             this.L1Settings = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.testBuddy = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -176,6 +177,13 @@
             this.testFindJson = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.debugButton = new System.Windows.Forms.Button();
+            this.label23 = new System.Windows.Forms.Label();
+            this.ModDirLabel = new System.Windows.Forms.Label();
+            this.gameDirInfo = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -1383,7 +1391,6 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.button2);
             this.tabPage2.Controls.Add(this.bSaveLevelInfo);
             this.tabPage2.Controls.Add(this.bPasteLevelInfo);
             this.tabPage2.Controls.Add(this.bCopyLevelButton);
@@ -1402,16 +1409,6 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Organizer";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(818, 191);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 35);
-            this.button2.TabIndex = 32;
-            this.button2.Text = "Get Rid of Tabs";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.tabRemoval);
             // 
             // bSaveLevelInfo
             // 
@@ -2047,9 +2044,19 @@
             this.L1Settings.UseVisualStyleBackColor = true;
             this.L1Settings.Click += new System.EventHandler(this.L1Settings_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(958, 22);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 35);
+            this.button2.TabIndex = 32;
+            this.button2.Text = "Get Rid of Tabs";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.tabRemoval);
+            // 
             // testBuddy
             // 
-            this.testBuddy.Location = new System.Drawing.Point(734, 483);
+            this.testBuddy.Location = new System.Drawing.Point(870, 22);
             this.testBuddy.Name = "testBuddy";
             this.testBuddy.Size = new System.Drawing.Size(75, 35);
             this.testBuddy.TabIndex = 31;
@@ -2414,12 +2421,90 @@
             this.debugButton.UseVisualStyleBackColor = true;
             this.debugButton.Click += new System.EventHandler(this.debugButtonClick);
             // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(87, 503);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(76, 13);
+            this.label23.TabIndex = 33;
+            this.label23.Text = "Mod Directory:";
+            // 
+            // ModDirLabel
+            // 
+            this.ModDirLabel.AutoSize = true;
+            this.ModDirLabel.Location = new System.Drawing.Point(163, 503);
+            this.ModDirLabel.MaximumSize = new System.Drawing.Size(500, 0);
+            this.ModDirLabel.MinimumSize = new System.Drawing.Size(300, 0);
+            this.ModDirLabel.Name = "ModDirLabel";
+            this.ModDirLabel.Size = new System.Drawing.Size(300, 13);
+            this.ModDirLabel.TabIndex = 34;
+            this.ModDirLabel.Text = "No Mod Folder Set";
+            this.ModDirLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // gameDirInfo
+            // 
+            this.gameDirInfo.AutoSize = true;
+            this.gameDirInfo.Location = new System.Drawing.Point(87, 480);
+            this.gameDirInfo.Name = "gameDirInfo";
+            this.gameDirInfo.Size = new System.Drawing.Size(116, 13);
+            this.gameDirInfo.TabIndex = 35;
+            this.gameDirInfo.Text = "Game Directory Found!";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(63, 474);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(24, 23);
+            this.button3.TabIndex = 36;
+            this.button3.Text = "...";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.SetGameDir);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(63, 497);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(24, 23);
+            this.button4.TabIndex = 37;
+            this.button4.Text = "...";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.SetModDir);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(18, 474);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(44, 23);
+            this.button5.TabIndex = 38;
+            this.button5.Text = "Open";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.OpenGameDir);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(18, 497);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(44, 23);
+            this.button6.TabIndex = 39;
+            this.button6.Text = "Open";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.OpenModDir);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1320, 536);
+            this.Controls.Add(this.button6);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.gameDirInfo);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.ModDirLabel);
+            this.Controls.Add(this.label23);
             this.Controls.Add(this.debugButton);
             this.Controls.Add(this.testBuddy);
             this.Controls.Add(this.button1);
@@ -2429,8 +2514,9 @@
             this.Controls.Add(this.createjson);
             this.Controls.Add(this.panel2);
             this.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Metal Manager";
             this.Load += new System.EventHandler(this.FormLoad);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -2620,6 +2706,13 @@
         private System.Windows.Forms.Button testBuddy;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button debugButton;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label ModDirLabel;
+        private System.Windows.Forms.Label gameDirInfo;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
     }
 }
 
