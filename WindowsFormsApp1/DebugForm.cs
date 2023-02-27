@@ -324,7 +324,7 @@ namespace WindowsFormsApp1
                             if (fixedJsonLines[i-1].Contains("{"))
                             {
                                 //this line has "LevelName", and the line before it has "{"
-                                i--;
+                                i--;//we'll go back and start verifying again on the line before this
                                 currPlaceInExpctdEntry = 0;
                                 linesWithErrors.Add(i + 1 + ":BackOnTrack"); //this isn't an error, but we'll check for it, and if we have it, we're out of the fatal error
                             } else
@@ -333,12 +333,14 @@ namespace WindowsFormsApp1
                                 linesWithErrors.Add(i + 1 + ":BackOnTrack"); //this isn't an error, but we'll check for it, and if we have it, we're out of the fatal error
                                 currPlaceInExpctdEntry = 1;
                             }
+                        } else if (line_nospaces.Contains("]")){
+                            currPlaceInExpctdEntry = expectedFields.Length; //when we reset this, it will recheck this line and activate what we do if we see the closing ] bracket
+                            linesWithErrors.Add(i + 1 + ":BackOnTrack");
                         }
                         fatalErrorEncountered = false;
                         continue;
                     } else
                     {
-                        MessageBox.Show("2");
                         i++;
                         continue;
                     }
@@ -381,7 +383,6 @@ namespace WindowsFormsApp1
                                 linesWithErrors.Add("forgotFirstLine");
                             }
                         }
-                        MessageBox.Show("3");
                         i++; continue;
                     } else
                     {
@@ -416,7 +417,6 @@ namespace WindowsFormsApp1
 
                                 
                         }
-                        MessageBox.Show("4");
                         i++; continue;
                     }
 
@@ -554,7 +554,6 @@ namespace WindowsFormsApp1
                     {
                         fatalErrorEncountered = true;
                         linesWithErrors.Add(i + 1 + ":" + lineErrors);
-                        MessageBox.Show("1");
                         i++;
                         continue;
                     }
@@ -980,7 +979,7 @@ namespace WindowsFormsApp1
                     if (checkEvent.Length != valueNS.Length - 2)
                     {
                         //the two quotes we found weren't surrounding
-                        lineFormatErrors.Add(":evF1");
+                        lineFormatErrors.Add("evF1");
                         return lineFormatErrors.ToArray();
 
                     }
@@ -989,7 +988,7 @@ namespace WindowsFormsApp1
                     if (checkEvent.Length != valueNS.Length - 4 || checkEvent.Length != 36)
                     {
                         //Event string does NOT have { and }, OR it does not have the full 36-digit ID
-                        lineFormatErrors.Add(":evF2");
+                        lineFormatErrors.Add("evF2");
                         return lineFormatErrors.ToArray();
                     }
                 } else if(indexOfLabel == 8)
@@ -1215,12 +1214,18 @@ namespace WindowsFormsApp1
                     {
                         //we had errors here before, but we still have errors; update the new errors
                         jsonAnomalyList.Items[i].SubItems[1].Text = newErrors;
-                        
+
                     }
 
                     return;
                 }
 
+            }
+
+            //if we got this far, it's possible we're trying to add something not in the list, but it still might be blank
+            if (newErrors == "" || newErrors == null)
+            {
+                return;
             }
 
             //if we got this far, we did not add adjust anything yet; we have a new error we need to add
@@ -1273,7 +1278,7 @@ namespace WindowsFormsApp1
             {
                 if (firstTwoLines[0].Contains(identifiableFields[i]))
                 {
-                    MessageBox.Show(firstTwoLines[0] + " h1as " + identifiableFields[i] + ", ID is " + corrPlaceOfIdableFields[i]);
+                    
                     return corrPlaceOfIdableFields[i];
                 }
             }
@@ -1284,7 +1289,7 @@ namespace WindowsFormsApp1
             {
                 if (firstTwoLines[1].Contains(identifiableFields[i]))
                 {
-                    MessageBox.Show(firstTwoLines[1] + " 2has " + identifiableFields[i] + ", ID is " + corrPlaceOfIdableFields[i]);
+                    
                     return corrPlaceOfIdableFields[i]-1;
                 }
             }
@@ -1464,7 +1469,7 @@ namespace WindowsFormsApp1
 
                 //if we got this far, we're completely lost regarding what's going on in the JSON
                 //fatal error: debuggie's off course
-                MessageBox.Show("CurLine: " + curLineStr + "\n NextLine: " + nextLineStr + "\n seqPlaceMissing: " + seqPlaceMissing);
+                //MessageBox.Show("CurLine: " + curLineStr + "\n NextLine: " + nextLineStr + "\n seqPlaceMissing: " + seqPlaceMissing);
                 return "fatality";
             }
 
@@ -1505,11 +1510,11 @@ namespace WindowsFormsApp1
             string nextLine = "";
             if (lineNum - 1 > 0)
             {
-                prevLine = JsonLinesBind[lineNum - 1].ToString(); //making sure this won't crash if we're on the first line
+                prevLine = JsonLinesBind[lineNum - 1].ListItem.ToString(); //making sure this won't crash if we're on the first line
             }
             if(lineNum + 1 < JsonLinesBind.Count)
             {
-                nextLine = JsonLinesBind[lineNum + 1].ToString(); //making sure this won't crash if we're on the last line
+                nextLine = JsonLinesBind[lineNum + 1].ListItem.ToString(); //making sure this won't crash if we're on the last line
             }
 
             string[] newLineSplit = newLine.Split(':');
@@ -1530,8 +1535,9 @@ namespace WindowsFormsApp1
                     }
                 } else if (newLine.Contains("}"))
                 {
+                    
                     string prevLineNS = NormalizeWhiteSpace(prevLine, true);
-                    if (prevLine.Contains("\"BPM\":") || prevLine.Contains("\"bankPath\":"))
+                    if (prevLineNS.Contains("\"BPM\":") || prevLineNS.Contains("\"bankPath\":"))
                     {
                         //previous line had BPM or bankPath, found position
                         placementInField = 9;
