@@ -12,7 +12,7 @@ using System.Text.RegularExpressions; //Regex is regular expressions!??!!! WHAT 
 
 namespace WindowsFormsApp1
 {
-    
+
     public partial class DebugForm : Form
     {
         public DebugForm()
@@ -98,7 +98,7 @@ namespace WindowsFormsApp1
                     {
                         setProperFatalityRange(Int32.Parse(errorInfo[0]), errorList);
                     }
-                }else 
+                } else
                 if (error.Contains("forgot"))
                 {
                     if (Int32.TryParse(errorInfo[0], out int yo))
@@ -107,10 +107,10 @@ namespace WindowsFormsApp1
                         lineInt += addedLines;
 
                         JsonLinesBind.Insert(lineInt, new JsonLineList(""));
-                        setJsonEditorLineBG(lineInt+1, true); //we want 1-based linenum
+                        setJsonEditorLineBG(lineInt + 1, true); //we want 1-based linenum
                         addedLines++;
                     }
-                }else
+                } else
                 if (errorInfo.Length == 2)
                 {
                     string lineNumStr = errorInfo[0];
@@ -121,7 +121,7 @@ namespace WindowsFormsApp1
                         lineNum += addedLines;
                         lineNum -= 1; //why do I need to do this
                         //dgJsonEditor.Rows[lineNum].DefaultCellStyle.BackColor = JsonEditorErrC1;
-                        setJsonEditorLineBG(lineNum+1, true); //we want 1-based linenum
+                        setJsonEditorLineBG(lineNum + 1, true); //we want 1-based linenum
                         //dgJsonEditor.Rows[lineNum].DefaultCellStyle.Font = new Font(dgJsonEditor.Rows[lineNum].DefaultCellStyle.Font, FontStyle.Bold); Well this doesn't work
                         dgJsonEditor.Rows[lineNum].DefaultCellStyle.ForeColor = Color.Black;
                     }
@@ -135,12 +135,12 @@ namespace WindowsFormsApp1
             //this function looks for the highest range that's less than errorList
             //lineNumBoT: line number where we're back on track
 
-            int rangeEnd = lineNumBoT-1;
+            int rangeEnd = lineNumBoT - 1;
             if (rangeEnd == -1) return;
             int closestWeCanGet = -1;
             //we'll look through our errorList for the closest, highest numer before the line num where we're back on track
             //while we're here, we'll get rid of the "BackOnTrack" entry that's in the JSON Anomaly list
-            for(int i =0; i<errorList.Length; i++)
+            for (int i = 0; i < errorList.Length; i++)
             {
                 if (errorList[i].Contains(':'))
                 {
@@ -156,8 +156,8 @@ namespace WindowsFormsApp1
                             break;
                         }
 
-                        
-                        if(currentErrorLnNum > closestWeCanGet)
+
+                        if (currentErrorLnNum > closestWeCanGet)
                         {
                             closestWeCanGet = currentErrorLnNum;
                         }
@@ -166,7 +166,7 @@ namespace WindowsFormsApp1
             }
 
             if (closestWeCanGet == -1) return;
-            
+
 
             //if we're here, we have a number
 
@@ -174,9 +174,9 @@ namespace WindowsFormsApp1
             int endingLine = rangeEnd;
             //we're going to add "-##" at the end of our LineNum for Fatality, so it looks like ie: 3-11
             //while we're here, we'll get rid of the BackOnTrack entry in error list
-            for (int i=0; i<jsonAnomalyList.Items.Count; i++)
+            for (int i = 0; i < jsonAnomalyList.Items.Count; i++)
             {
-                if(jsonAnomalyList.Items[i].SubItems[0].Text == closestWeCanGet.ToString() &&
+                if (jsonAnomalyList.Items[i].SubItems[0].Text == closestWeCanGet.ToString() &&
                     jsonAnomalyList.Items[i].SubItems[1].Text.Contains("fatal"))
                 {
                     //we found it!
@@ -187,7 +187,12 @@ namespace WindowsFormsApp1
                     startingLine = Int32.Parse(oldNum);
                     endingLine = rangeEnd;
 
-                    jsonAnomalyList.Items[i].SubItems[0].Text += "-" + rangeEnd;
+                    jsonAnomalyList.Items[i].SubItems[0].Text += "–" + rangeEnd;
+                    if (jsonAnomalyList.Items[i + 1].SubItems[1].Text.Contains("BackOnTrack"))
+                    {
+                        //make sure the line in front of us is the BackOnTrack line, then delete it. if it isn't, then.. it's still going to be there
+                        jsonAnomalyList.Items[i + 1].Remove();
+                    }
                     //if(jsonAnomalyList.Items[i].SubItems[0].Contains())
                 }
             }
@@ -195,13 +200,13 @@ namespace WindowsFormsApp1
             if (startingLine == -1) return; if (endingLine == -1) return; //pretty sure we don't need these
 
             //if we're this far, we should be good to reset the backgrounds of everything with a fatal error
-            for (int i=startingLine;i<=endingLine; i++)
-            { 
+            for (int i = startingLine; i <= endingLine; i++)
+            {
                 setJsonEditorLineBG(i, true); //sets our background of each affected entry in DataGrid to red
             }
 
         }
-        
+
 
 
         /* We use DataGridView instead now
@@ -238,7 +243,7 @@ namespace WindowsFormsApp1
                 string errorCode = "";
                 string[] errorInfo = error.Split(':');
 
-                if(errorInfo.Length == 1)
+                if (errorInfo.Length == 1)
                 {
                     lineNum = "...";
                     errorCode = error;
@@ -264,7 +269,7 @@ namespace WindowsFormsApp1
                 jsonAnomalyList.Items.Add(newItem);
 
                 //we only want to add to the line # AFTER we've already added a line
-                
+
                 if (errorCode.Contains("forgot"))
                 {
                     addedLines++;
@@ -283,6 +288,128 @@ namespace WindowsFormsApp1
 
         string[] levelNames = { "voke", "stygia", "yhelm", "incaustis", "gehenna", "nihil", "acheron", "sheol" };
 
+        private void debuggyRange(int oneBasedFirstLine, int oneBasedLastLine, int jsonAnomalyEntryIndex)
+        {
+            //unlike debuggy(), this analyzes the lines in the JSON editor(really its source); debuggy() analyzes the original JSON
+
+            //we don't care if they changed anything except the first (we could do last, but then we'd have to rewrite code)
+            int rangeLength = oneBasedLastLine - oneBasedFirstLine + 1; //+1 because we need to include the first line
+
+            string lineBeforeRange = JsonLinesBind[oneBasedFirstLine - 2].ListItem.ToString(); //we'll use this to get our placement
+            int placement = getPlacementInSequence(lineBeforeRange, oneBasedFirstLine - 2);//this line num wants a zero-based index;
+            if (placement == -1) return;
+            else placement++; //as long as we found a placement, add one to it as we go into the next line
+            //if placement -1, that means the next line is actually a valid line, too (or at least has a label)
+            if (placement > expectedFields.Length - 1) placement = 0;
+
+            MessageBox.Show("LineBeforeRange: " + lineBeforeRange + "\nPlacementForIt: " + placement);
+
+            int fixedLines = 0; //we'll use this to know what to subtract from our range if we fixed anything (er really, what to add to the Start #)
+            int i = 0;
+            while (i < rangeLength)
+            {
+                int bindIndex = oneBasedFirstLine - 1 + i; //bind index is zero based
+                string currentLn = JsonLinesBind[bindIndex].ListItem.ToString();
+                if (i + 1 > JsonLinesBind.Count - 1) return; if (JsonLinesBind[bindIndex + 1] == null) return;//make sure next line isn't blank
+                string nextLn = JsonLinesBind[bindIndex + 1].ListItem.ToString();
+                if (nextLn == "" || nextLn == null) return;
+                string lineErrors = getLineErrors(currentLn, nextLn, placement);
+                //MessageBox.Show("Get Line Errors for: \n" + currentLn + "\n" + nextLn + "\n" + placement + "\nErrors: \n" + lineErrors + "\n(Length: \n" + lineErrors.Length);
+                //need to know what to do if we encounter a duplicate, forgotten line, etc.
+                
+                //Alright, if our line contains dupe, forgot, labelinvalid, or fatality, it means we threw an error for a line that doesn't have a valid label
+                //we need a valid label to know where we are in the loop (forgot could be an incorrect call if we're missing a few lines and trying to fix them)
+                //as long as we don't have those label-reading errors, we were able to detect what we wanted in the next line, so we add to "FixedLines"
+                //if we actually encounter another error, we need to add in the new error, while keeping the background red
+
+
+                if (lineErrors.Contains("dupe") || lineErrors.Contains("fatality") || lineErrors.Contains("forgot") || lineErrors.Contains("labelinvalid"))
+                {
+                    goto SetNewRange;
+                    //our line isn't fixed
+                    //this breaks out of the for loop too
+                } else
+                {
+                    fixedLines++;
+                }
+
+                if (lineErrors == null || lineErrors == "")
+                {
+                    //if the returned no errors, take away these
+                    setJsonEditorLineBG(bindIndex + 1);
+                } else
+                {
+                    //we encountered an error, but it wasn't a fatal error/label-reading error
+                    jsonAnomalyList.Items.Add(lineErrors);
+                }
+
+                placement++;
+                i++;
+
+                //the following fixes our placement for the next loop
+                //at this point, our placement is what will be there during next loop. nextLn will be our currentLn in said loop
+                if (placement == 8 && !nextLn.Contains("\"bankPath\"") && nextLn.Contains("}")) placement = 9;
+                if(placement== 10 && nextLn.Contains("{") && !nextLn.Contains("}"))
+                {
+                    placement = 2;
+                }
+
+            }
+
+            SetNewRange:
+            if(rangeLength <= fixedLines)
+            {
+                //we fixed all of the lines in our range!
+                //remove it from the JSON anomaly list
+                jsonAnomalyList.Items[jsonAnomalyEntryIndex].Remove();
+            } else
+            {
+                //rangeLength is more than the number of lines we fixed, we didn't fix all of them
+                //update its numbers
+                int newRangeStart = oneBasedFirstLine + fixedLines;
+                string newRange = newRangeStart + "–" + oneBasedLastLine;
+                jsonAnomalyList.Items[jsonAnomalyEntryIndex].SubItems[0].Text = newRange;
+            }
+
+           
+            //JsonLinesBind.Skip(oneBasedFirstLine - 1).Take(rangeLength); //OH CRAP this works!!
+
+
+            /*
+
+            if (lineErrors.Contains("fatal"))
+            {
+                fatalErrorEncountered = true;
+                linesWithErrors.Add(i + 1 + ":" + lineErrors);
+                i++;
+                continue;
+            }
+
+            if (lineErrors.Contains("dupe"))
+            {
+                currPlaceInExpctdEntry--;
+                //if we can see there was a duplicate entry in our line, we need to set our currPlaceInExpectedEntry back;
+                //we'll be back on track after the rest of the for loop runs
+            }
+
+            if (lineErrors.Contains("forgot"))
+            {
+                currPlaceInExpctdEntry++;
+            }
+
+            if (lineErrors.Length > 0)
+            {
+                linesWithErrors.Add(i + 1 + ":" + lineErrors); //i+1 because we don't start on line 0
+
+            }
+
+            currPlaceInExpctdEntry++;
+            */
+
+        }
+
+
+
         private string[] debuggy(string fullJson)
         {
             string fixedJson = fullJson;
@@ -291,9 +418,9 @@ namespace WindowsFormsApp1
 
             string[] fixedJsonLinesWithEmpties = fixedJson.Split('\n'); //we're going to keep our empty lines, to be sure what line we're on
 
-            
+
             string[] fixedJsonLines = fixedJson.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            if(fixedJsonLines.Length < 10) { string[] tooshort = { "2short" }; return tooshort; }
+            if (fixedJsonLines.Length < 10) { string[] tooshort = { "2short" }; return tooshort; }
 
             int currPlaceInExpctdEntry = 0; //current place in expected entry
             int i = 0;
@@ -307,7 +434,7 @@ namespace WindowsFormsApp1
                 if (line_nospaces == null || line_nospaces == "")
                 {
 
-                    linesWithErrors.Add(i+1 + ":empty");
+                    linesWithErrors.Add(i + 1 + ":empty");
                     i++;
                     if (i >= 2) currPlaceInExpctdEntry++;
                     continue;
@@ -317,11 +444,11 @@ namespace WindowsFormsApp1
                 #region FatalErrorHandler
                 if (fatalErrorEncountered)
                 {
-                    if(line_nospaces.Contains("LevelName") || line_nospaces.Contains("]"))
+                    if (line_nospaces.Contains("LevelName") || line_nospaces.Contains("]"))
                     {
                         if (line_nospaces.Contains("LevelName"))
                         {
-                            if (fixedJsonLines[i-1].Contains("{"))
+                            if (fixedJsonLines[i - 1].Contains("{"))
                             {
                                 //this line has "LevelName", and the line before it has "{"
                                 i--;//we'll go back and start verifying again on the line before this
@@ -333,7 +460,7 @@ namespace WindowsFormsApp1
                                 linesWithErrors.Add(i + 1 + ":BackOnTrack"); //this isn't an error, but we'll check for it, and if we have it, we're out of the fatal error
                                 currPlaceInExpctdEntry = 1;
                             }
-                        } else if (line_nospaces.Contains("]")){
+                        } else if (line_nospaces.Contains("]")) {
                             currPlaceInExpctdEntry = expectedFields.Length; //when we reset this, it will recheck this line and activate what we do if we see the closing ] bracket
                             linesWithErrors.Add(i + 1 + ":BackOnTrack");
                         }
@@ -344,17 +471,17 @@ namespace WindowsFormsApp1
                         i++;
                         continue;
                     }
-                    
+
                 }
                 #endregion FatalErrorHandler
 
 
                 string finalChar = line_nospaces.Substring(line_nospaces.Length - 1, 1); //we only care about the last item on the line
 
-                if(i < 2)
+                if (i < 2)
                 {
                     //if we're here, we're checking either the first or 2nd line
-                    if(i == 0)
+                    if (i == 0)
                     {
                         //first line, we only want {
                         if (line_nospaces.Contains("{"))
@@ -374,12 +501,12 @@ namespace WindowsFormsApp1
                                 //our { is on the next line
 
                                 linesWithErrors.Add("garbageLine");
-                                 
-                                
+
+
                             } else if (fixedJsonLines[1].Contains("\"customLevelMusic\""))
                             {
                                 //we can't find {, but customLevelMusic is on next line
-                                
+
                                 linesWithErrors.Add("forgotFirstLine");
                             }
                         }
@@ -390,7 +517,7 @@ namespace WindowsFormsApp1
                         //second line, we want "customLevelMusic" : [
                         string firstLineNoSpaces = NormalizeWhiteSpace(fixedJsonLines[0], true);
 
-                        if(line_nospaces != "\"customLevelMusic\":[")
+                        if (line_nospaces != "\"customLevelMusic\":[")
                         {
                             string[] secondLineError = { "wtf?" };
                             if (fixedJsonLines.Length < 3) return secondLineError;
@@ -398,7 +525,7 @@ namespace WindowsFormsApp1
                             if (fixedJsonLines[2].Contains("{"))
                             {
                                 //our next line contains the next sequence, we forgot the CLM opener
-                                secondLineError[0] =  "forgotCLM";
+                                secondLineError[0] = "forgotCLM";
                                 return secondLineError;
                             } else if (line_nospaces.Contains("{") && fixedJsonLines[2].Contains("\"customLevelMusic\":["))
                             {
@@ -415,25 +542,25 @@ namespace WindowsFormsApp1
                                 linesWithErrors.Add("clm"); //customLevelMusic opening line incorrect format
                             }
 
-                                
+
                         }
                         i++; continue;
                     }
 
                 } else if (i >= 2)
                 {
-                    if(i == 2)
+                    if (i == 2)
                     {
                         //we're on our first line out of the openers, we should verify our placement
-                        
+
                         if (!line_unaltered.Contains(expectedFields[currPlaceInExpctdEntry]))
                         {
                             //the first line did not have a {
                             string[] firstTwoLines = { fixedJsonLines[i], fixedJsonLines[i + 1] };
                             int backOnTrack = verifyWTFsGoingOnFirstLine(firstTwoLines);
-                            if(backOnTrack == -1)
+                            if (backOnTrack == -1)
                             {
-                                string[] fatalError = { (i+1) + ":fatality" };
+                                string[] fatalError = { (i + 1) + ":fatality" };
                                 fatalErrorEncountered = true;
                                 return fatalError;
                             } else
@@ -569,11 +696,11 @@ namespace WindowsFormsApp1
                     {
                         currPlaceInExpctdEntry++;
                     }
-                    
+
                     if (lineErrors.Length > 0)
                     {
                         linesWithErrors.Add(i + 1 + ":" + lineErrors); //i+1 because we don't start on line 0
-                        
+
                     }
 
                     currPlaceInExpctdEntry++;
@@ -647,37 +774,37 @@ namespace WindowsFormsApp1
                     }
 
 
-                    
+
                 }
 
-                    //errorsOnLine.Add("labelmissing");
-                    string whatsGoingOn = verifySequenceForMissingEntry(lineNS, nextLineNS, indexOfLabelWeWant);
-                    if(whatsGoingOn == "garbageLine")
-                    {
-                        return "bunkLine";
-                    } else if(whatsGoingOn == "dupe")
-                    {
-                        int prevIndx = indexOfLabelWeWant - 1; if (prevIndx < 0) prevIndx = expectedFields.Length-1;
-                        return "dupe_" + expectedFields[prevIndx];
-                    }
-                    else if(whatsGoingOn == "labelinvalid")
-                    {
-                        return "labelInvalid_"+expectedFields[indexOfLabelWeWant];
-                    }
-                    else if (whatsGoingOn == "forgotitem")
-                    {
-                        //when running through the function to translate these error codes, we need to add a line here
-                        //(and add numbers to our other error Line nums)
-                        return "forgot_" + expectedFields[indexOfLabelWeWant];
-                    } else if(whatsGoingOn == "fatality")
-                    {
-                        //   x_x
+                //errorsOnLine.Add("labelmissing");
+                string whatsGoingOn = verifySequenceForMissingEntry(lineNS, nextLineNS, indexOfLabelWeWant);
+                if (whatsGoingOn == "garbageLine")
+                {
+                    return "bunkLine";
+                } else if (whatsGoingOn == "dupe")
+                {
+                    int prevIndx = indexOfLabelWeWant - 1; if (prevIndx < 0) prevIndx = expectedFields.Length - 1;
+                    return "dupe_" + expectedFields[prevIndx];
+                }
+                else if (whatsGoingOn == "labelinvalid")
+                {
+                    return "labelInvalid_" + expectedFields[indexOfLabelWeWant];
+                }
+                else if (whatsGoingOn == "forgotitem")
+                {
+                    //when running through the function to translate these error codes, we need to add a line here
+                    //(and add numbers to our other error Line nums)
+                    return "forgot_" + expectedFields[indexOfLabelWeWant];
+                } else if (whatsGoingOn == "fatality")
+                {
+                    //   x_x
 
-                        return "fatality";
-                    }
+                    return "fatality";
+                }
 
 
-               // }
+                // }
             }
 
 
@@ -871,9 +998,9 @@ namespace WindowsFormsApp1
             List<string> lineFormatErrors = new List<string>();
 
 
-            if (splitInfo.Length == 3) { 
+            if (splitInfo.Length == 3) {
                 //we want 3 in splitInfo if we're on indexOfLabel 7, meaning we're looking for a bankpath
-                if(indexOfLabel == 8)
+                if (indexOfLabel == 8)
                 {
                     valueStr = splitInfo[1] + ":" + splitInfo[2];
                 } else
@@ -891,7 +1018,7 @@ namespace WindowsFormsApp1
                 }
             }
 
-            
+
             valueStr.TrimEnd();//get rid of all whitespace on the right of value/value's comma
             if (valueStr.Substring(valueStr.Length - 1, 1) == ",")
             {
@@ -936,7 +1063,7 @@ namespace WindowsFormsApp1
             }
             else if (numberOfQuotesInValue < 2)
             {
-                lineFormatErrors.Add("neqVal->"+valueNS);
+                lineFormatErrors.Add("neqVal->" + valueNS);
             }
             else
             {
@@ -949,7 +1076,7 @@ namespace WindowsFormsApp1
                     {
                         string valueNSShaven = shaveSurroundingQuotesAndSpaces(valueNS); //should we put 'false' for spaces..?
                         string capitalizeLevelName = allLevelNames[j].Substring(0, 1).ToUpper() + allLevelNames[j].Substring(1);
-                        
+
                         if (valueNSShaven == capitalizeLevelName)
                         {
                             //we found the level, formatted correctly, we're fine
@@ -991,7 +1118,7 @@ namespace WindowsFormsApp1
                         lineFormatErrors.Add("evF2");
                         return lineFormatErrors.ToArray();
                     }
-                } else if(indexOfLabel == 8)
+                } else if (indexOfLabel == 8)
                 {
                     //we're looking at a bankPath
                     string[] bankFormatErrors = getBankPathFormatErrors(valueNS);
@@ -1049,7 +1176,7 @@ namespace WindowsFormsApp1
             {
                 //we have / in our bankpath, when we only want \'s
                 bpFormErrors.Add("bpws"); //bank path wrong slash
-                                                      //we'll also replace them so we can continue with the code if that's the only issue
+                                          //we'll also replace them so we can continue with the code if that's the only issue
                 bpVal.Replace('/', '\\');
             }
 
@@ -1059,7 +1186,7 @@ namespace WindowsFormsApp1
 
             //we're going to take value for bankPath and analyze the formating, and verify a file exists
             int indexOfBankPathInfo = nextLine_chkIntegrity.IndexOf(":\\");
-            if(indexOfBankPathInfo == 0) { bpFormErrors.Add("nobpfile"); return bpFormErrors.ToArray(); } //if our line looks like bankPath: ":\\Dir\\Dir2\\ and they forgot the drive letter
+            if (indexOfBankPathInfo == 0) { bpFormErrors.Add("nobpfile"); return bpFormErrors.ToArray(); } //if our line looks like bankPath: ":\\Dir\\Dir2\\ and they forgot the drive letter
             indexOfBankPathInfo -= 1; //this should be the index of C:\, B:\ X:\ Etc
             if (indexOfBankPathInfo < 0)
             {
@@ -1086,6 +1213,7 @@ namespace WindowsFormsApp1
             return bpFormErrors.ToArray();
         }
 
+        //spaces before "customLevelMusic", and its closing ], is 4
 
         string[] expectedEndings = { "{", ",", "{", ",", ",", ",", ",", ",or ", "bnkp", "}or,", "}or," };
         //                            L   LN   MM   Ba   Ev   LH   Ofs   BPM*  BnkPth   MMcBMc  Lc
@@ -1177,7 +1305,7 @@ namespace WindowsFormsApp1
                 Alignment = StringAlignment.Center,
                 LineAlignment = StringAlignment.Center
             };
-            
+
             var headerBounds = new Rectangle(e.RowBounds.Left, e.RowBounds.Top, grid.RowHeadersWidth, e.RowBounds.Height);
             e.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.GrayText, headerBounds, centerFormat);
         }
@@ -1194,6 +1322,46 @@ namespace WindowsFormsApp1
             setDGEditorLinesBGColrs(errors);//sets the bg color of each line to red if it has an error
         }
 
+        private void CheckToRemoveFatalError(string rangeString, int oneBsdLineNum, int indexOfRangeOnAnomalyList)
+        {
+            //if there's a series of fatal errors in our list, we'll check if our line falls within its range
+            //rangeString will look like -> 12-19
+            //if this is true, it will trigger us to check the entire fatality block for fixes
+
+            //first check if we're within the range
+
+            if (!rangeString.Contains("–")) return; //this is not a dash, it's Alt+0150
+            string[] rangeNums = rangeString.Split('–'); //split our string to get the two numbers
+            if (rangeNums.Length != 2) return;
+            string rngStart = rangeNums[0]; //get string of start
+            string rngEnd = rangeNums[1]; //and of end
+            int intRngStart = -1; //declare ints
+            int intRngEnd = -1;
+
+            if (Int32.TryParse(rngStart, out int tra))
+            {
+                intRngStart = Int32.Parse(rngStart); //make sure it's a number, then set our Starting Point
+            }
+            if (Int32.TryParse(rngEnd, out int lala))
+            {
+                intRngEnd = Int32.Parse(rngEnd); //set our End
+            }
+            if (intRngStart == -1 || intRngEnd == -1) return; //we didn't have a number in one of the options
+
+            //if we got this far, we have the information for our range
+
+            if (oneBsdLineNum < intRngStart && oneBsdLineNum > intRngEnd) return; //we're not within the range
+            //if we got this far, the line we changed is within our range; RangeStart <= OneBasedLineNumber <= RangeEnd
+            //we have the green light to check the range if it's been fixed
+
+            debuggyRange(intRngStart, intRngEnd, indexOfRangeOnAnomalyList); //indexOfRangeOnAnomalyList is used if we need to update/remove the range
+
+
+
+
+
+        }
+
         private void adjustErrorsList(string newErrors, int changedLineNum)
         {
             //changedLineNum is one-based
@@ -1201,7 +1369,7 @@ namespace WindowsFormsApp1
 
             for (int i = 0; i < errorListEntries.Count; i++)
             {
-                if(errorListEntries[i].SubItems[0].Text.ToString() == changedLineNum.ToString())
+                if (errorListEntries[i].SubItems[0].Text.ToString() == changedLineNum.ToString())
                 {
                     //we already had an entry for this line, which we found! Update it!
                     if (newErrors == "" || newErrors == null)
@@ -1218,6 +1386,11 @@ namespace WindowsFormsApp1
                     }
 
                     return;
+                } else if (errorListEntries[i].SubItems[0].Text.ToString().Contains("–"))
+                {
+                    //– is not a -, it's Alt+0150
+                    CheckToRemoveFatalError(errorListEntries[i].SubItems[0].Text.ToString(), changedLineNum, i);
+                    //we're taking i to be able up update the range in the JsonAnomalyList if need be
                 }
 
             }
@@ -1241,7 +1414,7 @@ namespace WindowsFormsApp1
             {
                 if (LineNumOneBased % 2 == 1)
                 {
-                    dgJsonEditor.Rows[LineNumOneBased-1].DefaultCellStyle.BackColor = JsonEditorColor1;
+                    dgJsonEditor.Rows[LineNumOneBased - 1].DefaultCellStyle.BackColor = JsonEditorColor1;
                     dgJsonEditor.Rows[LineNumOneBased - 1].HeaderCell.Style.BackColor = JsonEditorColor1;
                 }
                 else
@@ -1261,8 +1434,8 @@ namespace WindowsFormsApp1
                     dgJsonEditor.Rows[LineNumOneBased - 1].DefaultCellStyle.BackColor = JsonEditorErrC2;
                     //dgJsonEditor.Rows[LineNumOneBased - 1].HeaderCell.Style.BackColor = JsonEditorColor2;
                 }
-                
-                
+
+
                 //dgJsonEditor.Rows[LineNumOneBased - 1].HeaderCell.Style.BackColor = JsonEditorErrC1;
             }
 
@@ -1272,13 +1445,13 @@ namespace WindowsFormsApp1
         {
             //this function returns what placement in the sequence we're on
             //first10Lines[2] was supposed to have {, then LevelName in it
-            
+
 
             for (int i = 0; i < identifiableFields.Length; i++)
             {
                 if (firstTwoLines[0].Contains(identifiableFields[i]))
                 {
-                    
+
                     return corrPlaceOfIdableFields[i];
                 }
             }
@@ -1289,8 +1462,8 @@ namespace WindowsFormsApp1
             {
                 if (firstTwoLines[1].Contains(identifiableFields[i]))
                 {
-                    
-                    return corrPlaceOfIdableFields[i]-1;
+
+                    return corrPlaceOfIdableFields[i] - 1;
                 }
             }
 
@@ -1304,11 +1477,11 @@ namespace WindowsFormsApp1
         {
             //this function is called if we had a missing label in our line, AND the line was not empty
             //we need to check what's going on with the sequence of our expected fields
-            
 
-            
+
+
             int nextSequenceWeWant = seqPlaceMissing + 1;
-            if (nextSequenceWeWant >= expectedFields.Length) 
+            if (nextSequenceWeWant >= expectedFields.Length)
             {
                 nextSequenceWeWant = 0;
             }
@@ -1316,14 +1489,14 @@ namespace WindowsFormsApp1
             int prevSequenceWeWant = seqPlaceMissing - 1;
             if (prevSequenceWeWant < 0)
             {
-                prevSequenceWeWant = expectedFields.Length-1;
+                prevSequenceWeWant = expectedFields.Length - 1;
             }
 
             string expFld = expectedFields[seqPlaceMissing];
             string prevExpFld = expectedFields[prevSequenceWeWant];
             string nextExpFld = expectedFields[nextSequenceWeWant];
 
-            if(seqPlaceMissing == 10)
+            if (seqPlaceMissing == 10)
             {
                 //our level-closing } is missing
                 //we can't go back to prevExpFld to look for a duplicate
@@ -1445,7 +1618,7 @@ namespace WindowsFormsApp1
 
                 //I REALLY hope I did these right
                 if (prevExpFld.Contains("|") && (
-                    curLineStr.Contains("\"MainMusic\"") || curLineStr.Contains("\"BossMusic\"") ))
+                    curLineStr.Contains("\"MainMusic\"") || curLineStr.Contains("\"BossMusic\"")))
                 {
                     return "dupe";
                 }
@@ -1464,7 +1637,7 @@ namespace WindowsFormsApp1
                 {
                     return "labelinvalid";
                 }
-                
+
 
 
                 //if we got this far, we're completely lost regarding what's going on in the JSON
@@ -1473,10 +1646,106 @@ namespace WindowsFormsApp1
                 return "fatality";
             }
 
-            
+
 
 
         }
+
+        private int getPlacementInSequence(string newLine, int lineNum)
+        {
+            //this is CheckEditorLine, but just returns our sequence
+            int placementInField = -1;
+
+            string lineLabel = "";
+            string lineValue = "";
+
+            string prevLine = "";
+            string nextLine = "";
+            if (lineNum - 1 > 0)
+            {
+                prevLine = JsonLinesBind[lineNum - 1].ListItem.ToString(); //making sure this won't crash if we're on the first line
+            }
+            if (lineNum + 1 < JsonLinesBind.Count)
+            {
+                nextLine = JsonLinesBind[lineNum + 1].ListItem.ToString(); //making sure this won't crash if we're on the last line
+            }
+
+            string[] newLineSplit = newLine.Split(':');
+            if (newLineSplit.Length == 1)
+            {
+                //there's no colon in our line, possibly supposed to be { or }
+                //if it's {, there should absolutely be "LevelName"
+                //if it's }, it can have BPM or bankPath above it, OR it can have another } above it, where { would be underneath it
+
+
+
+                if (newLine.Contains("{"))
+                {
+                    if (nextLine.Contains("LevelName"))
+                    {
+                        //found line
+                        placementInField = 0;
+                    }
+                }
+                else if (newLine.Contains("}"))
+                {
+
+                    string prevLineNS = NormalizeWhiteSpace(prevLine, true);
+                    if (prevLineNS.Contains("\"BPM\":") || prevLineNS.Contains("\"bankPath\":"))
+                    {
+                        //previous line had BPM or bankPath, found position
+                        placementInField = 9;
+                    }
+                    else if (prevLine.Contains("}") &&
+                      (nextLine.Contains("{") || (nextLine.Contains("]"))))
+                    {
+                        //we're surrounded by a music-closing }, and either a Level-opening { OR the end of the JSON
+                        placementInField = 10;
+                    }
+                }
+
+            }
+            else
+            {
+                //we have a colon!
+                //there might be more than 1, but we'll handle that with the lineErrors
+                //strip the label of spaces, and the value of spaces and possible comma
+                //we didn't need to that, we only need the label
+                lineLabel = newLineSplit[0];
+                lineLabel = lineLabel.Trim();
+                lineValue = newLineSplit[1];
+                lineValue = lineValue.Trim();
+                if (lineValue.Last() == ',')
+                {
+                    lineValue = lineValue.Substring(0, lineValue.Length - 1);
+                }
+
+            }
+
+
+            //if we already found our placement our field sequence, skip the for loop
+            if (placementInField != -1)
+            {
+                goto PlacementIdentified;
+            }
+
+
+            for (int i = 0; i < identifiableFields.Length; i++)
+            {
+                if (newLine.Contains(identifiableFields[i]))
+                {
+
+                    placementInField = corrPlaceOfIdableFields[i];
+                    break;
+                }
+            }
+
+        PlacementIdentified:
+            return placementInField;
+
+        }
+
+
 
         int[] corrPlaceOfIdableFields = { 1, 2, 2, 3, 4, 5, 6, 7, 8 }; //correlating Placements Of Identifiable Fields
         string[] identifiableFields = { "\"LevelName\"", "\"MainMusic\"", "\"BossMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\"" };
@@ -1510,12 +1779,30 @@ namespace WindowsFormsApp1
             string nextLine = "";
             if (lineNum - 1 > 0)
             {
+                if (JsonLinesBind[lineNum - 1].ListItem == null || JsonLinesBind[lineNum - 1].ListItem.ToString() == "") return "Cannot handle blank lines(A)";
                 prevLine = JsonLinesBind[lineNum - 1].ListItem.ToString(); //making sure this won't crash if we're on the first line
             }
-            if(lineNum + 1 < JsonLinesBind.Count)
+            if (lineNum + 1 < JsonLinesBind.Count)
             {
+                if (JsonLinesBind[lineNum + 1].ListItem == null || JsonLinesBind[lineNum + 1].ListItem.ToString() == "") return "Cannot handle blank lines(B)";
                 nextLine = JsonLinesBind[lineNum + 1].ListItem.ToString(); //making sure this won't crash if we're on the last line
             }
+
+            /* :(
+            //we'll do this to actually find the real next line
+            if (nextLine == "" || nextLine == null)
+            {
+                int j = lineNum;
+                while (j < JsonLinesBind.Count)
+                {
+                    nextLine = JsonLinesBind[lineNum + 1].ListItem.ToString();
+                    if (nextLine != "" || nextLine != null)
+                    {
+                        j += 500;
+                    }
+                    j++;
+                }
+            }*/
 
             string[] newLineSplit = newLine.Split(':');
             if (newLineSplit.Length == 1)
@@ -1585,9 +1872,10 @@ namespace WindowsFormsApp1
                 }
             }
 
+
             if(placementInField == -1)
             {
-                //we can't find where we are, return error;
+                //whatever line we just changed in the Json editor, we can't find where we are, return error;
                 return "???";
             }
 
@@ -1602,10 +1890,10 @@ namespace WindowsFormsApp1
         {
             string lineNumStr = jsonAnomalyList.SelectedItems[0].SubItems[0].Text;
 
-            if (lineNumStr.Contains("-"))
+            if (lineNumStr.Contains("–"))
             {
                 //ie: 1-10
-                string[] lineNumSplit = lineNumStr.Split('-');
+                string[] lineNumSplit = lineNumStr.Split('–');
                 lineNumStr = lineNumSplit[0];
             }
 
@@ -1627,8 +1915,162 @@ namespace WindowsFormsApp1
             GoToJsonLine();
         }
 
-        private void AddLineToEditor()
+        int[] spacesBeforeField = { 8, 12, 12, 16, 16, 16, 16, 16, 16, 12, 8 }; //these are the spaces before Level opening {, to level closing }
+        private string setProperSpacePrefix(string lineStr, int lineNum)
         {
+            //this just rewrites our lines at the beginning of our label
+            //we should only call this after this debugger confirms that an edited line in the JSON has the label it wants
+
+            int placement = getPlacementInSequence(lineStr, lineNum); //use our line's information and its line # to figure out our placement
+            if (placement == -1) return lineStr;
+
+            int indexOfLabel = lineStr.IndexOf(expectedFields[placement]);
+            #region HandleDoublePossibilities
+            if (placement == 2)
+            {
+                //our expectedField is MainMusic or BossMusic
+                indexOfLabel = lineStr.IndexOf("\"MainMusic\""); //first we look for MainMusic
+                if(indexOfLabel == -1) indexOfLabel = lineStr.IndexOf("\"BossMusic\"");  //if that didn't work, look for BossMusic
+            }
+            #endregion HandleDoublePossibilities
+            if (indexOfLabel == -1) return lineStr;
+
+            //we'll cut the line in half, with the intention of setting the proper spaces at the beginning of the line
+            //if our user did->    hi    "Bank" : , it'll turn into->       hi"Bank":
+
+            string allBeforeLabel = lineStr.Substring(0, indexOfLabel);
+            string allAfterLabelIndex = lineStr.Substring(indexOfLabel);
+            allBeforeLabel = NormalizeWhiteSpace(allBeforeLabel, true);
+            string editedLine = spacesBeforeField[placement] + allBeforeLabel + allAfterLabelIndex;
+
+            if(lineStr != editedLine)
+            {
+                //it's about to get updated, block the update call
+                managerFixingLine = true;
+            } else
+            {
+                MessageBox.Show("Spacing was good!");
+            }
+
+            return editedLine;
+        }
+
+        private void HandleLineNums(int indexOfAddedRow)
+        {
+            //the index of the added row is the zero-based line number that got added
+            //when we add, what we were selecting moves downward(increases line num), and the line we were selecting is now blank
+            var errorListEntries = jsonAnomalyList.Items;
+
+            for (int i = 0; i < errorListEntries.Count; i++)
+            {
+                string lineNumStr = errorListEntries[i].SubItems[0].Text.ToString();
+                if (lineNumStr.Contains("–"))
+                {
+                    //we have a range in the box, like 14–25
+                    string[] lineRange = lineNumStr.Split('–');
+                    string rangeStartStr = lineRange[0];
+                    string rangeEndStr = lineRange[1];
+                    int rangeStart = -1;
+                    int rangeEnd = -1;
+
+                    if (Int32.TryParse(lineRange[0], out int onebanana))
+                    {
+                        rangeStart = Int32.Parse(lineRange[0]);
+                    }
+                    if (Int32.TryParse(lineRange[1], out int twobanana))
+                    {
+                        rangeEnd = Int32.Parse(lineRange[1]);
+                    }
+                    if (rangeStart == -1) return; if (rangeEnd == -1) return;
+
+                    int OneBsdAddedRowNum = indexOfAddedRow + 1;
+
+                    int newRangeStart = rangeStart;
+                    int newRangeEnd = rangeEnd;
+
+                    if (OneBsdAddedRowNum < rangeStart)
+                    {
+                        newRangeStart++;
+                    }
+                    if (OneBsdAddedRowNum <= rangeEnd)
+                    {
+                        newRangeEnd++;
+                    }
+                    errorListEntries[i].SubItems[0].Text = newRangeStart + "–" + newRangeEnd;
+
+
+                    bool inRangeOfFatality = (OneBsdAddedRowNum >= rangeStart) && (OneBsdAddedRowNum <= rangeEnd);
+                    //I think it actually needs to be > range start, not >=
+                    if (inRangeOfFatality)
+                    {
+                        //set background to red
+                        setJsonEditorLineBG(OneBsdAddedRowNum, true);
+                    }
+
+
+                    /*
+                     * Need to check individually if the line we're adding is above the Start, then is Above the End
+                     * If it is, we add to these numbers, and SET them in the JsonAnomalyList
+                     * 
+                     * We still need to add what we do if we only have one number in the box--same thing without the split sequence
+                     * 
+                     * */
+
+
+
+
+                } /*else
+                {
+                    //we just have one number in the box
+
+
+                    
+                    if (Int32.TryParse(lineNumStr, out int threebanana))
+                    {
+                        intRngEnd = Int32.Parse(rngEnd); //set our End
+                    }
+
+                    jsonAnomalyList.Items[i].SubItems[1].Text = newErrors;
+                }
+                
+                if (Int32.TryParse(lineNumStr, out int hi))
+                {
+                    intRngEnd = Int32.Parse(rngEnd); //set our End
+                }
+
+
+                if (errorListEntries[i].SubItems[0].Text.ToString() == changedLineNum.ToString())
+                {
+                    //we already had an entry for this line, which we found! Update it!
+                    if (newErrors == "" || newErrors == null)
+                    {
+                        jsonAnomalyList.Items[i].Remove();
+                        //if we just cleared the errors on a line, we need to set its BG back
+                        setJsonEditorLineBG(changedLineNum);//sets our BG to the white/offwhite tones; changedLineNum is one-based
+                    }
+                    else
+                    {
+                        //we had errors here before, but we still have errors; update the new errors
+                        jsonAnomalyList.Items[i].SubItems[1].Text = newErrors;
+
+                    }
+
+                    return;
+                }
+                else if (errorListEntries[i].SubItems[0].Text.ToString().Contains("–"))
+                {
+                    //– is not a -, it's Alt+0150
+                    CheckToRemoveFatalError(errorListEntries[i].SubItems[0].Text.ToString(), changedLineNum);
+                }
+                */
+            }
+
+
+        }
+
+        private void AddLineToEditor(bool AddBelowSelected = false)
+        {
+            //Adds a line to our editor. I'm pretty sure it pushes our selection down
             var selectedRows = dgJsonEditor.SelectedRows;
             if(selectedRows.Count > 1)
             {
@@ -1639,28 +2081,42 @@ namespace WindowsFormsApp1
             } else
             {
                 int selectedIndex = dgJsonEditor.SelectedRows[0].Index;
+                if (AddBelowSelected) { selectedIndex += 1; }
                 JsonLinesBind.Insert(selectedIndex, new JsonLineList(""));
+                HandleLineNums(selectedIndex); //this changes our numbers in our JSON anomaly list based on our added number
             }
         }
         private void AddLineClick(object sender, EventArgs e)
         {
             AddLineToEditor();
         }
+        private void AddLineBelowClick(object sender, EventArgs e)
+        {
+            AddLineToEditor(true);
+        }
 
+        bool managerFixingLine = false;
         private void JsonCellUpdate(object sender, DataGridViewCellEventArgs e)
         {
-            
+
             //DataGridViewCell dgc = sender as DataGridViewCell;
             //string lineString = dgc.Value.ToString();
             //e.
+            if (managerFixingLine)
+            {
+                managerFixingLine = false; return; //we use this if WE updated the cell, and want to block it from rechecking
+            }
+
             int lineNumZeroBased = e.RowIndex;
             string editedLine = "";
             if (JsonLinesBind[lineNumZeroBased].ListItem != null)
             {
                 editedLine = JsonLinesBind[lineNumZeroBased].ListItem.ToString();
             }
+            //editedLine = setProperSpacePrefix(editedLine, lineNumZeroBased);
             string errorCode = CheckEditorLine(editedLine, lineNumZeroBased);
             adjustErrorsList(errorCode, lineNumZeroBased+1);
+            
         }
 
     }
