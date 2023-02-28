@@ -190,7 +190,7 @@ namespace WindowsFormsApp1
                     jsonAnomalyList.Items[i].SubItems[0].Text += "–" + rangeEnd;
                     if (jsonAnomalyList.Items[i + 1].SubItems[1].Text.Contains("BackOnTrack"))
                     {
-                        //make sure the line in front of us is the BackOnTrack line, then delete it. if it isn't, then.. it's still going to be there
+                        //make sure the line in front of us is the BackOnTrack line, then delete it. if it isn't, then.. it's still going to be there, I guess
                         jsonAnomalyList.Items[i + 1].Remove();
                     }
                     //if(jsonAnomalyList.Items[i].SubItems[0].Contains())
@@ -302,7 +302,7 @@ namespace WindowsFormsApp1
             //if placement -1, that means the next line is actually a valid line, too (or at least has a label)
             if (placement > expectedFields.Length - 1) placement = 0;
 
-            MessageBox.Show("LineBeforeRange: " + lineBeforeRange + "\nPlacementForIt: " + placement);
+            
 
             int fixedLines = 0; //we'll use this to know what to subtract from our range if we fixed anything (er really, what to add to the Start #)
             int i = 0;
@@ -339,8 +339,11 @@ namespace WindowsFormsApp1
                     setJsonEditorLineBG(bindIndex + 1);
                 } else
                 {
-                    //we encountered an error, but it wasn't a fatal error/label-reading error
-                    jsonAnomalyList.Items.Add(lineErrors);
+                    //we encountered an error, but it wasn't a fatal error/label-reading error; we'll add it now
+                    //We could probably insert it instead, so it comes before?
+                    string[] row = { (bindIndex+1).ToString(), lineErrors };
+                    ListViewItem newItem = new ListViewItem(row);
+                    jsonAnomalyList.Items.Add(newItem);
                 }
 
                 placement++;
