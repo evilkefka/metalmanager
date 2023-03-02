@@ -37,9 +37,9 @@
             this.ErrorCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.debugTextbox = new System.Windows.Forms.TextBox();
             this.dgJsonEditor = new System.Windows.Forms.DataGridView();
+            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.AddLineButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dgJsonEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -115,6 +115,10 @@
             this.dgJsonEditor.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.JsonCellUpdate);
             this.dgJsonEditor.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgJsonEditor_RowPostPaint);
             // 
+            // stringValueBindingSource
+            // 
+            this.stringValueBindingSource.DataSource = typeof(WindowsFormsApp1.StringValue);
+            // 
             // AddLineButton
             // 
             this.AddLineButton.Image = global::WindowsFormsApp1.Properties.Resources.add;
@@ -141,10 +145,6 @@
             this.button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.AddLineBelowClick);
-            // 
-            // stringValueBindingSource
-            // 
-            this.stringValueBindingSource.DataSource = typeof(WindowsFormsApp1.StringValue);
             // 
             // DebugForm
             // 
