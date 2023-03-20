@@ -4668,7 +4668,7 @@ namespace MetalManager
                     MessageBox.Show("An error occured when saving game's customsongs.json. :(");
                 } else
                 {
-                    MessageBox.Show("This mods folder:\n" + thisModsFolder);
+                   // MessageBox.Show("This mods folder:\n" + thisModsFolder);
                     MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
                 }
                 return false;
@@ -4739,7 +4739,7 @@ namespace MetalManager
             }
             catch
             {
-                MessageBox.Show("This mods folder:\n" + thisModsFolder);
+                //MessageBox.Show("This mods folder:\n" + thisModsFolder);
                 MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
             }
             
@@ -5323,7 +5323,7 @@ namespace MetalManager
                 }
                 else
                 {
-                    MessageBox.Show("Mods folder:\n" + modFolder);
+                    //MessageBox.Show("Mods folder:\n" + modFolder);
                     MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
                 }
                 return false;
@@ -10339,7 +10339,7 @@ namespace MetalManager
 
 
             string musicBankpath = gameDir + "\\Music.bank";
-            if (!File.Exists(musicBankpath)) { MessageBox.Show("Can't find Music.bank in game folder"); return; }
+            if (!File.Exists(musicBankpath)) { return; }
 
             FileInfo musicBankFile = new System.IO.FileInfo(musicBankpath);
             long gamesCurrMusicBanksFiSz = musicBankFile.Length;
@@ -10447,6 +10447,11 @@ namespace MetalManager
         {
             //this is ran when the program first loads
             DisableAllInputs();
+            
+            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "MetalManager.exe.config"))
+            {
+                ConfigCreator.CreateConfig();
+            }
             GetDirectoriesFromConfig();
             //AlertDLCUntested();
         }

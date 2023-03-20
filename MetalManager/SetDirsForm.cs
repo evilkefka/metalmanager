@@ -288,6 +288,23 @@ namespace MetalManager
             this.Close();
         }
 
+        /// <summary>
+        /// Looks if we're sitting somewhere where we can find Metal Hellsinger
+        /// </summary>
+        private void checkIfWereInGameFolder()
+        {
+            string myDir = AppDomain.CurrentDomain.BaseDirectory;
+            if (myDir.Last() == '\\') myDir = myDir.Substring(0, myDir.Length - 1);
+            string streamingAssetsDir = FindGameAndGetStreamingAssets(myDir); //returns the StreamingAssets folder
+            if (streamingAssetsDir == null) return;
+            
+            //if we got this far, we're in the game folder
+            gameDirTextbox.Text = FixPath(streamingAssetsDir);
+            gameDirFlagLabel.Text = "Game/StreamingAssets directory Found!";
+            gameDirTextbox.BackColor = DirBGudC;
+            unlockGate("game", true);
+        }
+
 
         bool gameKeyInserted = false;
         bool modKeyInserted = false;
@@ -550,5 +567,9 @@ namespace MetalManager
             return returnPath;
         }
 
+        private void SetDirsForm_Shown(object sender, EventArgs e)
+        {
+            checkIfWereInGameFolder();
+        }
     }
 }

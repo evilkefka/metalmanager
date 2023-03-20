@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SetDirsForm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.pazBuddyIcon = new System.Windows.Forms.PictureBox();
             this.mod_prsEntrLabel = new System.Windows.Forms.Label();
             this.modDirFlagLabel = new System.Windows.Forms.Label();
             this.ModDirLabel = new System.Windows.Forms.Label();
@@ -45,11 +46,11 @@
             this.confirmDirsBtn = new System.Windows.Forms.Button();
             this.confirmLabel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.pazBuddyIcon = new System.Windows.Forms.PictureBox();
+            this.startupMMInfoLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pazBuddyIcon)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pazBuddyIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -66,6 +67,16 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mod Directory";
+            // 
+            // pazBuddyIcon
+            // 
+            this.pazBuddyIcon.BackgroundImage = global::MetalManager.Properties.Resources.Paz;
+            this.pazBuddyIcon.Location = new System.Drawing.Point(345, 7);
+            this.pazBuddyIcon.Margin = new System.Windows.Forms.Padding(0);
+            this.pazBuddyIcon.Name = "pazBuddyIcon";
+            this.pazBuddyIcon.Size = new System.Drawing.Size(58, 60);
+            this.pazBuddyIcon.TabIndex = 5;
+            this.pazBuddyIcon.TabStop = false;
             // 
             // mod_prsEntrLabel
             // 
@@ -219,21 +230,22 @@
             this.panel1.MouseEnter += new System.EventHandler(this.confirmBtnMouseOver);
             this.panel1.MouseLeave += new System.EventHandler(this.confirmBtnMouseLeft);
             // 
-            // pazBuddyIcon
+            // startupMMInfoLabel
             // 
-            this.pazBuddyIcon.BackgroundImage = global::MetalManager.Properties.Resources.Paz;
-            this.pazBuddyIcon.Location = new System.Drawing.Point(345, 7);
-            this.pazBuddyIcon.Margin = new System.Windows.Forms.Padding(0);
-            this.pazBuddyIcon.Name = "pazBuddyIcon";
-            this.pazBuddyIcon.Size = new System.Drawing.Size(58, 60);
-            this.pazBuddyIcon.TabIndex = 5;
-            this.pazBuddyIcon.TabStop = false;
+            this.startupMMInfoLabel.AutoSize = true;
+            this.startupMMInfoLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.startupMMInfoLabel.Location = new System.Drawing.Point(5, 285);
+            this.startupMMInfoLabel.Name = "startupMMInfoLabel";
+            this.startupMMInfoLabel.Size = new System.Drawing.Size(111, 13);
+            this.startupMMInfoLabel.TabIndex = 7;
+            this.startupMMInfoLabel.Text = "Metal Manager v0.1.0";
             // 
             // SetDirsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(471, 303);
+            this.Controls.Add(this.startupMMInfoLabel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.confirmLabel);
             this.Controls.Add(this.groupBox2);
@@ -242,13 +254,15 @@
             this.Name = "SetDirsForm";
             this.Text = "Get ready to burn!";
             this.Load += new System.EventHandler(this.SetDirsForm_Load);
+            this.Shown += new System.EventHandler(this.SetDirsForm_Shown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pazBuddyIcon)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pazBuddyIcon)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -271,5 +285,6 @@
         private System.Windows.Forms.Label confirmLabel;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pazBuddyIcon;
+        private System.Windows.Forms.Label startupMMInfoLabel;
     }
 }

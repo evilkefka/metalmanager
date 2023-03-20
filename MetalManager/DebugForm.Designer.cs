@@ -353,7 +353,7 @@
             this.debugVersionLabel.Name = "debugVersionLabel";
             this.debugVersionLabel.Size = new System.Drawing.Size(482, 16);
             this.debugVersionLabel.TabIndex = 22;
-            this.debugVersionLabel.Text = "Metal Manager Debug Panel v1.0.0  ";
+            this.debugVersionLabel.Text = "Metal Manager Debug Panel v0.1.0  ";
             this.debugVersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // debugPastebox

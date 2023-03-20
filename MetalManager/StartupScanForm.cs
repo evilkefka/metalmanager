@@ -273,7 +273,7 @@ namespace MetalManager
 
             if (!File.Exists(pathToModsJson))
             {
-                MessageBox.Show("PathToModsJson: " + pathToModsJson);
+                //MessageBox.Show("PathToModsJson: " + pathToModsJson);
                 CloseManagerFromError("GMJ01");
                 return "-2";
             }
@@ -469,7 +469,7 @@ namespace MetalManager
             if (modDi == null)
             {
                 //No Mods folder!
-                MessageBox.Show("No Mod folder found, skipping this");
+                //MessageBox.Show("No Mod folder found, skipping this");
                 return;
             }
             if (modDi.Exists)

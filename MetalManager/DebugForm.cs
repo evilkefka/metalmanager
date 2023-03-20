@@ -3276,7 +3276,7 @@ namespace MetalManager
                 enableSaveButton(numberOfCritErrors, numberOfPotntlErrors);
             } else
             {
-                MessageBox.Show("No errors found");
+                //MessageBox.Show("No errors found");
                 //we didn't have any songs to be told to fix. Does the user want to bring this up for some reason?
             }
 
@@ -4958,7 +4958,7 @@ namespace MetalManager
                 }
                 else
                 {
-                    MessageBox.Show("Original path: " + originalPath);
+                   // MessageBox.Show("Original path: " + originalPath);
                 }
 
             }

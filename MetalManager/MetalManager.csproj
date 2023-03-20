@@ -57,6 +57,7 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigCreator.cs" />
     <Compile Include="ConfigDataDaddy\Configuration\CustomConfigurationSection.cs" />
     <Compile Include="ConfigDataDaddy\Configuration\EndpointsConfiguration.cs" />
     <Compile Include="ConfigDataDaddy\Endpoints.cs" />
@@ -126,48 +127,48 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
+    <None Include="MetalManager.exe.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\add.gif" />
+    <Resource Include="Resources\add.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\B.gif" />
+    <Resource Include="Resources\B.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\M.gif" />
+    <Resource Include="Resources\M.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Paz.gif" />
+    <Resource Include="Resources\Paz.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PazLife.gif" />
+    <Resource Include="Resources\PazLife.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\addBelow.gif" />
+    <Resource Include="Resources\addBelow.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pazCrossbones.png" />
+    <Resource Include="Resources\pazCrossbones.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\minus.gif" />
+    <Resource Include="Resources\minus.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\recheck.gif" />
+    <Resource Include="Resources\recheck.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\check-stillframe.gif" />
+    <Resource Include="Resources\check-stillframe.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\check.gif" />
+    <Resource Include="Resources\check.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\mm128.gif" />
+    <Resource Include="Resources\mm128.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\256.ico" />
+    <Resource Include="Resources\256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

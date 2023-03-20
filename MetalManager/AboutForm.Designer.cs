@@ -93,7 +93,7 @@
             this.aboutLabel2.Name = "aboutLabel2";
             this.aboutLabel2.Size = new System.Drawing.Size(72, 13);
             this.aboutLabel2.TabIndex = 7;
-            this.aboutLabel2.Text = "Version: 1.0.0";
+            this.aboutLabel2.Text = "Version: 0.1.0";
             // 
             // sendFdbkCopyText
             // 
