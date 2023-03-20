@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp1", "WindowsFormsApp1\WindowsFormsApp1.csproj", "{D8676447-DA3C-4203-A439-6994DF449D99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetalManager", "MetalManager\MetalManager.csproj", "{D8676447-DA3C-4203-A439-6994DF449D99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

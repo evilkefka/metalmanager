@@ -8,25 +8,52 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+//using System.Configuration;
 using System.Text.RegularExpressions; //Regex is regular expressions!??!!! WHAT a country!!
 
-namespace WindowsFormsApp1
+namespace MetalManager
 {
 
     public partial class DebugForm : Form
     {
-        public DebugForm()
+
+        string summoner = "";
+
+        public DebugForm(string whatSummonsMe)
         {
             InitializeComponent();
+            summoner = whatSummonsMe;
         }
 
         public Form1 MyParentForm;
 
+        public string DebuggedSongPath
+        {
+            get { return debugSongPath.ToString(); }
+        }
+        public string CleanedJson
+        {
+            get { return cleanedUpJson.ToString(); }
+        }
+
+        string cleanedUpJson = null;
+        private void SaveAndCloseDebugger(object sender, EventArgs e)
+        {
+            cleanedUpJson = TurnEditingLinesIntoString();
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        private void closeDebugger(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        /*
         public string TheValue
         {
 
             get { return debugTextbox.Text; }
-        }
+        }*/
 
         private void fillJsonDataGrid(string fullJson)
         {
@@ -400,7 +427,7 @@ namespace WindowsFormsApp1
                         }
                         else
                         {
-                           //MessageBox.Show("A");
+                           
                             anomaliesToPurge.Add(i);
                         }
                     }
@@ -562,7 +589,7 @@ namespace WindowsFormsApp1
                 //if we actually encounter another error, we need to add in the new error, while keeping the background red
                 
 
-                if (lineErrors.Contains("dupe") || lineErrors.Contains("fatality") || lineErrors.Contains("forgot") || lineErrors.Contains("labelinvalid"))
+                if (lineErrors.Contains("dupe") || lineErrors.Contains("fatality") || lineErrors.Contains("forgot") || lineErrors.Contains("labelInvalid"))
                 {
                     goto SetNewRange;
                     //our line isn't fixed
@@ -730,7 +757,7 @@ namespace WindowsFormsApp1
                             string unexpChars = line_nospaces.Replace("{", "");
                             if (unexpChars.Length > 0)
                             {
-                                linesWithErrors.Add("1:unexpectedChars_" + unexpChars);
+                                linesWithErrors.Add("1:unexpChars_" + unexpChars);
                             }
 
                         }
@@ -746,7 +773,7 @@ namespace WindowsFormsApp1
                             {
                                 //our { is on the next line
 
-                                linesWithErrors.Add("1:garbageLine");
+                                linesWithErrors.Add("1:grbgLine");
 
 
                             }
@@ -754,7 +781,7 @@ namespace WindowsFormsApp1
                             {
                                 //we can't find {, but customLevelMusic is on next line
 
-                                linesWithErrors.Add("1:forgotFirstLine");
+                                linesWithErrors.Add("1:forgot1stLn");
                             }
                         }
                         i++; continue;
@@ -785,7 +812,7 @@ namespace WindowsFormsApp1
                             else if (line_nospaces.Contains("{") && firstLineNoSpaces.Contains("{\"customLevelMusic\":["))
                             {
                                 //the user seems to have combined { and "customLevelMusic" : [ onto one line. that works, but we don't want that
-                                secondLineError[0] = "2:forgotCLMFormat"; //we want it to add another
+                                secondLineError[0] = "2:forgotClmFormat"; //we want it to add another
                             }
                             else
                             {
@@ -819,7 +846,7 @@ namespace WindowsFormsApp1
                             else
                             {
                                 placement = backOnTrack;
-                                linesWithErrors.Add((i) + ":forgotCLMFormat"); //we don't want i-1
+                                linesWithErrors.Add((i) + ":forgotClmFormat"); //we don't want i-1
                                 continue;
                             }
 
@@ -945,6 +972,687 @@ namespace WindowsFormsApp1
             }
         }
 
+        private string replaceAllTabs(string fullJson)
+        {
+            if (fullJson.Contains('\t'))
+            {
+                string newJson = fullJson.Replace("\t", "        ");
+                return newJson;
+            } else
+            {
+                return fullJson;
+            }
+        }
+
+        private string fixAnyLinesWithTabs(string fullJson)
+        {
+            //this actually takes a full JSON, and looks for any tabs, removes them, then rewrites the blemished line
+            //we return the full JSON string, fixed
+
+            string fixedJson = fullJson;
+
+            if (!fixedJson.Contains('\t'))
+            {
+                //there's no horizontal tabs in here, just return what we had
+                return fixedJson;
+            }
+
+            //if we got this far, we have horizontal tabs we need to fix
+
+            string[] fixedJsonLines = fixedJson.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries); //split our Json into an array of strings, line by line
+
+            if (fixedJsonLines.Length == 1)
+            {
+                //we couldn't find any line breaks using \n, we'll try to split it with \r
+                fixedJsonLines = fixedJson.Split(new string[] { "\r" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            if (fixedJsonLines.Length == 1)
+            {
+                //there's either an error, or the mod creator is a psychopath and didn't put line returns
+                return "Error, no line returns";
+            }
+
+            string[] openingKeywords = { "{", "\"customLevelMusic\"" };
+            string[] keywords = { "{", "\"LevelName\"", "\"MainMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\"", "}",
+            "\"BossMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\"", "}", "}" };
+            string[] closingKeywords = { "]", "}" };
+
+            //for keywords string:
+            //BossMusic is index 10 of keywords
+            //main music closer is 9
+            //boss music closer is 17
+            //LEVEL music closer is 18
+
+            string[] uniqueKeywords = { "\"LevelName\"", "\"MainMusic\"", "\"BossMusic\"", "\"Bank\"", "\"Event\"", "\"LowHealthBeatEvent\"", "\"BeatInputOffset\"", "\"BPM\"", "\"bankPath\"" };
+            //uniqueKeywords are used to determine which line we might be on in the JSON
+
+            //for uniqueKeywords string:
+            //Bank - bankPath are Index 3-8
+            //main music and boss music are 1-2
+            //LevelName is 0
+
+
+
+
+
+            fixedJson = ""; //reset this, we're going to use it to return the info
+            for (int i = 0; i < fixedJsonLines.Length; i++)
+            {
+                if (fixedJsonLines[i].Contains("\t"))
+                {
+                    //the line contains a tab.
+
+                    string fixedLine = fixedJsonLines[i].Replace("\t", ""); //first, burn the tabs
+
+                    // now find out where we are
+
+                    bool uniqueFound = false;
+
+                    if (hasStringWithColonAfterIt(fixedLine, "customLevelMusic"))
+                    {
+                        fixedJson += "    \"customLevelMusic\" : [\n";
+                        continue;
+                    }
+                    if (fixedLine.Contains("]") && i == fixedJsonLines.Length - 2)
+                    {
+                        fixedJson += "    ]\n";
+                        continue;
+                    }
+                    else if (fixedLine.Contains("]") && i != fixedJsonLines.Length - 2)
+                    {
+                        return "Error - there is a weird placement of ] in the JSON";
+                    }
+
+
+                    for (int z = 0; z < uniqueKeywords.Length; z++)
+                    {
+                        if (hasStringWithColonAfterIt(fixedLine, uniqueKeywords[z]))
+                        {
+                            string rewrittenLine = "";
+                            //we found a unique keyword, we can immediately know what the line should look like
+                            int lineLabelStart = fixedLine.IndexOf(uniqueKeywords[z]);
+                            int lineLabelAfterColon = fixedLine.IndexOf(":", lineLabelStart + uniqueKeywords[z].Length) + 1;
+                            string lineLabel = fixedLine.Substring(lineLabelStart, lineLabelAfterColon);
+                            rewrittenLine += lineLabel + " ";
+
+                            string lineInfo = fixedLine.Substring(lineLabelAfterColon); //gets everything after the colon. could have a space, could have quotes (we're about to get rid of potential comma)
+
+                            int indexOfComma = fixedLine.IndexOf(",");
+                            if (indexOfComma != -1)
+                            {
+                                //there's a comma, make our line info only have what's before it
+                                int realInfoLength = indexOfComma - lineLabelAfterColon;
+                                lineInfo = fixedLine.Substring(realInfoLength);
+                            }
+
+
+
+                            lineInfo = shaveSurroundingQuotesAndSpaces(lineInfo); //now we only have the information
+
+
+                            //fixedJson += fixedJsonLines[i];
+
+                            if (z == 0)
+                            {
+                                //levelName
+
+                                rewrittenLine = "            \"" + lineLabel + " " + lineInfo + "\",\n";//+\n? //will return (spaces) "LevelName" : "Stygia",
+                            }
+                            else if (z >= 2 && z <= 3)
+                            {
+                                //BossMusic or MainMusic
+                                rewrittenLine = "            \"" + lineLabel + " {\n";
+                            }
+                            else
+                            {
+                                //one of the labels
+                                if (uniqueKeywords[z] == "\"BeatInputOffset\"" || uniqueKeywords[z] == "\"BPM\"")
+                                {
+
+                                    //we don't want to add quotes to info
+                                    rewrittenLine = "                " + lineLabel + " " + lineInfo;
+                                }
+                                else
+                                {
+                                    //we want to add quotes to info, since we took them away
+                                    rewrittenLine = "                " + lineLabel + " \"" + lineInfo + "\"";
+                                }
+
+                                if (uniqueKeywords[z] == "\"BPM\"")
+                                {
+                                    //we're doing a BPM line, we need to check to add a comma or not
+
+                                    if (hasStringWithColonAfterIt(fixedJsonLines[i + 1], "\"bankPath\""))
+                                    {
+                                        //there IS a bank path
+                                        rewrittenLine += ",\n";
+                                    }
+                                    else
+                                    {
+                                        //no bankPath detected after this line
+                                        rewrittenLine += "\n";
+                                    }
+                                }
+
+                            }
+                            //MessageBox.Show("Found: " + uniqueKeywords[z]+ "\n Rewritten: " + rewrittenLine);
+
+                            fixedJson += rewrittenLine;
+                            break; //since we found a unique keyword, get out of this
+                        }
+                    }
+
+                    if (!uniqueFound)
+                    {
+                        //we couldn't find a unique keyword, we still don't know where we're at
+
+                        //we're either on a line with only {, or }, possibly next to a comma
+                        if (fixedLine.Contains("{"))
+                        {
+                            if (i == 0)
+                            {
+                                //we're on the first line
+                                fixedJson += "}";
+                                continue;
+                            }
+                            else
+                            {
+                                //after first line, the only time we can have { without any of the uniqueKeywords is when opening a level. we know where we're at
+                                fixedJson += "        {\n";
+                                continue;
+                            }
+                        }
+                        else if (fixedLine.Contains("}"))
+                        {
+                            string rewrittenLine = "";
+
+                            //need to find out if we just closed the Main/BossMusic, or the Level
+
+                            //we might be on the last line of the code
+                            if (i == fixedJsonLines.Length - 1)
+                            {
+                                //we're on the last line
+                                fixedJson += "}\n";
+                                continue;
+                            }
+                            else if (hasStringWithColonAfterIt(fixedJsonLines[i - 1], "BPM") || hasStringWithColonAfterIt(fixedJsonLines[i - 1], "bankPath"))
+                            {
+                                //check to see if the line before us has a label for "BPM" or "bankPath"
+
+
+                                //the line before this has the BPM or the bankPath, we're either closing the Main or Boss Music
+                                if (fixedJsonLines[i + 1].Contains("\"BossMusic\""))
+                                {
+                                    //the line underneath us has the bossMusic info, so put a comma
+                                    fixedJson += "            },\n";
+
+                                    continue;
+                                }
+                                else if (fixedJsonLines[i + 1].Contains("}"))
+                                {
+                                    //the line underneath us is closing out the level, don't put a comma
+                                    fixedJson += "            }\n";
+
+                                    continue;
+                                }
+                            }
+                            else if (fixedJsonLines[i - 1].Contains("}"))
+                            {
+                                //the line before this is closing out the music, we need to close out the level
+                                rewrittenLine = "        }";
+                                if (fixedJsonLines[i + 1].Contains("{"))
+                                {
+                                    //the next line opens up to another level, so put a comma
+                                    rewrittenLine += ",\n";
+                                }
+                                else
+                                {
+                                    rewrittenLine += "\n";
+                                }
+                                fixedJson += rewrittenLine;
+                                continue;
+
+
+                            }
+                            else
+                            {
+                                return "Error - there was an error trying to fix the horizontal tabs";
+                            }
+                        }
+
+                    }
+
+
+
+                }
+                else
+                {
+                    //we didn't have a tab here, and that's this function's jurisdiction
+                    fixedJson += fixedJsonLines[i] + '\n';
+
+                }
+
+
+            }
+            return fixedJson;
+
+
+        }
+
+        //we use this function to see what we're looking at in a line like this "Bank": "BPM"
+        private bool hasStringWithColonAfterIt(string hay, string needle)
+        {
+            //MessageBox.Show("Checking " + hay + "for " + needle);
+
+            if (!hay.Contains(needle)) return false; //we don't have it at all
+
+            int indexOfColon = hay.IndexOf(":");
+            if (indexOfColon == -1) return false;//we don't have a colon at all in this label, which is weird
+
+
+
+            if (indexOfColon < hay.IndexOf(needle)) return false; //our colon is before our needle, return false
+
+            int indexAfterNeedle = hay.IndexOf(needle) + needle.Length;
+            int lengthOfArea = indexOfColon - indexAfterNeedle;
+            string textBetweenNeedleAndColon = hay.Substring(indexAfterNeedle, lengthOfArea);
+            textBetweenNeedleAndColon = textBetweenNeedleAndColon.Replace("\t", "");
+            textBetweenNeedleAndColon = textBetweenNeedleAndColon.Replace(" ", "");
+            textBetweenNeedleAndColon = textBetweenNeedleAndColon.Replace("\"", "");
+            if (textBetweenNeedleAndColon.Length > 0) return false; //there's something weird in between the needle and the colon
+
+            return true; //our colon is directly after our needle, return true!
+        }
+
+        private string ReplaceErrorWShortDescrptn(string errorCodes)
+        {
+            string errorsShortDiscrptn = "";
+            string errorsEnclsdErrCode = "";
+            if (errorCodes.Contains("tabs"))
+            {
+                errorsShortDiscrptn += "Horizontal tabs/indentation replaced with spaces.";
+                errorsEnclsdErrCode += "(tabs)";
+            }
+            if (errorCodes.Contains("2short"))
+            {
+                errorsShortDiscrptn += "Json file too short. ";
+                errorsEnclsdErrCode += "(2short)";
+            }
+            if (errorCodes.Contains("2long"))
+            {
+                errorsShortDiscrptn += "Json file way too long. ";
+                errorsEnclsdErrCode += "(2long)";
+            }
+            if (errorCodes.Contains("empty"))
+            {
+                errorsShortDiscrptn += "Empty line. ";
+                errorsEnclsdErrCode += "(empty)";
+            }
+            if (errorCodes.Contains("BackOnTrack"))
+            {
+                errorsShortDiscrptn += "";
+                errorsEnclsdErrCode += "(BackOnTrack)";
+            }
+            if (errorCodes.Contains("unexpChars_"))
+            {
+                //string 
+
+                errorsShortDiscrptn += "Unexpected anomalies. ";
+                errorsEnclsdErrCode += "(unexpChars)";
+            }
+            if (errorCodes.Contains("unexpChLC_"))
+            {
+
+                errorsShortDiscrptn += "Unexpected anomalies near label. ";
+                errorsEnclsdErrCode += "(unexpChLC)";
+            }
+            if (errorCodes.Contains("grbgLine"))
+            {
+
+                errorsShortDiscrptn += "Unneeded Line. ";
+                errorsEnclsdErrCode += "(grbgLine)";
+            }
+            if (errorCodes.Contains("erj"))
+            {
+
+                errorsShortDiscrptn += "Error reading first few lines. ";
+                errorsEnclsdErrCode += "(erj)";
+            }
+            if (errorCodes.Contains("forgot1stLn"))
+            {
+
+                errorsShortDiscrptn += "First line missing. ";
+                errorsEnclsdErrCode += "(forgot1stLn)";
+            }
+            if (errorCodes.Contains("forgotCLM"))
+            {
+
+                errorsShortDiscrptn += "customLevelMusic opener missing. ";
+                errorsEnclsdErrCode += "(forgotCLM)";
+            }
+            if (errorCodes.Contains("dupe"))
+            {
+                string dupedItem = getNextItemInQuotes(errorCodes, "dupe_");
+
+
+                errorsShortDiscrptn += "Possible duplicate ";
+                if (dupedItem.Length > 0) errorsShortDiscrptn += "of " + dupedItem + ". ";
+                errorsEnclsdErrCode += "(dupe)";
+            }
+            if (errorCodes.Contains("forgotClmFormat"))
+            {
+                errorsShortDiscrptn += "Technically correct, but please separate { to its own line. ";
+                errorsEnclsdErrCode += "(forgotClmFormat)";
+            }
+            if (errorCodes.Contains("clmF"))
+            {
+
+                errorsShortDiscrptn += "customLevelMusic opener missing. ";
+                errorsEnclsdErrCode += "(forgotCLM)";
+            }
+            if (errorCodes.Contains("fatality"))
+            {
+
+                errorsShortDiscrptn += "Fatal error reading Json. ";
+                errorsEnclsdErrCode += "(fatality)";
+            }
+            if (errorCodes.Contains("fatal"))
+            {
+
+                errorsShortDiscrptn += "Fatal error reading Json. ";
+                errorsEnclsdErrCode += "(fatal)";
+            }
+            if (errorCodes.Contains("forgot_"))
+            {
+                //need to get 2nd part of this that says what was forgotten
+                string forgottenItem = getNextItemInQuotes(errorCodes, "forgot_");
+
+
+                if (forgottenItem.Length > 0) errorsShortDiscrptn += forgottenItem + " skipped. ";
+                else errorsShortDiscrptn += "Label skipped. ";
+
+                errorsEnclsdErrCode += "(forgot)";
+            }
+            if (errorCodes.Contains("clmClose"))
+            {
+
+                errorsShortDiscrptn += "Closing ] and/or } missing. ";
+                errorsEnclsdErrCode += "(fatal)";
+            }
+            if (errorCodes.Contains("clmClsUnexpCh"))
+            {
+                //need to get 2nd part that says the anomalies
+                //not going to
+
+                errorsShortDiscrptn += "Unexpected anomalies. ";
+                errorsEnclsdErrCode += "(clmClsUnexpCh)";
+            }
+            if (errorCodes.Contains("forgotClosers"))
+            {
+                errorsShortDiscrptn += "Closing ] and/or } missing. ";
+                errorsEnclsdErrCode += "(forgotClosers)";
+            }
+            if (errorCodes.Contains("noClmClose"))
+            {
+                errorsShortDiscrptn += "Closing ] and/or } missing. ";
+                errorsEnclsdErrCode += "(forgotClosers)";
+            }
+            if (errorCodes.Contains("bunkLine"))
+            {
+                errorsShortDiscrptn += "Unneeded Line. ";
+                errorsEnclsdErrCode += "(bunkLine)";
+            }
+            if (errorCodes.Contains("labelInvalid"))
+            {
+                errorsShortDiscrptn += "Unrecognized label, possibly misspelled or missing quotes. ";
+                errorsEnclsdErrCode += "(labelInvalid)";
+            }
+            if (errorCodes.Contains("unexpEnd-"))
+            {
+                //need to get the 2nd part
+                if(errorCodes.Contains("unexpEnd-Wanted_\",\""))
+                {
+                    errorsShortDiscrptn += "Unexpected end of line, possibly missing comma. ";
+                } else
+                {
+                    errorsShortDiscrptn += "Unexpected end of line. ";
+                }
+
+                errorsEnclsdErrCode += "(unexpEnd-)";
+            }
+            if (errorCodes.Contains("unexpEndN"))
+            {
+                errorsShortDiscrptn += "Unexpected end, expecting number with no comma. ";
+                errorsEnclsdErrCode += "(unexpEndN)";
+            }
+            if (errorCodes.Contains("missingcomma"))
+            {
+                errorsShortDiscrptn += "Unexpected comma at the end of line. ";
+                errorsEnclsdErrCode += "(missingcomma)";
+            }
+            if (errorCodes.Contains("unexpChars"))
+            {
+                //need to get 2nd part
+
+                errorsShortDiscrptn += "Unexpected anomalies found. ";
+                errorsEnclsdErrCode += "(unexpChars)";
+            }
+            if (errorCodes.Contains("nocolon"))
+            {
+                errorsShortDiscrptn += "No colon ( : ) to separate label from value. ";
+                errorsEnclsdErrCode += "(nocolon)";
+            }
+            if (errorCodes.Contains("2manycol"))
+            {
+                errorsShortDiscrptn += "There was more than one colon ( : ). ";
+                errorsEnclsdErrCode += "(2manycol)";
+            }
+            if (errorCodes.Contains("bpnocol"))
+            {
+                errorsShortDiscrptn += "Expecting absolute file location in bankPath. ";
+                errorsEnclsdErrCode += "(bpnocol)";
+            }
+            if (errorCodes.Contains("tmcom"))
+            {
+                errorsShortDiscrptn += "Possible extra or misplaced comma. ";
+                errorsEnclsdErrCode += "(tmcom)";
+            }
+            if (errorCodes.Contains("neqVal"))
+            {
+                errorsShortDiscrptn += "Missing quotes around value. ";
+                errorsEnclsdErrCode += "(neqVal)";
+            }
+            if (errorCodes.Contains("LCap"))
+            {
+                errorsShortDiscrptn += "Level capitalization invalid. ";
+                errorsEnclsdErrCode += "(LCap)";
+            }
+            if (errorCodes.Contains("LUr"))
+            {
+                //need to get 2nd part
+
+                errorsShortDiscrptn += "Level unrecognized. ";
+                errorsEnclsdErrCode += "(LUr)";
+            }
+            if (errorCodes.Contains("evF1"))
+            {
+                errorsShortDiscrptn += "Event format invalid. ";
+                errorsEnclsdErrCode += "(evF1)";
+            }
+            if (errorCodes.Contains("evF2"))
+            {
+                errorsShortDiscrptn += "Event format invalid. ";
+                errorsEnclsdErrCode += "(evF2)";
+            }
+            if (errorCodes.Contains("unwntdq"))
+            {
+                errorsShortDiscrptn += "Unexpected quotes around value. ";
+                errorsEnclsdErrCode += "(unwntdq)";
+            }
+            if (errorCodes.Contains("unexpChRC_"))
+            {
+                //need to get 2nd part
+
+
+                errorsShortDiscrptn += "Unexpected characters near value. ";
+                errorsEnclsdErrCode += "(unexpChRC)";
+            }
+            if (errorCodes.Contains("numFormat"))
+            {
+                errorsShortDiscrptn += "Value must be a number. ";
+                errorsEnclsdErrCode += "(numFormat)";
+            }
+            if (errorCodes.Contains("nobpfile"))
+            {
+                errorsShortDiscrptn += "No .bank file in bankPath. ";
+                errorsEnclsdErrCode += "(nobpfile)";
+            }
+            if (errorCodes.Contains("bpws"))
+            {
+                errorsShortDiscrptn += "Wrong slashes in bankPath. ";
+                errorsEnclsdErrCode += "(bpws)";
+            }
+            if (errorCodes.Contains("nobpdir"))
+            {
+                errorsShortDiscrptn += "Error looking for directory in bankPath. ";
+                errorsEnclsdErrCode += "(nobpdir)";
+            }
+            if (errorCodes.Contains("cvBP"))
+            {
+                errorsShortDiscrptn += "Can't verify bankPath's format. ";
+                errorsEnclsdErrCode += "(cvBP)";
+            }
+            if (errorCodes.Contains("2mSl"))
+            {
+                errorsShortDiscrptn += "Too many slashes in bankPath. ";
+                errorsEnclsdErrCode += "(2mSl)";
+            }
+            if (errorCodes.Contains("bPF"))
+            {
+                //NEED TO MAKE SURE NONE OF THE BANKFORMATTING ERRORS WILL OVERLAP
+
+                errorsShortDiscrptn += "bankPath formatting off. "; //number of \s might be off
+                errorsEnclsdErrCode += "(bPF)";
+            }
+            if (errorCodes.Contains("bpFNF"))
+            {
+                errorsShortDiscrptn += "File in bankPath doesn't exist. ";
+                errorsEnclsdErrCode += "(bpFNF)";
+            }
+            if (errorCodes.Contains("NL_bossnotmain"))
+            {
+                errorsShortDiscrptn += "Next line, MM cannot handle Boss music before Main music. ";
+                errorsEnclsdErrCode += "(bossmain)";
+            }
+            if (errorCodes.Contains("bmdup"))
+            {
+                errorsShortDiscrptn += "Level contains two Boss Musics. ";
+                errorsEnclsdErrCode += "(bmdup)";
+            }
+            if (errorCodes.Contains("mmdup"))
+            {
+                errorsShortDiscrptn += "Level contains two Main Musics. ";
+                errorsEnclsdErrCode += "(mmdup)";
+            }
+
+            int numberOfParentheses = errorsEnclsdErrCode.Split('(').Length - 1;
+            string multiErrorString = "";
+            if(numberOfParentheses > 1)
+            {
+                multiErrorString = "(" + numberOfParentheses + ")";
+            }
+
+            string returnString = multiErrorString + errorsShortDiscrptn + errorsEnclsdErrCode;
+
+            return returnString;
+
+        }
+
+        int numberOfCritErrors;
+        int numberOfPotntlErrors;
+        private void ReplaceAllErrorsWithDescriptions()
+        {
+            //We'll also handle Number of Critical Errors here
+            numberOfCritErrors = 0;
+            numberOfPotntlErrors = 0;
+
+            for (int i=0; i<jsonAnomalyList.Items.Count; i++)
+            {
+                string errorCode = jsonAnomalyList.Items[i].SubItems[1].Text;
+                string desc = ReplaceErrorWShortDescrptn(errorCode);
+
+                jsonAnomalyList.Items[i].SubItems[1].Text = desc;
+
+                int numberOfParentheses = desc.Split('(').Length - 1;
+                if(numberOfParentheses == 0)
+                {
+                    //group 3 says "no errors remaining"
+                    if (jsonAnomalyList.Items.Count == 1)
+                    {
+                        jsonAnomalyList.Items[i].Group = jsonAnomalyList.Groups[3];
+                        jsonAnomalyList.Items[i].SubItems[0].Text = "";
+                        jsonAnomalyList.Items[i].SubItems[1].Text = "";
+                    } else
+                    {
+                        //this will come up if we had an unknown error (and we had another error. we're fucked if it was the only error)
+                        jsonAnomalyList.Items[i].SubItems[0].Text = "...";
+                        jsonAnomalyList.Items[i].SubItems[1].Text = "An unknown error broke me, please contact admin. :C";
+                    }
+
+                }
+                else if (numberOfParentheses == 1) {
+                    //we only have one error
+                    if (jsonAnomalyList.Items[i].SubItems[1].Text.Contains("(bpFNF)"))
+                    {
+                        //group 2 is Potential Issues
+                        jsonAnomalyList.Items[i].Group = jsonAnomalyList.Groups[2];
+                        numberOfPotntlErrors++;
+                    } else if (jsonAnomalyList.Items[i].SubItems[1].Text.Contains("(tabs)"))
+                    {
+                        //group 1 is Minor Issues
+                        jsonAnomalyList.Items[i].Group = jsonAnomalyList.Groups[1];
+                    } else
+                    {
+                        //group 0 is Critical Errors
+                        
+                        jsonAnomalyList.Items[i].Group = jsonAnomalyList.Groups[0];
+                        numberOfCritErrors++;
+                        
+                    }
+                } else
+                {
+                    jsonAnomalyList.Items[i].Group = jsonAnomalyList.Groups[0];
+                    numberOfCritErrors++;
+                }
+
+            }
+        }
+
+
+        private string getNextItemInQuotes(string fullString, string labelWeWant)
+        {
+            string returnString = "";
+
+            int indexOfLabel = fullString.IndexOf(labelWeWant);
+            if (indexOfLabel == -1) return returnString;
+
+            int indexOfFirstQuote = fullString.IndexOf("\"", indexOfLabel);
+            int afterFirstQuote = indexOfFirstQuote + 1;
+            if (indexOfFirstQuote == -1) return returnString;
+            int indexOf2ndQuote = fullString.IndexOf("\"", indexOfFirstQuote + 1);
+            if (indexOf2ndQuote == -1) return returnString;
+
+            int itemLength = indexOf2ndQuote - afterFirstQuote;
+            if (itemLength < 1) return returnString;
+
+            returnString = fullString.Substring(afterFirstQuote, itemLength);
+
+
+
+            return returnString;
+        }
+
+
 
         private string emptyLineHandler(string[] allLines, int zbLineNum, int currExpPlcmnt)
         {
@@ -997,6 +1705,7 @@ namespace WindowsFormsApp1
             
             if (JsonLinesBind.Count < 10) { string[] tooshort = { "2short" }; return tooshort; }
 
+            int bmCounter = 0; int mmCounter = 0;
             int currPlaceInExpctdEntry = 0; //current place in expected entry
             int i = 0;
             int threshold = 0;//threshold used to prevent infinite loop
@@ -1033,6 +1742,7 @@ namespace WindowsFormsApp1
                 #region FatalErrorHandler
                 if (fatalErrorEncountered)
                 {
+                    bmCounter = 0; mmCounter = 0;
                     if (line_nospaces.Contains("LevelName") || line_nospaces.Contains("]"))
                     {
                         if (line_nospaces.Contains("LevelName"))
@@ -1082,7 +1792,7 @@ namespace WindowsFormsApp1
                             string unexpChars = line_nospaces.Replace("{", "");
                             if (unexpChars.Length > 0)
                             {
-                                linesWithErrors.Add("1:unexpectedChars_"+unexpChars);
+                                linesWithErrors.Add("1:unexpChars_"+unexpChars);
                             }
                         }
                         else
@@ -1090,14 +1800,14 @@ namespace WindowsFormsApp1
                             //there's no { in the first line
                             //label is missing, we need to look around for something identifiable
                             //technically, they could have the first line be-> { "customLevelMusic":[ and still be correct
-                            string[] firstLineError = { "wtf?" };
+                            string[] firstLineError = { "erj" };
                             if (JsonLinesBind.Count < 2) return firstLineError; //catch-all in case JSON is very short
 
                             if (JsonLinesBind[1].ListItem.ToString().Contains("{"))
                             {
                                 //our { is on the next line
 
-                                linesWithErrors.Add("1:garbageLine");
+                                linesWithErrors.Add("1:grbgLine");
 
 
                             }
@@ -1105,7 +1815,7 @@ namespace WindowsFormsApp1
                             {
                                 //we can't find {, but customLevelMusic is on next line
 
-                                linesWithErrors.Add("1:forgotFirstLine");
+                                linesWithErrors.Add("1:forgot1stLn");
                             }
                         }
                         i++; continue;
@@ -1118,7 +1828,7 @@ namespace WindowsFormsApp1
 
                         if (line_nospaces != "\"customLevelMusic\":[")
                         {
-                            string[] secondLineError = { "wtf?" };
+                            string[] secondLineError = { "erj" };
                             if (JsonLinesBind.Count < 3) return secondLineError;
 
                             if (JsonLinesBind[2].ListItem.ToString().Contains("{"))
@@ -1136,11 +1846,11 @@ namespace WindowsFormsApp1
                             else if (line_nospaces.Contains("{") && firstLineNoSpaces.Contains("{\"customLevelMusic\":["))
                             {
                                 //the user seems to have combined { and "customLevelMusic" : [ onto one line. that works, but we don't want that
-                                secondLineError[0] = "2:forgotCLMFormat"; //we want it to add another
+                                secondLineError[0] = "2:forgotClmFormat"; //we want it to add another
                             }
                             else
                             {
-                                linesWithErrors.Add("2:clm"); //customLevelMusic opening line incorrect format
+                                linesWithErrors.Add("2:clmF"); //customLevelMusic opening line incorrect format
                             }
 
 
@@ -1169,7 +1879,7 @@ namespace WindowsFormsApp1
                             else
                             {
                                 currPlaceInExpctdEntry = backOnTrack;
-                                linesWithErrors.Add((i) + ":forgotCLMFormat"); //we don't want i-1
+                                linesWithErrors.Add((i) + ":forgotClmFormat"); //we don't want i-1
                                 continue;
                             }
 
@@ -1300,6 +2010,35 @@ namespace WindowsFormsApp1
                         //this is getting called if our line was blank, in which case it catches up with where it wants to be, but throws a false error
 
                     }
+                    #region Look For Boss/MainMusic Doubles
+                    
+                    if (currPlaceInExpctdEntry == 2 &&
+                        (JsonLinesBind[i].ListItem.ToString().Contains("\"BossMusic\"") || JsonLinesBind[i].ListItem.ToString().Contains("\"MainMusic\"")))
+                    {
+                        if (JsonLinesBind[i].ListItem.ToString().Contains("\"BossMusic\""))
+                        {
+                            bmCounter++;
+                        }
+                        else if (JsonLinesBind[i].ListItem.ToString().Contains("\"MainMusic\""))
+                        {
+                            mmCounter++;
+                        }
+                    }
+                    else if (currPlaceInExpctdEntry == 0 || currPlaceInExpctdEntry == 1)
+                    {
+                        bmCounter = 0; mmCounter = 0;
+                    }
+                    if (bmCounter > 1)
+                    {
+                        lineErrors += ("(bmdup)");
+                        bmCounter = 0; //reset it so it doesn't keep going
+                    }
+                    if (mmCounter > 1)
+                    {
+                        lineErrors += ("(mmdup)");
+                        mmCounter = 0; //reset it so it doesn't keep going
+                    }
+                    #endregion Look For Boss/MainMusic Doubles
 
                     if (lineErrors.Contains("forgot"))
                     {
@@ -1350,7 +2089,7 @@ namespace WindowsFormsApp1
                             string anomaliesInFinalLines = combinedFinalsNS.Replace("]}", "");
                             if (anomaliesInFinalLines.Length > 0)
                             {
-                                linesWithErrors.Add(i + 1 + "+:clmUnexpCh_");
+                                linesWithErrors.Add(i + 1 + "+:clmClsUnexpCh_");
                             }
                             
                         }
@@ -1369,7 +2108,7 @@ namespace WindowsFormsApp1
                             anomaliesInFinalLines = finalLine.Replace("]}", "");
                             if (anomaliesInFinalLines.Length > 0)
                             {
-                                linesWithErrors.Add(i + 1 + ":clmUnexpCh_");
+                                linesWithErrors.Add(i + 1 + ":clmClsUnexpCh_");
                             }
                         }
                     }
@@ -1402,11 +2141,24 @@ namespace WindowsFormsApp1
 
 
         }
-
-        private string[] BuggyD(string fullJson)
+        
+        /// <summary>
+        /// The Debugger
+        /// </summary>
+        /// <param name="fullJson"></param>
+        /// <returns></returns>
+        public string[] BuggyD(string fullJson)
         {
-            string fixedJson = fullJson;
             List<string> linesWithErrors = new List<string>();
+
+            string noTabs = replaceAllTabs(fullJson);
+            string fixedJson = noTabs;
+            if(fullJson != noTabs)
+            {
+                linesWithErrors.Add("...:tabs");
+            }
+
+            
             bool fatalErrorEncountered = false;//we use this if we find a fatal error; we keep skipping lines until we get out of the level with the error
 
             string[] fixedJsonLinesWithEmpties = fixedJson.Split('\n'); //we're going to keep our empty lines, to be sure what line we're on
@@ -1414,6 +2166,8 @@ namespace WindowsFormsApp1
 
             string[] fixedJsonLines = fixedJson.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);//it's not gonna have empty entries, damnit
             if (fixedJsonLines.Length < 10) { string[] tooshort = { "2short" }; return tooshort; }
+
+            int bmCounter = 0; int mmCounter = 0;//we will use these to make sure we don't have two MainMusics, or two BossMusics, per level
 
             int currPlaceInExpctdEntry = 0; //current place in expected entry
             int i = 0;
@@ -1449,6 +2203,8 @@ namespace WindowsFormsApp1
                 #region FatalErrorHandler
                 if (fatalErrorEncountered)
                 {
+                    bmCounter = 0; mmCounter = 0; //first, reset these
+
                     if (line_nospaces.Contains("LevelName") || line_nospaces.Contains("]"))
                     {
                         if (line_nospaces.Contains("LevelName"))
@@ -1494,7 +2250,7 @@ namespace WindowsFormsApp1
                             string unexpChars = line_nospaces.Replace("{", "");
                             if (unexpChars.Length > 0)
                             {
-                                linesWithErrors.Add("1:unexpectedChars_" + unexpChars);
+                                linesWithErrors.Add("1:unexpChars_" + unexpChars);
                             }
                         } else
                         {
@@ -1508,14 +2264,14 @@ namespace WindowsFormsApp1
                             {
                                 //our { is on the next line
 
-                                linesWithErrors.Add("1:garbageLine");
+                                linesWithErrors.Add("1:grbgLine");
 
 
                             } else if (fixedJsonLines[1].Contains("\"customLevelMusic\""))
                             {
                                 //we can't find {, but customLevelMusic is on next line
 
-                                linesWithErrors.Add("1:forgotFirstLine");
+                                linesWithErrors.Add("1:forgot1stLn");
                             }
                         }
                         i++; continue;
@@ -1544,7 +2300,7 @@ namespace WindowsFormsApp1
                             else if (line_nospaces.Contains("{") && firstLineNoSpaces.Contains("{\"customLevelMusic\":["))
                             {
                                 //the user seems to have combined { and "customLevelMusic" : [ onto one line. that works, but we don't want that
-                                secondLineError[0] = "2:forgotCLMFormat"; //we want it to add another
+                                secondLineError[0] = "2:forgotClmFormat"; //we want it to add another
                             } else
                             {
                                 linesWithErrors.Add("2:clmF"); //customLevelMusic opening line incorrect format
@@ -1574,7 +2330,7 @@ namespace WindowsFormsApp1
                             } else
                             {
                                 currPlaceInExpctdEntry = backOnTrack;
-                                linesWithErrors.Add((i) + ":forgotCLMFormat"); //we don't want i-1
+                                linesWithErrors.Add((i) + ":forgotClmFormat"); //we don't want i-1
                                 continue;
                             }
 
@@ -1711,11 +2467,45 @@ namespace WindowsFormsApp1
                         currPlaceInExpctdEntry++;
                     }
 
+                    #region Look For Boss/MainMusic Doubles
+                    //if (!hasMatchingLabel) bmCounter = 0; mmCounter = 0;
+                    if (currPlaceInExpctdEntry == 2 && 
+                        (fixedJsonLines[i].Contains("\"BossMusic\"") || fixedJsonLines[i].Contains("\"MainMusic\"")))
+                    {
+                        if (fixedJsonLines[i].Contains("\"BossMusic\""))
+                        {
+                            bmCounter++;
+                        }
+                        else if (fixedJsonLines[i].Contains("\"MainMusic\""))
+                        {
+                            mmCounter++;
+                        }
+                    }
+                    else if ((currPlaceInExpctdEntry == 0 || currPlaceInExpctdEntry == 1) &&
+                          hasMatchingLabel)
+                    {
+                        bmCounter = 0; mmCounter = 0;
+                    }
+                    if(bmCounter > 1)
+                    {
+                        lineErrors += ("(bmdup)");
+                        bmCounter = 0;
+                    }
+                    if (mmCounter > 1)
+                    {
+                        lineErrors += ("(mmdup)");
+                        mmCounter = 0;
+                    }
+                    #endregion Look For Boss/MainMusic Doubles
+
                     if (lineErrors.Length > 0)
                     {
                         linesWithErrors.Add(i + 1 + ":" + lineErrors); //i+1 because we don't start on line 0
 
                     }
+
+                    
+
 
                     currPlaceInExpctdEntry++;
                 }
@@ -1755,7 +2545,7 @@ namespace WindowsFormsApp1
                             anomaliesInFinalLines = anomaliesInFinalLines.Replace("]}", "");
                             if (anomaliesInFinalLines.Length > 0)
                             {
-                                linesWithErrors.Add(i + 1 + "+:unexpectedCharsA_"+anomaliesInFinalLines);
+                                linesWithErrors.Add(i + 1 + "+:unexpCharsA_"+anomaliesInFinalLines);
                             }
                         }
 
@@ -1773,7 +2563,7 @@ namespace WindowsFormsApp1
                             string anomaliesInFinalLine = finalLine.Replace("]}", "");
                             if (anomaliesInFinalLine.Length > 0)
                             {
-                                linesWithErrors.Add(i + 1 + "+:unexpectedCharsB_");
+                                linesWithErrors.Add(i + 1 + "+:unexpCharsB_");
                             }
                             
                         }
@@ -1852,7 +2642,7 @@ namespace WindowsFormsApp1
 
                 //errorsOnLine.Add("labelmissing");
                 string whatsGoingOn = verifySequenceForMissingEntry(lineNS, nextLineNS, indexOfLabelWeWant);
-                if (whatsGoingOn == "garbageLine")
+                if (whatsGoingOn == "grbgLine")
                 {
                     return "bunkLine";
                 } else if (whatsGoingOn == "dupe")
@@ -1860,7 +2650,7 @@ namespace WindowsFormsApp1
                     int prevIndx = indexOfLabelWeWant - 1; if (prevIndx < 0) prevIndx = expectedFields.Length - 1;
                     return "dupe_" + expectedFields[prevIndx];
                 }
-                else if (whatsGoingOn == "labelinvalid")
+                else if (whatsGoingOn == "labelInvalid")
                 {
                     return "labelInvalid_" + expectedFields[indexOfLabelWeWant];
                 }
@@ -1887,7 +2677,7 @@ namespace WindowsFormsApp1
             {
                 if (finalCharOnLine != endingWeWant)
                 {
-                    errorsOnLine.Add("unexpectedEnd-Wanted_" + endingWeWant);
+                    errorsOnLine.Add("unexpEnd-Wanted_\"" + endingWeWant + "\"");
                 }
             }
             else
@@ -1922,7 +2712,7 @@ namespace WindowsFormsApp1
                         else
                         {
                             //the last character on the line is not a number
-                            errorsOnLine.Add("unexpectedEnd");
+                            errorsOnLine.Add("unexpEndN");
                         }
                     }
                 }
@@ -1941,6 +2731,7 @@ namespace WindowsFormsApp1
                         //we're on the MainMusic close, opening for BossMusic next
                         //or the user copied and pasted and forgot to change MainMusic to BossMusic, which we'll handle first
                         /* Turns out, Main Music doesn't have to be first within the two!
+                         
                         if (nextLineNS.Contains("MainMusic"))
                         {
                             errorsOnLine.Add("NL_bossnotmain"); //next line, we want boss not main music
@@ -1954,10 +2745,10 @@ namespace WindowsFormsApp1
                     else
                     {
                         //we don't have BossMusic on the next line, we're just closing out Music
-                        string unexpectedCharacters = lineNS.Replace("}", "");
+                        string unexpCharacters = lineNS.Replace("}", "");
                         if (lineNS != "}")
                         {
-                            errorsOnLine.Add("unexpectedCharsC_" + unexpectedCharacters);
+                            errorsOnLine.Add("unexpCharsC_" + unexpCharacters);
                         }
 
                     }
@@ -1976,10 +2767,10 @@ namespace WindowsFormsApp1
                     {
                         //we don't have another level on the next line
                         //just make sure we didn't have anything else in this line
-                        string unexpectedCharacters = lineNS.Replace("}", "");
+                        string unexpCharacters = lineNS.Replace("}", "");
                         if (lineNS != "}")
                         {
-                            errorsOnLine.Add("unexpectedCharsD_" + unexpectedCharacters);
+                            errorsOnLine.Add("unexpCharsD_" + unexpCharacters);
                         }
                     }
 
@@ -1995,7 +2786,7 @@ namespace WindowsFormsApp1
             string errorReportString = "";
             foreach (string error in errorsOnLine)
             {
-                errorReportString += error + "|"; //for each error, we're making a string that says "1:errorCode|4:errorC1|34:errorCd5|
+                errorReportString += "(" + error + ")"; //for each error, we're making a string that says "1:(errorCode)(errorC1)(errorCd5)
             }
 
 
@@ -2022,29 +2813,29 @@ namespace WindowsFormsApp1
             if (indexOfLabelWeWant == 0)
             {
                 //Level Opening {
-                string unexpectedCharacters = lineNS.Replace("{", "");
-                if (unexpectedCharacters.Length > 0)
+                string unexpCharacters = lineNS.Replace("{", "");
+                if (unexpCharacters.Length > 0)
                 {
-                    formatErrors.Add("unexpectedCharsA_" + unexpectedCharacters);
+                    formatErrors.Add("unexpCharsA_" + unexpCharacters);
                 }
             }
             else if (indexOfLabelWeWant == 9 || indexOfLabelWeWant == 10)
             {
                 //either a level-closing or music-closing }
-                string unexpectedCharacters = lineNS;
-                if (unexpectedCharacters.Substring(unexpectedCharacters.Length - 1, 1) == ",")
+                string unexpCharacters = lineNS;
+                if (unexpCharacters.Substring(unexpCharacters.Length - 1, 1) == ",")
                 {
-                    unexpectedCharacters = unexpectedCharacters.Substring(0, unexpectedCharacters.Length - 1);
+                    unexpCharacters = unexpCharacters.Substring(0, unexpCharacters.Length - 1);
                 }
-                unexpectedCharacters = unexpectedCharacters.Replace("}", "").Replace("\r", "").Replace("\n", "");//why is this not working!?!!!
+                unexpCharacters = unexpCharacters.Replace("}", "").Replace("\r", "").Replace("\n", "");//why is this not working!?!!!
                                                                                                                  //removing control characters. I'm about to throw something through my wall
 
                 // Get the integral value of the character.
 
-                if (!string.IsNullOrEmpty(unexpectedCharacters))
+                if (!string.IsNullOrEmpty(unexpCharacters))
                 {
 
-                    formatErrors.Add("unexpectedCharsB_" + unexpectedCharacters);
+                    formatErrors.Add("unexpCharsB_" + unexpCharacters);
                 }
 
             }
@@ -2097,6 +2888,8 @@ namespace WindowsFormsApp1
             {
                 valueStr = valueStr.Substring(0, valueStr.Length - 1); //if we had a comma, it's gone now—we already checked for endings
             }
+            if (valueStr.Contains(",")) lineFormatErrors.Add("tmcom"); //we just got rid of the only comma that should be there
+
             string labelNS = NormalizeWhiteSpace(labelStr, true);
             string valueNS = NormalizeWhiteSpace(valueStr);
 
@@ -2110,18 +2903,18 @@ namespace WindowsFormsApp1
             {
                 string checkMainMusic = labelNS.Replace("\"MainMusic\"", "");
                 string checkBossMusic = labelNS.Replace("\"BossMusic\"", ""); //doing both of these in case our user somehow put MainMusic BossMusic: {
-                string unexpectedCharsInLabel = labelNS.Replace("\"MainMusic\"", "").Replace("\"BossMusic\"", ""); //but this will look weird if they did
+                string unexpCharsInLabel = labelNS.Replace("\"MainMusic\"", "").Replace("\"BossMusic\"", ""); //but this will look weird if they did
                 if (checkMainMusic.Length > 0 && checkBossMusic.Length > 0)
                 {
-                    lineFormatErrors.Add("unexpectedCharsLOfC_" + unexpectedCharsInLabel);
+                    lineFormatErrors.Add("unexpChLC_" + unexpCharsInLabel);
                 }
             }
             else
             {
-                string unexpectedCharsInLabel = labelNS.Replace(expectedFields[indexOfLabel], "");
-                if (unexpectedCharsInLabel.Length > 0)
+                string unexpCharsInLabel = labelNS.Replace(expectedFields[indexOfLabel], "");
+                if (unexpCharsInLabel.Length > 0)
                 {
-                    lineFormatErrors.Add("unexpectedCharsLOfC_" + unexpectedCharsInLabel);
+                    lineFormatErrors.Add("unexpChLC_" + unexpCharsInLabel);
                 }
             }
 
@@ -2136,7 +2929,7 @@ namespace WindowsFormsApp1
             }
             else if (numberOfQuotesInValue < 2)
             {
-                lineFormatErrors.Add("neqVal->" + valueNS);
+                lineFormatErrors.Add("neqVal");
             }
             else
             {
@@ -2207,7 +3000,7 @@ namespace WindowsFormsApp1
         ValueNoQuoteCheck:
             if (numberOfQuotesInValue > 0)
             {
-                lineFormatErrors.Add("unwantedquotes(value: " + valueNS + ")");
+                lineFormatErrors.Add("unwntdq");
             }
             else
             {
@@ -2216,7 +3009,7 @@ namespace WindowsFormsApp1
                 {
                     if (valueNS.Trim() != "{")
                     {
-                        lineFormatErrors.Add("unexpectedCharsROfC_" + labelNS.Replace("{", ""));
+                        lineFormatErrors.Add("unexpChRC_" + labelNS.Replace("{", ""));
                     }
                 }
                 else
@@ -2234,6 +3027,12 @@ namespace WindowsFormsApp1
                 }
             }
             return lineFormatErrors.ToArray();
+        }
+
+        private void verifyBankIfNoBankPath()
+        {
+            //if we see that our entry does not have a bankPath entry, we want to go back and check our "Bank"
+
         }
 
         private string[] getBankPathFormatErrors(string bankPathValue)
@@ -2259,7 +3058,7 @@ namespace WindowsFormsApp1
 
             //we're going to take value for bankPath and analyze the formating, and verify a file exists
             int indexOfBankPathInfo = nextLine_chkIntegrity.IndexOf(":\\");
-            if (indexOfBankPathInfo == 0) { bpFormErrors.Add("nobpfile"); return bpFormErrors.ToArray(); } //if our line looks like bankPath: ":\\Dir\\Dir2\\ and they forgot the drive letter
+            if (indexOfBankPathInfo == 0) { bpFormErrors.Add("nobpdir"); return bpFormErrors.ToArray(); } //if our line looks like bankPath: ":\\Dir\\Dir2\\ and they forgot the drive letter
             indexOfBankPathInfo -= 1; //this should be the index of C:\, B:\ X:\ Etc
             if (indexOfBankPathInfo < 0)
             {
@@ -2276,11 +3075,12 @@ namespace WindowsFormsApp1
             else if (directoriesBtwnDblSlashes.Length != directoriesBtwnSnglSlashes.Length)
             {
                 //if the # of our directories with double slashes does not match our # of directories after converting to single slashes, it means we don't have enough slashes somewhere er something
-                bpFormErrors.Add("bpF"); //bankpath formatting
+                bpFormErrors.Add("bPF"); //bankpath formatting
             }
             else if (!verifyFileExists(bankPathInfo))
             {
-                bpFormErrors.Add("bpFNF"); //bankpath file not found; this should be a potentially-major error (potentially major = problem will arise later, but program will still work)
+                //bpFormErrors.Add("bpFNF"); //bankpath file not found; this should be a potentially-major error (potentially major = problem will arise later, but program will still work)
+                //we're no longer doing this
             }
 
             return bpFormErrors.ToArray();
@@ -2383,17 +3183,342 @@ namespace WindowsFormsApp1
             e.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.GrayText, headerBounds, centerFormat);
         }
 
-
-        private void DebugFormLoad(object sender, EventArgs e)
+        private void Debug_TesterBoxValue()
         {
             string originalJson = ((Form1)MyParentForm).TesterBoxValue;
             string[] errors = BuggyD(originalJson);
             fillErrorList(errors); //fills our left ListViewBox, which tells us what errors we have and what lines they're on
             //fillJsonLines(originalJson);//fills the right ListView, which has our JSON in its entirety, NOT editable line-by-line
             //setEditorLinesBGColors(errors); //sets the bg color of each line to red if it has an error
-            fillJsonDataGrid(originalJson);//fills the right DataGrid, which has our JSON in its entirety, editable line-by-line
+            fillJsonDataGrid(replaceAllTabs(originalJson));//fills the right DataGrid, which has our JSON in its entirety, editable line-by-line
             setDGEditorLinesBGColrs(errors);//sets the bg color of each line to red if it has an error
             verifyAllDuplicates();
+            ReplaceAllErrorsWithDescriptions(); //this also finds our Crit Errors and adds to numberOfCritErrors
+            setALLProperSpacePrefixes();//sets the spaces indentations for the json. we only want to do this for initial load
+        }
+
+        private void Debug_PastedSong(string textInPasteBox)
+        {
+            string songJson = textInPasteBox;
+            string[] errors = BuggyD(songJson);
+            fillErrorList(errors); //fills our left ListViewBox, which tells us what errors we have and what lines they're on
+            fillJsonDataGrid(replaceAllTabs(songJson));//fills the right DataGrid, which has our JSON in its entirety, editable line-by-line
+            setDGEditorLinesBGColrs(errors);//sets the bg color of each line to red if it has an error
+            verifyAllDuplicates();
+            ReplaceAllErrorsWithDescriptions();//this also finds our Crit Errors and adds to numberOfCritErrors
+            setALLProperSpacePrefixes();//sets the spaces indentations for the json. we only want to do this for initial load(we do it individually afterwards)
+        }
+
+        private void Debug_GivenSong(string songName, string pathOfJson)
+        {
+            songTitleLabel.Text = "Analyzing Song: " + songName;
+            string songPath = pathOfJson;
+            string displayPath = pathShortener(songPath, 50, 4);
+            displayPath = displayPath.Substring(0, 1).ToUpper() + displayPath.Substring(1);
+            pathLabel.Text = displayPath;
+            string songJson = getCustomsongsJson(new string[] { songName, pathOfJson }, false, true);
+            string[] errors = BuggyD(songJson);
+            fillErrorList(errors); //fills our left ListViewBox, which tells us what errors we have and what lines they're on
+            fillJsonDataGrid(replaceAllTabs(songJson));//fills the right DataGrid, which has our JSON in its entirety, editable line-by-line
+            setDGEditorLinesBGColrs(errors);//sets the bg color of each line to red if it has an error
+            verifyAllDuplicates();
+            ReplaceAllErrorsWithDescriptions();//this also finds our Crit Errors and adds to numberOfCritErrors
+            setALLProperSpacePrefixes();//sets the spaces indentations for the json. we only want to do this for initial load
+            enableSaveButton(numberOfCritErrors, numberOfPotntlErrors);
+        }
+
+
+
+        private string TurnEditingLinesIntoString()
+        {
+            string fullJson = "";
+            foreach (var lt in JsonLinesBind)
+            {
+                fullJson += lt.ListItem.ToString() + "\r\n";
+            }
+            return fullJson;
+        }
+
+        private void CopyAllLinesBtn_Click(object sender, EventArgs e)
+        {
+            CopyAllLinesToClipboard();
+        }
+
+        private void CopyAllLinesToClipboard()
+        {
+            string fullJson = TurnEditingLinesIntoString();
+            Clipboard.SetText(fullJson);
+            MessageBox.Show("All lines copied to clipboard!");
+        }
+
+        string[][] SongsToFix = new string[0][];
+        private void Debug_Mandatory()
+        {
+            SongsToFix = ((Form1)MyParentForm).SongsRequireMandatoryDebug;
+            int NumOfSongsToFix = SongsToFix.Count();
+
+            if (NumOfSongsToFix > 0)
+            {
+                
+                songTitleLabel.Text = "Analyzing Song: " + SongsToFix[0][0];
+                string songPath = mDir.ToString() + SongsToFix[0][1] + "\\customsongs.json";
+                pathLabel.Text = pathShortener(songPath, 50, 4);
+
+
+                string firstJson = getCustomsongsJson(SongsToFix[0]);
+                string[] errors = BuggyD(firstJson);
+                fillErrorList(errors); //fills our left ListViewBox, which tells us what errors we have and what lines they're on
+                fillJsonDataGrid(replaceAllTabs(firstJson));//fills the right DataGrid, which has our JSON in its entirety, editable line-by-line
+                setDGEditorLinesBGColrs(errors);//sets the bg color of each line to red if it has an error
+                verifyAllDuplicates();
+                ReplaceAllErrorsWithDescriptions();//this also finds our Crit Errors and adds to numberOfCritErrors
+                setALLProperSpacePrefixes();//sets the spaces indentations for the json. we only want to do this for initial load
+                enableSaveButton(numberOfCritErrors, numberOfPotntlErrors);
+            } else
+            {
+                MessageBox.Show("No errors found");
+                //we didn't have any songs to be told to fix. Does the user want to bring this up for some reason?
+            }
+
+        }
+
+        DirectoryInfo mDir;
+        DirectoryInfo gDir;
+        private void getModAndGameDir()
+        {
+            mDir = ((Form1)MyParentForm).di;
+            gDir = ((Form1)MyParentForm).gameDir;
+        }
+
+
+        private string getCustomsongsJson(string[] songInfo, bool noLineReturns = false, bool absolutePath = false)
+        {
+
+            string pathToJson = "";
+
+            if (absolutePath) { pathToJson = songInfo[1]; goto SkipPathCreator; }
+
+            if(songInfo[0] == "(Game)")
+            {
+                pathToJson = gDir.ToString() + "\\customsongs.json";
+            } else
+            {
+                pathToJson = mDir.ToString() + songInfo[1] + "\\customsongs.json";
+            }
+           
+            SkipPathCreator:
+            
+            if (!File.Exists(pathToJson.ToString())) return "-1";
+
+            using (StreamReader sr = File.OpenText(@pathToJson))
+            {
+                string s = "";
+
+                string fullText = sr.ReadToEnd();
+                if (noLineReturns)
+                {
+                    string trimmedLine = NormalizeWhiteSpace(fullText);
+                    s = trimmedLine;
+                }
+                else
+                {
+                    s = fullText;
+                }
+
+                return s;
+            }
+
+
+
+
+        }
+
+        string debugSongPath = null;
+        private void debug_DropDownSelect()
+        {
+            string sName = ((ListItem)debugSongSelectCombo.SelectedItem).Name;
+            string sPath = ((ListItem)debugSongSelectCombo.SelectedItem).Path;
+            debugSongPath = sPath; //we'll send this back to Form1 if we save anything
+
+
+
+            songTitleLabel.Text = "Analyzing Song: " + sName; //Debug_GivenSong already does this, why do we do it again
+            string songPath = sPath;
+            pathLabel.Text = pathShortener(songPath, 50, 4);
+
+            string[] sInfo = { sName, sPath};
+            string firstJson = getCustomsongsJson(sInfo);
+
+            
+            debugPastebox.Visible = false;
+            debugPasteBoxPanel.Visible = false;
+            debugSongSelectCombo.Visible = false;
+            debugCopyAllLines.Visible = false;
+            jsonAnomalyList.Enabled = true;
+
+            suspendSongButton.Visible = true;
+            DebugSaveJsonBtn.Visible = true;
+            debugSJBtnPanel.Visible = true;
+
+            Debug_GivenSong(sName, sPath);
+            GoToFirstError();
+        }
+
+
+        private void debug_PasteBox()
+        {
+            string pasteboxJson = debugPastebox.Text;
+            debugPastebox.Visible = false;
+            debugPasteBoxPanel.Visible = false;
+            debugSongSelectCombo.Visible = false;
+            songTitleLabel.Text = "Analyzing Song: User-pasted info";
+            pathLabel.Text = "No file path";
+            debugCopyAllLines.Visible = true;
+            jsonAnomalyList.Enabled = true;
+
+            Debug_PastedSong(pasteboxJson);
+            setJsonAnomTextAfterScan();
+            GoToFirstError();
+        }
+        private void setJsonAnomTextAfterScan()
+        {
+            if (jsonAnomalyList.Items.Count == 0)
+            {
+                debug_undrJsonAnomLbl.Text = "No formatting errors or anomalies can be found in pasted customsongs.json.";
+            }
+            else
+            {
+                debug_undrJsonAnomLbl.Text = "Formatting errors and/or anomalies found in pasted customsongs.json.";
+            }
+        }
+
+        private void debuggerPasteBox(object sender, EventArgs e)
+        {
+            debug_PasteBox();
+        }
+
+        ListItem[] modsList;
+        private void getModsListFromMain()
+        {
+            modsList = ((Form1)MyParentForm).getSongsList().ToArray();
+        }
+
+        private void fillComboBoxWithCustomSongs()
+        {
+            debugSongSelectCombo.Items.Clear();
+
+            getModsListFromMain();
+            if(modsList.Length == 0)
+            {
+                debugSongSelectCombo.Text = "No custom songs found.";
+                debugSongSelectCombo.Enabled = false;
+            }
+
+            /* When we did this, Debug was changing the name of this "Current customsongs.json" to the name we were trying to put here. Forget it..
+            if(modsList[0].Name == "Current customsongs.json")
+            {
+                modsList[0].Name = "Game's current customsongs.json";
+            }*/
+
+            debugSongSelectCombo.Items.AddRange(modsList);
+            
+
+
+            /* This doesn't work, because it doesn't update
+            foreach (var endpoint in ConfigDataDaddy.Customsongs.CustomsongsList)
+            {
+                if (endpoint.Name == "(game)")
+                    debugSongSelectCombo.Items.Insert(0, new ListItem { Name = "Game's current customsongs.json", Path = gDir + "\\customsongs.json" });
+                else
+                    debugSongSelectCombo.Items.Add(new ListItem { Name = endpoint.Name, Path = mDir.ToString() + endpoint.SongInfo.Path + "\\customsongs.json" });
+            }*/
+        }
+
+
+        private void DebugFormLoad(object sender, EventArgs e)
+        {
+            getModAndGameDir();
+
+            if (summoner == "user")
+            {
+                //the user summoned us
+                suspendSongButton.Visible = false;
+                susSongExplLabel.Visible = false;
+                DebugSaveJsonBtn.Visible = false;
+                debugSJBtnPanel.Visible = false;
+
+                jsonAnomalyList.Enabled = false;
+                debugPastebox.Visible = true;
+                debugPasteBoxPanel.Visible = true;
+                debugSongSelectCombo.Visible = true;
+                debugCopyAllLines.Visible = false;
+
+                debug_undrJsonAnomLbl.Text = "Awaiting input. Please select a song or Copy+Paste your customsongs.json into the textbox.";
+
+                fillComboBoxWithCustomSongs();
+
+
+            }
+            else if (summoner.Contains("(.saveAttmpt.)"))
+            {
+                //Organizer's save attempt summoned us
+                suspendSongButton.Visible = false;
+                susSongExplLabel.Visible = false;
+                DebugSaveJsonBtn.Visible = false;
+                debugSJBtnPanel.Visible = false;
+
+                
+
+
+                string[] sNameSplit = summoner.Split('|');
+                debug_AttemptedSave(sNameSplit[1]);
+
+            }
+            else if (summoner.Contains("|") && summoner.Contains(":"))
+            {
+                //we were summoned by a song
+                //it looks like this: song:Unstoppable|M:/Path/To/customsongs.json
+
+                suspendSongButton.Visible = true;
+                //susSongExplLabel.Visible = true;
+                DebugSaveJsonBtn.Visible = true;
+                debugSJBtnPanel.Visible = true;
+
+                jsonAnomalyList.Enabled = true;
+                debugPastebox.Visible = false;
+                debugPasteBoxPanel.Visible = false;
+                debugSongSelectCombo.Visible = false;
+                debugCopyAllLines.Visible = false;
+
+                string[] sInfo = summoner.Split('|');
+                string[] sNameSplit = sInfo[0].Split(':');
+                Debug_GivenSong(sNameSplit[1], sInfo[1]);
+                debugSongPath = sInfo[1];
+                GoToFirstError();
+
+
+            }
+
+
+
+
+
+        }
+
+        private void debug_AttemptedSave(string attemptedSave)
+        {
+            
+            debugPastebox.Visible = false;
+            debugPasteBoxPanel.Visible = false;
+            debugSongSelectCombo.Visible = false;
+            songTitleLabel.Text = "Analyzing: Attempted Save";
+            pathLabel.Text = "No file path";
+            debugCopyAllLines.Visible = true;
+            jsonAnomalyList.Enabled = true;
+
+            Debug_PastedSong(attemptedSave);
+            setJsonAnomTextAfterScan();
+            GoToFirstError();
         }
 
         private void CheckForNewErrors(int oneBsedLineNum)
@@ -2447,10 +3572,12 @@ namespace WindowsFormsApp1
 
         }
 
+        //used to be deletedLineHadError
 
-        private bool deletedLineHadError(int zbLineIndex)
+        private bool lineHasError(int zbLineIndex)
         {
             //this just looks at our colors and sees if red is red, and says true if red
+            if (zbLineIndex >= JsonLinesBind.Count) return true; //returning true stops whatever we were about to do
             int greenAmt = dgJsonEditor.Rows[zbLineIndex].DefaultCellStyle.BackColor.G;
             if(greenAmt > 120)
             {
@@ -2467,6 +3594,8 @@ namespace WindowsFormsApp1
             jsonAnomalyList.Items.Clear();
             fillErrorList(errors, false);
             setDGEditorLinesBGColrs(errors, false);
+            ReplaceAllErrorsWithDescriptions();
+            enableSaveButton(numberOfCritErrors, numberOfPotntlErrors);
         }
         
 
@@ -2685,14 +3814,14 @@ namespace WindowsFormsApp1
                 //we can't go back to prevExpFld to look for a duplicate
                 if (nextLineStr.Contains(expFld))
                 {
-                    //our next line has the } we wanted, this line is garbage to us
-                    return "garbageLine";
+                    //our next line has the } we wanted, this line is grbg to us
+                    return "grbgLine";
                 } else if (curLineStr.Contains(nextExpFld) || nextLineStr.Contains("]"))
                 {
                     return "forgotitem";
                 } else if (nextLineStr.Contains(nextExpFld))
                 {
-                    return "labelinvalid";
+                    return "labelInvalid";
                 } else
                 {
                     return "levelclosemissing";
@@ -2737,7 +3866,7 @@ namespace WindowsFormsApp1
                 string[] possibles = nextExpFld.Split('|');
                 if (curLineStr.Contains(possibles[0]) || curLineStr.Contains(possibles[1]))
                 {
-                    return "garbageLine";
+                    return "grbgLine";
                 }
             }
             if (nextLineStr.Contains(expectedFields[nextSequenceWeWant]))
@@ -2778,9 +3907,9 @@ namespace WindowsFormsApp1
 
             } else if (nextLineStr.Contains(expectedFields[seqPlaceMissing]))
             {
-                //next line contains the missing label for our current seqence, this line is garbage to us
+                //next line contains the missing label for our current seqence, this line is grbg to us
                 //we want to continue with the same Placement, but adding to i
-                return "garbageLine";
+                return "grbgLine";
             }
             else if (curLineStr.Contains(expectedFields[nextSequenceWeWant]))
             {
@@ -2794,7 +3923,7 @@ namespace WindowsFormsApp1
                 //still can't find the label we want, but the next line contains the NEXT label we wanted, so we want to skip this field
                 //we later add a line here so the user could add something
                 //we want to continue, adding to Placement and adding to i
-                return "labelinvalid";
+                return "labelInvalid";
             }
             else
             {
@@ -2808,7 +3937,7 @@ namespace WindowsFormsApp1
                 else if (expFld.Contains("|") && (
                     nextLineStr.Contains("\"MainMusic\"") || nextLineStr.Contains("\"BossMusic\"")))
                 {
-                    return "garbageLine";
+                    return "grbgLine";
                 }
                 else if (nextExpFld.Contains("|") && (
                     curLineStr.Contains("\"MainMusic\"") || curLineStr.Contains("\"BossMusic\"")))
@@ -2818,7 +3947,7 @@ namespace WindowsFormsApp1
                 else if (nextExpFld.Contains("|") && (
                     nextLineStr.Contains("\"MainMusic\"") || nextLineStr.Contains("\"BossMusic\"")))
                 {
-                    return "labelinvalid";
+                    return "labelInvalid";
                 }
 
 
@@ -3072,6 +4201,38 @@ namespace WindowsFormsApp1
             return lineErrors;
         }
 
+        private void GoToFirstError()
+        {
+            if (jsonAnomalyList.Items.Count == 0) return;
+
+            string firstErrorLineNumStr = jsonAnomalyList.Items[0].SubItems[0].Text;
+            if (firstErrorLineNumStr == "..." || firstErrorLineNumStr == "") return;
+
+            if (firstErrorLineNumStr.Contains("+"))
+            {
+                //ie: 1-10
+
+                firstErrorLineNumStr = firstErrorLineNumStr.Replace("+", "");
+            }
+
+            if (firstErrorLineNumStr.Contains("–"))
+            {
+                //ie: 1-10
+                string[] lineNumSplit = firstErrorLineNumStr.Split('–');
+                firstErrorLineNumStr = lineNumSplit[0];
+            }
+
+            if (Int32.TryParse(firstErrorLineNumStr, out int ihaveaheadache))
+            {
+                //it's a real number! yay!
+                int lineNum = Int32.Parse(firstErrorLineNumStr);
+                lineNum -= 1; //why do I need to do this
+                jsonAnomalyList.Items[0].Selected = true;
+                dgJsonEditor.Rows[lineNum].Selected = true; //this just makes us select the row
+                dgJsonEditor.CurrentCell = dgJsonEditor.Rows[lineNum].Cells[0];//this makes us scroll to the selection
+            }
+        }
+
         private void GoToJsonLine()
         {
             string lineNumStr = jsonAnomalyList.SelectedItems[0].SubItems[0].Text;
@@ -3097,9 +4258,6 @@ namespace WindowsFormsApp1
                 lineNum -= 1; //why do I need to do this
                 dgJsonEditor.Rows[lineNum].Selected = true; //this just makes us select the row
                 dgJsonEditor.CurrentCell = dgJsonEditor.Rows[lineNum].Cells[0];//this makes us scroll to the selection
-
-
-
             }
         }
 
@@ -3183,6 +4341,7 @@ namespace WindowsFormsApp1
 
             string allBeforeLabel = lineStr.Substring(0, indexOfLabel);
             string allAfterLabelIndex = lineStr.Substring(indexOfLabel);
+            allAfterLabelIndex = allAfterLabelIndex.TrimEnd();
             allBeforeLabel = NormalizeWhiteSpace(allBeforeLabel, true);
 
             string spaces = "";
@@ -3201,6 +4360,198 @@ namespace WindowsFormsApp1
             }
 
             return editedLine;
+        }
+        private void setALLProperSpacePrefixes()
+        {
+            //runs through our binding list, line by line. If line has no error we reset the spacing
+
+            int closeBracketLine = -1; //we'll use this to know if we found our closing ]
+
+            int verifiedPlacement = 0;
+            for (int i=0; i<JsonLinesBind.Count; i++)
+            {
+                if (lineHasError(i)) { verifiedPlacement = -1; continue; }//line had an error, don't do anything
+
+                string spacesPrefix = "";
+                string lineString = JsonLinesBind[i].ListItem.ToString();
+                int indexOfLabel = -1;
+                if(i == 0)
+                {
+                    //first line
+                    indexOfLabel = lineString.IndexOf("{"); //there's no errors here, so this should be fine
+                    spacesPrefix = "";//0
+                    goto HaveSpacesAndIndex;
+                } else if (i == 1)
+                {
+                    //2nd line
+                    indexOfLabel = lineString.IndexOf("\"custom"); //there's no errors here, so this should be fine
+                    spacesPrefix = "    ";//4
+                    goto HaveSpacesAndIndex;
+                } else if(closeBracketLine == -1)
+                {
+                    //all lines after first 2 lines
+
+
+                    #region Verify placement isn't lost
+                    if(verifiedPlacement == -1)
+                    {
+                        //we lost our verified Placement because there was an error, we'll reset it
+                        for (int z = 0; z < identifiableFields.Length; z++)
+                        {
+                            if (lineString.Contains(identifiableFields[z]))
+                            {
+
+                                verifiedPlacement = corrPlaceOfIdableFields[z];
+                                break;
+                            }
+                        }
+
+                        //if verified placement is still -1, it wasn't any of those
+                        if (verifiedPlacement == -1)
+                        {
+                            if (lineString.Contains("{"))
+                            {
+                                // SPACE COUNT IS 8, level opener
+                                spacesPrefix = "        ";//8
+                            } else if (lineString.Contains("]")){
+                                //space count is 4
+                                spacesPrefix = "    ";//4
+                                closeBracketLine = i; //set our closeBracketLine so we start setting everything else
+                                indexOfLabel = lineString.IndexOf("]");
+                                goto HaveSpacesAndIndex;
+                            } else if (lineString.Contains("}"))
+                            {
+                                //could be Music closer, or Level closer
+                                if (!lineHasError(i - 1))
+                                {
+                                    if (JsonLinesBind[i - 1].ListItem.ToString().Contains("}"))
+                                    {
+                                        //previous line had a music closer
+                                        //space count is 8
+                                        spacesPrefix = "        ";//8
+                                    } else if (JsonLinesBind[i - 1].ListItem.ToString().Contains("BPM") ||
+                                        JsonLinesBind[i - 1].ListItem.ToString().Contains("bankPath"))
+                                    {
+                                        //previous line had BPM or bankPath in it
+                                        //space count is 12
+                                        spacesPrefix = "            ";//12
+                                    }
+                                } else if (!lineHasError(i + 1))
+                                {
+                                    if (JsonLinesBind[i + 1].ListItem.ToString().Contains("}"))
+                                    {
+                                        //previous line had a music closer
+                                        //space count is 8
+                                        spacesPrefix = "        ";//8
+                                    }
+                                    else if (JsonLinesBind[i + 1].ListItem.ToString().Contains("{") ||
+                                        JsonLinesBind[i + 1].ListItem.ToString().Contains("]"))
+                                    {
+                                        //next line has a level opener, or the closing ]
+                                        //space count is 12
+                                        spacesPrefix = "            ";//12
+                                    }
+                                } else
+                                {
+                                    //could not find spacing, just return the line
+                                    continue;//continue will stop line from being altered
+                                }
+                            }
+                        }
+                    }
+                    #endregion Verify placement isn't lost
+
+                    if (verifiedPlacement >= expectedFields.Length)
+                    {
+                        if (lineString.Contains("]"))
+                        {
+                            indexOfLabel = lineString.IndexOf("]");
+                            spacesPrefix = "    ";//4
+                            goto HaveSpacesAndIndex;
+                        } else
+                        {
+                            verifiedPlacement = 0;
+                        }
+                    } else if(verifiedPlacement == 8 && !lineString.Contains("bankPath"))
+                    {
+                        verifiedPlacement = 9;
+                    } else if(verifiedPlacement == 10 && lineString.Contains("{"))
+                    {
+                        verifiedPlacement = 2;
+                    }
+
+                    //There are NO errors if we're here....
+
+
+                    if(verifiedPlacement == 0)
+                    {
+                        spacesPrefix = "        ";//8
+                    } else if(verifiedPlacement == 1)
+                    {
+                        spacesPrefix = "            ";//12
+                    }
+                    else if(verifiedPlacement == 2)
+                    {
+                        spacesPrefix = "            ";//12
+
+                    } else if(verifiedPlacement <= 3 && verifiedPlacement >= 8)
+                    {
+                        //i donno how to do this in a switch statement
+                        spacesPrefix = "                ";//16
+                    }
+                    else if (verifiedPlacement == 9)
+                    {
+                        spacesPrefix = "            ";//12
+                    }
+                    else if (verifiedPlacement == 10)
+                    {
+                        spacesPrefix = "        ";//8
+                    } else
+                    {
+                        continue;
+                    }
+
+
+                } else
+                {
+                    //we found a ], everything else will be no spaces
+                    indexOfLabel = -2;
+                }
+
+                indexOfLabel = lineString.IndexOf(expectedFields[verifiedPlacement]);
+
+                #region HandleDoublePossibilities
+                if (verifiedPlacement == 2)
+                {
+                    //our expectedField is MainMusic or BossMusic
+                    indexOfLabel = lineString.IndexOf("\"MainMusic\""); //first we look for MainMusic
+                    if (indexOfLabel == -1) indexOfLabel = lineString.IndexOf("\"BossMusic\"");  //if that didn't work, look for BossMusic
+                }
+                #endregion HandleDoublePossibilities
+
+            HaveSpacesAndIndex:
+
+                if (indexOfLabel == -1) continue;//we can't find the label we want, something went wrong
+                if(indexOfLabel == -2)
+                {
+                    //we're handling a line that's after the closing ]
+                    string allTextOnLine = JsonLinesBind[i].ListItem.ToString();
+                    allTextOnLine = NormalizeWhiteSpace(allTextOnLine, true);
+                    JsonLinesBind[i].ListItem = allTextOnLine;
+                }
+
+                string allBeforeLabel = lineString.Substring(0, indexOfLabel);
+                string allAfterLabelIndex = lineString.Substring(indexOfLabel);
+                allBeforeLabel = NormalizeWhiteSpace(allBeforeLabel, true);
+                allAfterLabelIndex = allAfterLabelIndex.TrimEnd();
+
+                string fixedLine = spacesPrefix + allBeforeLabel + allAfterLabelIndex;
+                JsonLinesBind[i].ListItem = fixedLine;
+
+                verifiedPlacement++;
+                //end of for loop
+            }
+
         }
 
         private void HandleLineNums(int indexOfAddedRow, bool subtract = false)
@@ -3409,6 +4760,19 @@ namespace WindowsFormsApp1
         }
 
 
+
+        //i might need to put this in Form1
+        //this function checks to see if it has a verification date AFTER the Json's last modified date
+        private void CheckIfJsonClean()
+        {
+
+
+
+        }
+
+
+
+
         bool managerFixingLine = false;
         private void JsonCellUpdate(object sender, DataGridViewCellEventArgs e)
         {
@@ -3435,8 +4799,9 @@ namespace WindowsFormsApp1
             } else
             {
                 JsonLinesBind.RemoveAt(lineNumZeroBased);
-                justCheckEntireJsonListAgain(lineNumZeroBased);
+                justCheckEntireJsonListAgain(-1);
                 verifyAllDuplicates();
+                HandleLineNums(lineNumZeroBased, true);
             }
 
             
@@ -3463,6 +4828,245 @@ namespace WindowsFormsApp1
 
         }
 
+
+
+        private void enableSaveButton(int NumOfCritErrors, int NumOfPotntlErrors)
+        {
+            //MessageBox.Show("CritErrors: " + NumOfCritErrors + "; PotErrs: " + NumOfPotntlErrors);
+            if(NumOfCritErrors == 0 && NumOfPotntlErrors == 0)
+            { 
+                DebugSaveJsonBtn.ForeColor = Color.FromArgb(255, 255, 255, 255);
+                DebugSaveJsonBtn.BackColor = Color.FromArgb(255, 0, 64, 0);
+                DebugSaveJsonBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 0, 77, 0);
+                DebugSaveJsonBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(255, 0, 40, 0);
+                DebugSaveJsonBtn.FlatAppearance.BorderColor = Color.FromArgb(255, 160, 160, 160);
+                DebugSaveJsonBtn.Enabled = true;
+                Image enabledCheck = MetalManager.Properties.Resources.check;
+                DebugSaveJsonBtn.Image = enabledCheck;
+                SaCBtnLabel.Text = "";
+                debug_undrJsonAnomLbl.Text = "All formating errors and anomalies have been purged from this customsongs.json.";
+
+
+                suspendSongButton.ForeColor = Color.FromArgb(255, 200, 160, 160);
+                suspendSongButton.BackColor = Color.FromArgb(255, 70, 50, 50);
+                suspendSongButton.FlatAppearance.BorderColor = Color.FromArgb(255, 255, 128, 128);
+
+            }
+            if (NumOfCritErrors == 0 && NumOfPotntlErrors > 0)
+            {
+                //no critical errors, but we have potential issues
+                DebugSaveJsonBtn.ForeColor = Color.FromArgb(255, 255, 255, 255);
+                DebugSaveJsonBtn.BackColor = Color.FromArgb(255, 129, 64, 0);
+                DebugSaveJsonBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 145, 75, 0);
+                DebugSaveJsonBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(255, 84, 42, 0);
+                DebugSaveJsonBtn.FlatAppearance.BorderColor = Color.FromArgb(255, 255, 0, 0);
+                DebugSaveJsonBtn.Enabled = true;
+                Image enabledCheck = MetalManager.Properties.Resources.check;
+                DebugSaveJsonBtn.Image = enabledCheck;
+
+                SaCBtnLabel.Width = 200;
+                SaCBtnLabel.Left = 713;
+                SaCBtnLabel.Text = "Potential Issues remain. Only continue if you know what you're doing.";
+                debug_undrJsonAnomLbl.Text = "No formating errors can be found, but Debug Panel found issues that can cause in-game crashes.";
+
+                suspendSongButton.ForeColor = Color.FromArgb(255, 255, 255, 255);
+                suspendSongButton.BackColor = Color.FromArgb(255, 90, 0, 0);
+                suspendSongButton.FlatAppearance.BorderColor = Color.FromArgb(255, 255, 128, 128);
+            }
+            else if(NumOfCritErrors > 0)
+            {
+                DebugSaveJsonBtn.ForeColor = Color.FromArgb(255, 160, 160, 160);
+                DebugSaveJsonBtn.BackColor = Color.FromArgb(255, 128, 128, 128);
+                //DebugSaveJsonBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 0, 77, 0);
+                //DebugSaveJsonBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(255, 0, 40, 0); these don't matter, it's disabled
+                DebugSaveJsonBtn.FlatAppearance.BorderColor = Color.FromArgb(255, 128, 128, 128);
+                DebugSaveJsonBtn.Enabled = false;
+                Image disabledCheck = MetalManager.Properties.Resources.check_stillframe;
+                DebugSaveJsonBtn.Image = disabledCheck;
+                debug_undrJsonAnomLbl.Text = "This customsongs.json contains errors that must be addressed before Metal Manager can select it.";
+
+                suspendSongButton.ForeColor = Color.FromArgb(255, 255, 255, 255);
+                suspendSongButton.BackColor = Color.FromArgb(255, 90, 0, 0);
+                suspendSongButton.FlatAppearance.BorderColor = Color.FromArgb(255, 255, 128, 128);
+                
+
+                SaCBtnLabel.Width = 171;
+                SaCBtnLabel.Left = 742;
+                SaCBtnLabel.Text = "All Critical Errors must be fixed before .json can be saved.";
+            }
+        }
+
+        int maxSongAnalysisWidth = 413;
+        private void StringFitToWidth(Label Lbl, string stringToSqueezeIn)
+        {
+            Lbl.Text = stringToSqueezeIn;
+            int strLength = stringToSqueezeIn.Length;
+            int verymaxStringLmt = 130; //the maximum limit. the label can only fit 130 i's for example
+            if(strLength>verymaxStringLmt) strLength = verymaxStringLmt;
+
+            while(Lbl.Width > 413)
+            {
+                string shrtnd = StringShortener(stringToSqueezeIn, strLength);
+                strLength -= 5;
+            }
+        }
+
+        private string StringShortener(string ogString, int maxLength)
+        {
+            if (ogString.Length > maxLength)
+            {
+                string shortened = ogString.Substring(0, maxLength-2) + "...";
+                return shortened;
+            } else
+            {
+                return ogString;
+            }
+        }
+
+        private string pathShortener(string originalPath, int maxCharacters, int directoriesToShow)
+        {
+            string returnString = originalPath;
+
+            
+            if (originalPath.Length > maxCharacters)
+            {
+                //find the first /, which is likely going to look like R:/
+                int indexOfFirstSlash = originalPath.IndexOf("\\");
+                returnString = "";
+                returnString += originalPath.Substring(0, indexOfFirstSlash + 1); //+1 gives us the slash too
+                returnString += "...\\";
+                string[] dirs = originalPath.Split('\\');
+                //give last few directories
+                int numberOfDirectoriesToShow = directoriesToShow;
+
+                //make sure none of the directories have ridiculous file names
+                if (dirs.Length > numberOfDirectoriesToShow)
+                {
+                    for (int p = 0; p < numberOfDirectoriesToShow; p++)
+                    {
+                        if (dirs[dirs.Length - numberOfDirectoriesToShow + p].ToString().Length > 30)
+                        {
+                            dirs[dirs.Length - numberOfDirectoriesToShow + p] = dirs[dirs.Length - numberOfDirectoriesToShow + p].Substring(0, 27) + "...";
+                        }
+
+                        returnString += dirs[dirs.Length - numberOfDirectoriesToShow + p].ToString();
+                        if (p < numberOfDirectoriesToShow - 1)
+                        {
+                            returnString += "\\";
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Original path: " + originalPath);
+                }
+
+            }
+            return returnString;
+        }
+
+        private void SaC_MouseOver(object sender, MouseEventArgs e)
+        {
+            SaCBtnLabel.Visible = true;
+        }
+
+        private void SaC_MouseOut(object sender, EventArgs e)
+        {
+            SaCBtnLabel.Visible = false;
+        }
+
+        private void suspendBtn_mouseOver(object sender, MouseEventArgs e)
+        {
+            susSongExplLabel.Visible = true;
+        }
+
+        private void suspendBtn_mouseOut(object sender, EventArgs e)
+        {
+            susSongExplLabel.Visible = false;
+        }
+
+        private void RmvSlctdLineBtn_click(object sender, EventArgs e)
+        {
+            var selectedRows = dgJsonEditor.SelectedRows;
+            if(selectedRows.Count > 1)
+            {
+                MessageBox.Show("Please select one line at a time when deleting.");
+                return;
+            } else if(selectedRows.Count == 0)
+            {
+                MessageBox.Show("No row selected.");
+            }
+
+            int selectedIndex = dgJsonEditor.SelectedRows[0].Index;
+            JsonLinesBind.RemoveAt(selectedIndex);
+            justCheckEntireJsonListAgain(-1);
+            verifyAllDuplicates();
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void RescanJsonBtn_Click(object sender, EventArgs e)
+        {
+            justCheckEntireJsonListAgain(-1);
+            verifyAllDuplicates();
+            DisableRescanBtnForFewSeconds();
+
+        }
+        System.Windows.Forms.Timer rescanTimer = new System.Windows.Forms.Timer();
+        private void DisableRescanBtnForFewSeconds() 
+        {
+            rescanTimer.Interval = 2000; // here time in milliseconds
+            rescanTimer.Tick += timer_Tick;
+            rescanTimer.Start();
+            RescanJsonLinesBtn.Text = "Rescan Complete";
+            RescanJsonLinesBtn.Enabled = false;
+        }
+
+        void timer_Tick(object sender, System.EventArgs e)
+        {
+            RescanJsonLinesBtn.Enabled = true;
+            RescanJsonLinesBtn.Text = "Rescan for Errors";
+            rescanTimer.Stop();
+        }
+
+
+        string initialDebugPBText = null; //we'll set this the first time we enter the box
+        private void debugPasteBox_enter(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (initialDebugPBText == null) initialDebugPBText = tb.Text;
+
+            if (tb.Text == initialDebugPBText)
+            {
+                tb.Text = "";
+            }
+        }
+        private void debugPasteBox_unfocus(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (tb.Text == "")
+            {
+                tb.Text = initialDebugPBText;
+            }
+        }
+
+        private void clearDebugPastebox(object sender, EventArgs e)
+        {
+            debugPastebox.Clear();
+        }
+
+
+        private void debugChoseDDSlct(object sender, EventArgs e)
+        {
+            if(debugSongSelectCombo.SelectedIndex > -1)
+            {
+                debug_DropDownSelect();
+            }
+        }
+
+        
     }
 
     public class JsonLineList

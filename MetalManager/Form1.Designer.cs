@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1
+﻿namespace MetalManager
 {
     partial class Form1
     {
@@ -28,10 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.createjson = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.getmodsdir = new System.Windows.Forms.Button();
+            this.components = new System.ComponentModel.Container();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.mainCombo1 = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -87,25 +84,42 @@
             this.checkm8 = new System.Windows.Forms.CheckBox();
             this.mainCombo8 = new System.Windows.Forms.ComboBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.checkBox15 = new System.Windows.Forms.CheckBox();
+            this.button7 = new System.Windows.Forms.Button();
             this.customMusicBankCombo = new System.Windows.Forms.ComboBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.autoSelectGrabLvl = new System.Windows.Forms.CheckBox();
+            this.saveCurrSLButton = new System.Windows.Forms.Button();
+            this.successLabel = new System.Windows.Forms.Label();
+            this.copySLButton = new System.Windows.Forms.Button();
+            this.tutorialGroupBox = new System.Windows.Forms.GroupBox();
+            this.ML9ModLvlButton = new System.Windows.Forms.Button();
+            this.checkm9 = new System.Windows.Forms.CheckBox();
+            this.mainCombo9 = new System.Windows.Forms.ComboBox();
             this.SetList_DebugLabel3 = new System.Windows.Forms.Label();
             this.SetList_DebugLabel2 = new System.Windows.Forms.Label();
             this.SetList_DebugLabel1 = new System.Windows.Forms.Label();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.sL_noCSFoundPanel = new System.Windows.Forms.Panel();
+            this.noSongsFoundLabel = new System.Windows.Forms.Label();
             this.setListCatalog = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.org_modHasErrorsLbl = new System.Windows.Forms.Label();
+            this.organizer_restoreJson = new System.Windows.Forms.Button();
+            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.org_noCSFoundPanel = new System.Windows.Forms.Panel();
+            this.label23 = new System.Windows.Forms.Label();
             this.bSaveLevelInfo = new System.Windows.Forms.Button();
             this.bPasteLevelInfo = new System.Windows.Forms.Button();
+            this.Org_OpenSongInDebug = new System.Windows.Forms.Button();
             this.bCopyLevelButton = new System.Windows.Forms.Button();
             this.mSaveLevelInfo = new System.Windows.Forms.Button();
             this.mPasteLevelInfo = new System.Windows.Forms.Button();
             this.mCopyLevelInfo = new System.Windows.Forms.Button();
             this.debugLabel = new System.Windows.Forms.Label();
             this.supportedLevelsGroup = new System.Windows.Forms.GroupBox();
+            this.L0Settings = new System.Windows.Forms.Button();
+            this.organizer_songDirLbl = new System.Windows.Forms.Label();
+            this.org_openSongDir = new System.Windows.Forms.Button();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.bBankPathTextbox = new System.Windows.Forms.TextBox();
             this.bTrueBankPath = new System.Windows.Forms.Label();
@@ -154,7 +168,7 @@
             this.L4Settings = new System.Windows.Forms.Button();
             this.L3Settings = new System.Windows.Forms.Button();
             this.L1Settings = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.restoredLabel = new System.Windows.Forms.Label();
             this.testBuddy = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -176,14 +190,56 @@
             this.IncaustisRadioButtonM1 = new System.Windows.Forms.RadioButton();
             this.testFindJson = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.debugButton = new System.Windows.Forms.Button();
-            this.label23 = new System.Windows.Forms.Label();
-            this.ModDirLabel = new System.Windows.Forms.Label();
-            this.gameDirInfo = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.topTSM_File = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_linkGameDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_setModFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_openStrmgAssts = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_openModFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_FileSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_revertSetList = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_reloadMods = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_clearSetList = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_FileSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_changeModFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_FileSep3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_quitMM = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_tools = new System.Windows.Forms.ToolStripMenuItem();
+            this.debugPanelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_SetListOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_showTutSetList = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_AllowAutoSelect = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_OrganizerOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_showTutOrganizer = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.whenSelectingSongToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_orgSlctFirstLevel = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_orgSlctFirstSupprtdLvl = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_orgDntChngLvlSlct = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_Debug = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_help = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_getLHLibrary = new System.Windows.Forms.ToolStripMenuItem();
+            this.getLHLibrarySeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_viewHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendFeedbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_about = new System.Windows.Forms.ToolStripMenuItem();
+            this.listSlctnRightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.moveUpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moveDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moveToTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moveToBottomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsm_customSort = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_sortAtoZ = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsm_sortZtoA = new System.Windows.Forms.ToolStripMenuItem();
+            this.setList_topLabel = new System.Windows.Forms.Label();
+            this.testBuddy2 = new System.Windows.Forms.Button();
+            this.BfGWorkerMain = new System.ComponentModel.BackgroundWorker();
+            this.button2 = new System.Windows.Forms.Button();
+            this.mDeleteLevelInfo = new System.Windows.Forms.Button();
+            this.bDeleteLevelInfo = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -195,50 +251,32 @@
             this.groupBox9.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tutorialGroupBox.SuspendLayout();
             this.groupBox12.SuspendLayout();
+            this.sL_noCSFoundPanel.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.groupBox13.SuspendLayout();
+            this.org_noCSFoundPanel.SuspendLayout();
             this.supportedLevelsGroup.SuspendLayout();
             this.groupBox11.SuspendLayout();
             this.groupBox14.SuspendLayout();
             this.panel2.SuspendLayout();
             this.ML1RadioPanel.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
+            this.listSlctnRightClickMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // createjson
-            // 
-            this.createjson.Location = new System.Drawing.Point(856, 483);
-            this.createjson.Name = "createjson";
-            this.createjson.Size = new System.Drawing.Size(92, 23);
-            this.createjson.TabIndex = 0;
-            this.createjson.Text = "Create .json file";
-            this.createjson.UseVisualStyleBackColor = true;
-            this.createjson.Click += new System.EventHandler(this.createjson_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(121, 8);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(399, 20);
-            this.textBox1.TabIndex = 1;
-            // 
-            // getmodsdir
-            // 
-            this.getmodsdir.Location = new System.Drawing.Point(6, 6);
-            this.getmodsdir.Name = "getmodsdir";
-            this.getmodsdir.Size = new System.Drawing.Size(109, 23);
-            this.getmodsdir.TabIndex = 2;
-            this.getmodsdir.Text = "Set Mods Directory";
-            this.getmodsdir.UseVisualStyleBackColor = true;
-            this.getmodsdir.Click += new System.EventHandler(this.getmodsdir_Click);
             // 
             // listBox1
             // 
+            this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(6, 34);
+            this.listBox1.Location = new System.Drawing.Point(6, 19);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(150, 342);
+            this.listBox1.Size = new System.Drawing.Size(188, 342);
             this.listBox1.TabIndex = 3;
+            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox_DrawItem);
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Catalog_MouseDown);
             // 
             // mainCombo1
             // 
@@ -253,13 +291,12 @@
             this.mainCombo1.Size = new System.Drawing.Size(152, 21);
             this.mainCombo1.TabIndex = 2;
             this.mainCombo1.Text = "This Is the End (Default)";
-            this.mainCombo1.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo1.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo1.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.mainCombo1.SelectedValueChanged += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo1.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo1.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo1.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo1.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo1.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.mainCombo1.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo1.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox1
             // 
@@ -270,7 +307,7 @@
             this.groupBox1.Controls.Add(this.checkm1);
             this.groupBox1.Controls.Add(this.mainCombo1);
             this.groupBox1.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox1.Location = new System.Drawing.Point(6, 6);
+            this.groupBox1.Location = new System.Drawing.Point(6, 55);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(268, 67);
             this.groupBox1.TabIndex = 0;
@@ -336,6 +373,7 @@
             this.checkb1.TabIndex = 3;
             this.checkb1.Text = "Boss Fight";
             this.checkb1.UseVisualStyleBackColor = true;
+            this.checkb1.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb1.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // bossCombo1
@@ -351,13 +389,12 @@
             this.bossCombo1.Size = new System.Drawing.Size(152, 21);
             this.bossCombo1.TabIndex = 4;
             this.bossCombo1.Text = "Blood and Law (Default)";
-            this.bossCombo1.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo1.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo1.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.bossCombo1.SelectedValueChanged += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo1.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo1.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo1.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo1.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo1.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.bossCombo1.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo1.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm1
             // 
@@ -371,6 +408,7 @@
             this.checkm1.TabIndex = 1;
             this.checkm1.Text = "Main Level";
             this.checkm1.UseVisualStyleBackColor = true;
+            this.checkm1.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm1.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // groupBox2
@@ -382,7 +420,7 @@
             this.groupBox2.Controls.Add(this.checkm2);
             this.groupBox2.Controls.Add(this.mainCombo2);
             this.groupBox2.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox2.Location = new System.Drawing.Point(6, 79);
+            this.groupBox2.Location = new System.Drawing.Point(6, 127);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(268, 67);
             this.groupBox2.TabIndex = 1;
@@ -448,6 +486,7 @@
             this.checkb2.TabIndex = 7;
             this.checkb2.Text = "Boss Fight";
             this.checkb2.UseVisualStyleBackColor = true;
+            this.checkb2.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb2.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // bossCombo2
@@ -463,13 +502,13 @@
             this.bossCombo2.Size = new System.Drawing.Size(152, 21);
             this.bossCombo2.TabIndex = 8;
             this.bossCombo2.Text = "Infernal Invocation I (Default)";
-            this.bossCombo2.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo2.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo2.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo2.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.bossCombo2.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo2.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo2.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo2.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo2.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo2.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.bossCombo2.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo2.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm2
             // 
@@ -483,6 +522,7 @@
             this.checkm2.TabIndex = 5;
             this.checkm2.Text = "Main Level";
             this.checkm2.UseVisualStyleBackColor = true;
+            this.checkm2.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm2.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo2
@@ -498,13 +538,13 @@
             this.mainCombo2.Size = new System.Drawing.Size(152, 21);
             this.mainCombo2.TabIndex = 6;
             this.mainCombo2.Text = "Stygia (Default)";
-            this.mainCombo2.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo2.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo2.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo2.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.mainCombo2.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo2.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo2.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo2.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo2.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo2.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.mainCombo2.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo2.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox3
             // 
@@ -515,7 +555,7 @@
             this.groupBox3.Controls.Add(this.checkm3);
             this.groupBox3.Controls.Add(this.mainCombo3);
             this.groupBox3.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox3.Location = new System.Drawing.Point(6, 152);
+            this.groupBox3.Location = new System.Drawing.Point(6, 200);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(268, 67);
             this.groupBox3.TabIndex = 2;
@@ -558,6 +598,7 @@
             this.checkb3.TabIndex = 11;
             this.checkb3.Text = "Boss Fight";
             this.checkb3.UseVisualStyleBackColor = true;
+            this.checkb3.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb3.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // ML3ModLvlButton
@@ -596,13 +637,13 @@
             this.bossCombo3.Size = new System.Drawing.Size(152, 21);
             this.bossCombo3.TabIndex = 12;
             this.bossCombo3.Text = "Infernal Invocation II (Default)";
-            this.bossCombo3.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo3.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo3.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo3.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.bossCombo3.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo3.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo3.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo3.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo3.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo3.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.bossCombo3.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo3.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm3
             // 
@@ -616,6 +657,7 @@
             this.checkm3.TabIndex = 9;
             this.checkm3.Text = "Main Level";
             this.checkm3.UseVisualStyleBackColor = true;
+            this.checkm3.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm3.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo3
@@ -631,13 +673,13 @@
             this.mainCombo3.Size = new System.Drawing.Size(152, 21);
             this.mainCombo3.TabIndex = 10;
             this.mainCombo3.Text = "Burial At Night (Default)";
-            this.mainCombo3.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo3.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo3.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo3.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.mainCombo3.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo3.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo3.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo3.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo3.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo3.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.mainCombo3.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo3.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox4
             // 
@@ -648,7 +690,7 @@
             this.groupBox4.Controls.Add(this.checkm4);
             this.groupBox4.Controls.Add(this.mainCombo4);
             this.groupBox4.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox4.Location = new System.Drawing.Point(6, 225);
+            this.groupBox4.Location = new System.Drawing.Point(6, 273);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(268, 67);
             this.groupBox4.TabIndex = 3;
@@ -691,6 +733,7 @@
             this.checkb4.TabIndex = 15;
             this.checkb4.Text = "Boss Fight";
             this.checkb4.UseVisualStyleBackColor = true;
+            this.checkb4.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb4.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // ML4ModLvlButton
@@ -729,13 +772,13 @@
             this.bossCombo4.Size = new System.Drawing.Size(152, 21);
             this.bossCombo4.TabIndex = 16;
             this.bossCombo4.Text = "Infernal Invocation III (Default)";
-            this.bossCombo4.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo4.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo4.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo4.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.bossCombo4.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo4.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo4.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo4.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo4.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo4.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.bossCombo4.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo4.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm4
             // 
@@ -749,6 +792,7 @@
             this.checkm4.TabIndex = 13;
             this.checkm4.Text = "Main Level";
             this.checkm4.UseVisualStyleBackColor = true;
+            this.checkm4.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm4.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo4
@@ -764,13 +808,13 @@
             this.mainCombo4.Size = new System.Drawing.Size(152, 21);
             this.mainCombo4.TabIndex = 14;
             this.mainCombo4.Text = "This Devastation (Default)";
-            this.mainCombo4.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo4.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo4.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo4.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
-            this.mainCombo4.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo4.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo4.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo4.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo4.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo4.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.mainCombo4.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo4.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox5
             // 
@@ -824,6 +868,7 @@
             this.checkb5.TabIndex = 19;
             this.checkb5.Text = "Boss Fight";
             this.checkb5.UseVisualStyleBackColor = true;
+            this.checkb5.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb5.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // ML5ModLvlButton
@@ -862,15 +907,15 @@
             this.bossCombo5.Size = new System.Drawing.Size(152, 21);
             this.bossCombo5.TabIndex = 20;
             this.bossCombo5.Text = "Infernal Invocation II (Default)";
-            this.bossCombo5.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo5.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo5.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo5.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.bossCombo5.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo5.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo5.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo5.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.bossCombo5.TextChanged += new System.EventHandler(this.ComboTextChanged);
             this.bossCombo5.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.bossCombo5.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo5.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo5.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo5.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm5
             // 
@@ -884,6 +929,7 @@
             this.checkm5.TabIndex = 17;
             this.checkm5.Text = "Main Level";
             this.checkm5.UseVisualStyleBackColor = true;
+            this.checkm5.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm5.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo5
@@ -899,15 +945,15 @@
             this.mainCombo5.Size = new System.Drawing.Size(152, 21);
             this.mainCombo5.TabIndex = 18;
             this.mainCombo5.Text = "Poetry of Cinder (Default)";
-            this.mainCombo5.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo5.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo5.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo5.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.mainCombo5.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo5.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo5.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo5.DropDownClosed += new System.EventHandler(this.ComboTextChangeReset);
             this.mainCombo5.TextChanged += new System.EventHandler(this.ComboTextChanged);
             this.mainCombo5.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.mainCombo5.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo5.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo5.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo5.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox6
             // 
@@ -961,6 +1007,7 @@
             this.checkb6.TabIndex = 23;
             this.checkb6.Text = "Boss Fight";
             this.checkb6.UseVisualStyleBackColor = true;
+            this.checkb6.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb6.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // ML6ModLvlButton
@@ -999,14 +1046,14 @@
             this.bossCombo6.Size = new System.Drawing.Size(152, 21);
             this.bossCombo6.TabIndex = 24;
             this.bossCombo6.Text = "Infernal Invocation I (Default)";
-            this.bossCombo6.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo6.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo6.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo6.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.bossCombo6.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo6.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo6.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo6.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.bossCombo6.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.bossCombo6.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo6.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo6.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo6.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo6.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo6.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm6
             // 
@@ -1020,6 +1067,7 @@
             this.checkm6.TabIndex = 21;
             this.checkm6.Text = "Main Level";
             this.checkm6.UseVisualStyleBackColor = true;
+            this.checkm6.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm6.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo6
@@ -1035,14 +1083,14 @@
             this.mainCombo6.Size = new System.Drawing.Size(152, 21);
             this.mainCombo6.TabIndex = 22;
             this.mainCombo6.Text = "Dissolution (Default)";
-            this.mainCombo6.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo6.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo6.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo6.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.mainCombo6.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo6.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo6.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo6.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.mainCombo6.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.mainCombo6.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo6.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo6.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo6.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo6.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo6.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox7
             // 
@@ -1096,6 +1144,7 @@
             this.checkb7.TabIndex = 27;
             this.checkb7.Text = "Boss Fight";
             this.checkb7.UseVisualStyleBackColor = true;
+            this.checkb7.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkb7.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // ML7ModLvlButton
@@ -1134,14 +1183,14 @@
             this.bossCombo7.Size = new System.Drawing.Size(154, 21);
             this.bossCombo7.TabIndex = 28;
             this.bossCombo7.Text = "Infernal Invocation III (Default)";
-            this.bossCombo7.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.bossCombo7.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.bossCombo7.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.bossCombo7.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.bossCombo7.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.bossCombo7.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.bossCombo7.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.bossCombo7.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.bossCombo7.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.bossCombo7.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.bossCombo7.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.bossCombo7.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.bossCombo7.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.bossCombo7.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.bossCombo7.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // checkm7
             // 
@@ -1155,12 +1204,13 @@
             this.checkm7.TabIndex = 25;
             this.checkm7.Text = "Main Level";
             this.checkm7.UseVisualStyleBackColor = true;
+            this.checkm7.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm7.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo7
             // 
             this.mainCombo7.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.mainCombo7.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.mainCombo7.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.mainCombo7.BackColor = System.Drawing.SystemColors.Window;
             this.mainCombo7.CausesValidation = false;
             this.mainCombo7.ForeColor = System.Drawing.SystemColors.WindowText;
@@ -1170,14 +1220,14 @@
             this.mainCombo7.Size = new System.Drawing.Size(154, 21);
             this.mainCombo7.TabIndex = 26;
             this.mainCombo7.Text = "Acheron (Default)";
-            this.mainCombo7.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo7.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo7.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo7.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.mainCombo7.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo7.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo7.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo7.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.mainCombo7.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.mainCombo7.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo7.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo7.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo7.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo7.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo7.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox8
             // 
@@ -1227,6 +1277,7 @@
             this.checkm8.TabIndex = 29;
             this.checkm8.Text = "Main Level";
             this.checkm8.UseVisualStyleBackColor = true;
+            this.checkm8.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
             this.checkm8.Click += new System.EventHandler(this.changeMusicCheckBox_check);
             // 
             // mainCombo8
@@ -1242,48 +1293,56 @@
             this.mainCombo8.Size = new System.Drawing.Size(154, 21);
             this.mainCombo8.TabIndex = 30;
             this.mainCombo8.Text = "Silent No More (Default)";
-            this.mainCombo8.SelectedIndexChanged += new System.EventHandler(this.musicSelectLostFocus);
-            this.mainCombo8.SelectionChangeCommitted += new System.EventHandler(this.changeDefaultGrabLvlText);
-            this.mainCombo8.TextUpdate += new System.EventHandler(this.OnModGrabLvlChangeText);
-            this.mainCombo8.DropDownClosed += new System.EventHandler(this.musicSelectChangeTextDB);
+            this.mainCombo8.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo8.SelectionChangeCommitted += new System.EventHandler(this.musicSelectCombo_slctChngCmtd);
+            this.mainCombo8.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo8.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
             this.mainCombo8.Click += new System.EventHandler(this.changeMusicCheckBox_check);
-            this.mainCombo8.GotFocus += new System.EventHandler(this.musicSelectGainedFocus);
-            this.mainCombo8.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown_GrabLvlBox);
-            this.mainCombo8.LostFocus += new System.EventHandler(this.musicSelectLostFocus);
+            this.mainCombo8.GotFocus += new System.EventHandler(this.musicSelectCombo_gainFocus);
+            this.mainCombo8.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
+            this.mainCombo8.LostFocus += new System.EventHandler(this.musicSelectCombo_lostFocus);
             // 
             // groupBox9
             // 
-            this.groupBox9.Controls.Add(this.checkBox15);
+            this.groupBox9.Controls.Add(this.button7);
             this.groupBox9.Controls.Add(this.customMusicBankCombo);
             this.groupBox9.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox9.Location = new System.Drawing.Point(281, 276);
+            this.groupBox9.Location = new System.Drawing.Point(309, 276);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(256, 45);
+            this.groupBox9.Size = new System.Drawing.Size(243, 45);
             this.groupBox9.TabIndex = 8;
             this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "Custom Music.bank";
+            this.groupBox9.Text = "Music.bank";
             // 
-            // checkBox15
+            // button7
             // 
-            this.checkBox15.AutoSize = true;
-            this.checkBox15.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBox15.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.checkBox15.Location = new System.Drawing.Point(12, 17);
-            this.checkBox15.MaximumSize = new System.Drawing.Size(80, 0);
-            this.checkBox15.Name = "checkBox15";
-            this.checkBox15.Size = new System.Drawing.Size(78, 17);
-            this.checkBox15.TabIndex = 31;
-            this.checkBox15.Text = "Main Level";
-            this.checkBox15.UseVisualStyleBackColor = true;
+            this.button7.BackColor = System.Drawing.Color.Transparent;
+            this.button7.Enabled = false;
+            this.button7.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.button7.FlatAppearance.CheckedBackColor = System.Drawing.Color.Transparent;
+            this.button7.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.button7.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.button7.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button7.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.button7.Location = new System.Drawing.Point(217, 15);
+            this.button7.MaximumSize = new System.Drawing.Size(24, 24);
+            this.button7.MinimumSize = new System.Drawing.Size(24, 24);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(24, 24);
+            this.button7.TabIndex = 32;
+            this.button7.TabStop = false;
+            this.button7.Text = "3";
+            this.button7.UseVisualStyleBackColor = false;
+            this.button7.Visible = false;
             // 
             // customMusicBankCombo
             // 
             this.customMusicBankCombo.BackColor = System.Drawing.SystemColors.Window;
             this.customMusicBankCombo.ForeColor = System.Drawing.SystemColors.WindowText;
             this.customMusicBankCombo.FormattingEnabled = true;
-            this.customMusicBankCombo.Location = new System.Drawing.Point(93, 15);
+            this.customMusicBankCombo.Location = new System.Drawing.Point(13, 17);
             this.customMusicBankCombo.Name = "customMusicBankCombo";
-            this.customMusicBankCombo.Size = new System.Drawing.Size(152, 21);
+            this.customMusicBankCombo.Size = new System.Drawing.Size(204, 21);
             this.customMusicBankCombo.TabIndex = 32;
             // 
             // tabControl1
@@ -1296,11 +1355,15 @@
             this.tabControl1.Size = new System.Drawing.Size(940, 421);
             this.tabControl1.TabIndex = 15;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.TC1_Selecting);
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage1.Controls.Add(this.autoSelectGrabLvl);
+            this.tabPage1.BackColor = System.Drawing.SystemColors.Window;
+            this.tabPage1.Controls.Add(this.saveCurrSLButton);
+            this.tabPage1.Controls.Add(this.successLabel);
+            this.tabPage1.Controls.Add(this.copySLButton);
+            this.tabPage1.Controls.Add(this.tutorialGroupBox);
             this.tabPage1.Controls.Add(this.SetList_DebugLabel3);
             this.tabPage1.Controls.Add(this.SetList_DebugLabel2);
             this.tabPage1.Controls.Add(this.SetList_DebugLabel1);
@@ -1321,21 +1384,117 @@
             this.tabPage1.Size = new System.Drawing.Size(932, 395);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Set List";
+            this.tabPage1.Click += new System.EventHandler(this.FocusTabPage);
             // 
-            // autoSelectGrabLvl
+            // saveCurrSLButton
             // 
-            this.autoSelectGrabLvl.AutoSize = true;
-            this.autoSelectGrabLvl.Checked = true;
-            this.autoSelectGrabLvl.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoSelectGrabLvl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.autoSelectGrabLvl.Location = new System.Drawing.Point(40, 303);
-            this.autoSelectGrabLvl.Name = "autoSelectGrabLvl";
-            this.autoSelectGrabLvl.Size = new System.Drawing.Size(232, 17);
-            this.autoSelectGrabLvl.TabIndex = 30;
-            this.autoSelectGrabLvl.Text = "Auto-select Level if selection isn\'t supported";
-            this.autoSelectGrabLvl.UseVisualStyleBackColor = true;
-            this.autoSelectGrabLvl.MouseLeave += new System.EventHandler(this.AutoSelectLeave);
-            this.autoSelectGrabLvl.MouseHover += new System.EventHandler(this.AutoSelectHover);
+            this.saveCurrSLButton.FlatAppearance.BorderColor = System.Drawing.Color.Green;
+            this.saveCurrSLButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(150)))), ((int)(((byte)(75)))));
+            this.saveCurrSLButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(255)))), ((int)(((byte)(200)))));
+            this.saveCurrSLButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveCurrSLButton.ForeColor = System.Drawing.Color.Black;
+            this.saveCurrSLButton.Location = new System.Drawing.Point(569, 330);
+            this.saveCurrSLButton.Name = "saveCurrSLButton";
+            this.saveCurrSLButton.Padding = new System.Windows.Forms.Padding(0, 0, 0, 2);
+            this.saveCurrSLButton.Size = new System.Drawing.Size(139, 28);
+            this.saveCurrSLButton.TabIndex = 50;
+            this.saveCurrSLButton.Text = "Save Current Set List";
+            this.saveCurrSLButton.UseVisualStyleBackColor = true;
+            this.saveCurrSLButton.Click += new System.EventHandler(this.saveCurrentSetList);
+            // 
+            // successLabel
+            // 
+            this.successLabel.AutoSize = true;
+            this.successLabel.Location = new System.Drawing.Point(591, 316);
+            this.successLabel.Name = "successLabel";
+            this.successLabel.Size = new System.Drawing.Size(94, 13);
+            this.successLabel.TabIndex = 52;
+            this.successLabel.Text = "Success — Saved!";
+            this.successLabel.Visible = false;
+            // 
+            // copySLButton
+            // 
+            this.copySLButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.copySLButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.copySLButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.copySLButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.copySLButton.ForeColor = System.Drawing.Color.Black;
+            this.copySLButton.Location = new System.Drawing.Point(569, 360);
+            this.copySLButton.Name = "copySLButton";
+            this.copySLButton.Size = new System.Drawing.Size(139, 24);
+            this.copySLButton.TabIndex = 51;
+            this.copySLButton.Text = "Copy Set List to Clipboard";
+            this.copySLButton.UseVisualStyleBackColor = true;
+            this.copySLButton.Click += new System.EventHandler(this.copySLButton_click);
+            // 
+            // tutorialGroupBox
+            // 
+            this.tutorialGroupBox.Controls.Add(this.ML9ModLvlButton);
+            this.tutorialGroupBox.Controls.Add(this.checkm9);
+            this.tutorialGroupBox.Controls.Add(this.mainCombo9);
+            this.tutorialGroupBox.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.tutorialGroupBox.Location = new System.Drawing.Point(6, 6);
+            this.tutorialGroupBox.Name = "tutorialGroupBox";
+            this.tutorialGroupBox.Size = new System.Drawing.Size(268, 45);
+            this.tutorialGroupBox.TabIndex = 32;
+            this.tutorialGroupBox.TabStop = false;
+            this.tutorialGroupBox.Text = "Tutorial";
+            // 
+            // ML9ModLvlButton
+            // 
+            this.ML9ModLvlButton.BackColor = System.Drawing.Color.Transparent;
+            this.ML9ModLvlButton.Enabled = false;
+            this.ML9ModLvlButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.ML9ModLvlButton.FlatAppearance.CheckedBackColor = System.Drawing.Color.Transparent;
+            this.ML9ModLvlButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.ML9ModLvlButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.ML9ModLvlButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ML9ModLvlButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.ML9ModLvlButton.Location = new System.Drawing.Point(241, 13);
+            this.ML9ModLvlButton.MaximumSize = new System.Drawing.Size(24, 24);
+            this.ML9ModLvlButton.MinimumSize = new System.Drawing.Size(24, 24);
+            this.ML9ModLvlButton.Name = "ML9ModLvlButton";
+            this.ML9ModLvlButton.Size = new System.Drawing.Size(24, 24);
+            this.ML9ModLvlButton.TabIndex = 31;
+            this.ML9ModLvlButton.TabStop = false;
+            this.ML9ModLvlButton.UseVisualStyleBackColor = false;
+            this.ML9ModLvlButton.Click += new System.EventHandler(this.ML1ModLvlButton_Click);
+            this.ML9ModLvlButton.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modGrabLvl_KeyDown);
+            this.ML9ModLvlButton.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.modGrabLvl_KeyPress);
+            this.ML9ModLvlButton.KeyUp += new System.Windows.Forms.KeyEventHandler(this.modGrabLvl_KeyUp);
+            // 
+            // checkm9
+            // 
+            this.checkm9.AutoSize = true;
+            this.checkm9.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkm9.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.checkm9.Location = new System.Drawing.Point(7, 17);
+            this.checkm9.MaximumSize = new System.Drawing.Size(80, 0);
+            this.checkm9.Name = "checkm9";
+            this.checkm9.Size = new System.Drawing.Size(78, 17);
+            this.checkm9.TabIndex = 29;
+            this.checkm9.Text = "Main Level";
+            this.checkm9.UseVisualStyleBackColor = true;
+            this.checkm9.CheckedChanged += new System.EventHandler(this.SLCheckForUnsaved);
+            this.checkm9.Click += new System.EventHandler(this.changeMusicCheckBox_check);
+            // 
+            // mainCombo9
+            // 
+            this.mainCombo9.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.mainCombo9.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.mainCombo9.BackColor = System.Drawing.SystemColors.Window;
+            this.mainCombo9.CausesValidation = false;
+            this.mainCombo9.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.mainCombo9.FormattingEnabled = true;
+            this.mainCombo9.Location = new System.Drawing.Point(88, 15);
+            this.mainCombo9.Name = "mainCombo9";
+            this.mainCombo9.Size = new System.Drawing.Size(152, 21);
+            this.mainCombo9.TabIndex = 30;
+            this.mainCombo9.Text = "Through You (Default)";
+            this.mainCombo9.SelectedIndexChanged += new System.EventHandler(this.musicSelectCombo_musicSlctChIndx);
+            this.mainCombo9.TextUpdate += new System.EventHandler(this.musicSelectCombo_txtUpdate);
+            this.mainCombo9.DropDownClosed += new System.EventHandler(this.musicSelectCombo_drDwnClz);
+            this.mainCombo9.KeyDown += new System.Windows.Forms.KeyEventHandler(this.musicSelectCombo_KeyDown);
             // 
             // SetList_DebugLabel3
             // 
@@ -1344,7 +1503,7 @@
             this.SetList_DebugLabel3.Name = "SetList_DebugLabel3";
             this.SetList_DebugLabel3.Size = new System.Drawing.Size(531, 13);
             this.SetList_DebugLabel3.TabIndex = 29;
-            this.SetList_DebugLabel3.Text = "Hold SHIFT when clicking to select the level\'s Boss info instead.";
+            this.SetList_DebugLabel3.Text = "Press T key to select Tutorial level info.";
             this.SetList_DebugLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SetList_DebugLabel3.Visible = false;
             // 
@@ -1373,35 +1532,63 @@
             // 
             // groupBox12
             // 
+            this.groupBox12.Controls.Add(this.sL_noCSFoundPanel);
             this.groupBox12.Controls.Add(this.setListCatalog);
-            this.groupBox12.Location = new System.Drawing.Point(628, 6);
+            this.groupBox12.Location = new System.Drawing.Point(714, 6);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(270, 383);
+            this.groupBox12.Size = new System.Drawing.Size(208, 381);
             this.groupBox12.TabIndex = 16;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "Catalog";
             // 
+            // sL_noCSFoundPanel
+            // 
+            this.sL_noCSFoundPanel.Controls.Add(this.noSongsFoundLabel);
+            this.sL_noCSFoundPanel.Location = new System.Drawing.Point(7, 20);
+            this.sL_noCSFoundPanel.Name = "sL_noCSFoundPanel";
+            this.sL_noCSFoundPanel.Size = new System.Drawing.Size(194, 18);
+            this.sL_noCSFoundPanel.TabIndex = 16;
+            this.sL_noCSFoundPanel.Visible = false;
+            // 
+            // noSongsFoundLabel
+            // 
+            this.noSongsFoundLabel.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.noSongsFoundLabel.Location = new System.Drawing.Point(12, 3);
+            this.noSongsFoundLabel.Name = "noSongsFoundLabel";
+            this.noSongsFoundLabel.Size = new System.Drawing.Size(169, 13);
+            this.noSongsFoundLabel.TabIndex = 0;
+            this.noSongsFoundLabel.Text = "No Custom Songs Found!";
+            this.noSongsFoundLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // setListCatalog
             // 
+            this.setListCatalog.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.setListCatalog.FormattingEnabled = true;
             this.setListCatalog.Location = new System.Drawing.Point(6, 19);
             this.setListCatalog.Name = "setListCatalog";
-            this.setListCatalog.Size = new System.Drawing.Size(159, 355);
+            this.setListCatalog.Size = new System.Drawing.Size(196, 355);
             this.setListCatalog.TabIndex = 15;
+            this.setListCatalog.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox_DrawItem);
+            this.setListCatalog.LostFocus += new System.EventHandler(this.refreshListSlctns);
+            this.setListCatalog.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Catalog_MouseDown);
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.bDeleteLevelInfo);
+            this.tabPage2.Controls.Add(this.mDeleteLevelInfo);
+            this.tabPage2.Controls.Add(this.org_modHasErrorsLbl);
+            this.tabPage2.Controls.Add(this.organizer_restoreJson);
+            this.tabPage2.Controls.Add(this.groupBox13);
             this.tabPage2.Controls.Add(this.bSaveLevelInfo);
             this.tabPage2.Controls.Add(this.bPasteLevelInfo);
+            this.tabPage2.Controls.Add(this.Org_OpenSongInDebug);
             this.tabPage2.Controls.Add(this.bCopyLevelButton);
             this.tabPage2.Controls.Add(this.mSaveLevelInfo);
             this.tabPage2.Controls.Add(this.mPasteLevelInfo);
             this.tabPage2.Controls.Add(this.mCopyLevelInfo);
             this.tabPage2.Controls.Add(this.debugLabel);
             this.tabPage2.Controls.Add(this.supportedLevelsGroup);
-            this.tabPage2.Controls.Add(this.listBox1);
-            this.tabPage2.Controls.Add(this.getmodsdir);
-            this.tabPage2.Controls.Add(this.textBox1);
+            this.tabPage2.Controls.Add(this.restoredLabel);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -1409,11 +1596,66 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Organizer";
             this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabPage2.Click += new System.EventHandler(this.FocusTabPage);
+            // 
+            // org_modHasErrorsLbl
+            // 
+            this.org_modHasErrorsLbl.Location = new System.Drawing.Point(221, 11);
+            this.org_modHasErrorsLbl.MaximumSize = new System.Drawing.Size(600, 0);
+            this.org_modHasErrorsLbl.MinimumSize = new System.Drawing.Size(300, 18);
+            this.org_modHasErrorsLbl.Name = "org_modHasErrorsLbl";
+            this.org_modHasErrorsLbl.Size = new System.Drawing.Size(419, 18);
+            this.org_modHasErrorsLbl.TabIndex = 46;
+            this.org_modHasErrorsLbl.Text = "This mod\'s customsongs.json contains errors! Pull up Debug Panel to fix them.";
+            this.org_modHasErrorsLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.org_modHasErrorsLbl.Visible = false;
+            // 
+            // organizer_restoreJson
+            // 
+            this.organizer_restoreJson.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.organizer_restoreJson.Location = new System.Drawing.Point(765, 39);
+            this.organizer_restoreJson.Name = "organizer_restoreJson";
+            this.organizer_restoreJson.Size = new System.Drawing.Size(121, 22);
+            this.organizer_restoreJson.TabIndex = 45;
+            this.organizer_restoreJson.Text = "Restore Original .json";
+            this.organizer_restoreJson.UseVisualStyleBackColor = true;
+            this.organizer_restoreJson.Visible = false;
+            this.organizer_restoreJson.Click += new System.EventHandler(this.RestoreOriginalJson);
+            // 
+            // groupBox13
+            // 
+            this.groupBox13.Controls.Add(this.org_noCSFoundPanel);
+            this.groupBox13.Controls.Add(this.listBox1);
+            this.groupBox13.Location = new System.Drawing.Point(6, 8);
+            this.groupBox13.Name = "groupBox13";
+            this.groupBox13.Size = new System.Drawing.Size(200, 368);
+            this.groupBox13.TabIndex = 44;
+            this.groupBox13.TabStop = false;
+            this.groupBox13.Text = "Catalog";
+            // 
+            // org_noCSFoundPanel
+            // 
+            this.org_noCSFoundPanel.Controls.Add(this.label23);
+            this.org_noCSFoundPanel.Location = new System.Drawing.Point(7, 20);
+            this.org_noCSFoundPanel.Name = "org_noCSFoundPanel";
+            this.org_noCSFoundPanel.Size = new System.Drawing.Size(186, 18);
+            this.org_noCSFoundPanel.TabIndex = 44;
+            this.org_noCSFoundPanel.Visible = false;
+            // 
+            // label23
+            // 
+            this.label23.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.label23.Location = new System.Drawing.Point(11, 3);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(161, 13);
+            this.label23.TabIndex = 0;
+            this.label23.Text = "No Custom Songs Found!";
+            this.label23.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // bSaveLevelInfo
             // 
             this.bSaveLevelInfo.Enabled = false;
-            this.bSaveLevelInfo.Location = new System.Drawing.Point(711, 309);
+            this.bSaveLevelInfo.Location = new System.Drawing.Point(765, 286);
             this.bSaveLevelInfo.Name = "bSaveLevelInfo";
             this.bSaveLevelInfo.Size = new System.Drawing.Size(121, 24);
             this.bSaveLevelInfo.TabIndex = 28;
@@ -1423,7 +1665,7 @@
             // 
             // bPasteLevelInfo
             // 
-            this.bPasteLevelInfo.Location = new System.Drawing.Point(711, 279);
+            this.bPasteLevelInfo.Location = new System.Drawing.Point(765, 256);
             this.bPasteLevelInfo.Name = "bPasteLevelInfo";
             this.bPasteLevelInfo.Size = new System.Drawing.Size(121, 24);
             this.bPasteLevelInfo.TabIndex = 27;
@@ -1431,9 +1673,21 @@
             this.bPasteLevelInfo.UseVisualStyleBackColor = true;
             this.bPasteLevelInfo.Click += new System.EventHandler(this.pasteLevelInfo_Click);
             // 
+            // Org_OpenSongInDebug
+            // 
+            this.Org_OpenSongInDebug.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Org_OpenSongInDebug.Location = new System.Drawing.Point(639, 9);
+            this.Org_OpenSongInDebug.Name = "Org_OpenSongInDebug";
+            this.Org_OpenSongInDebug.Size = new System.Drawing.Size(110, 22);
+            this.Org_OpenSongInDebug.TabIndex = 41;
+            this.Org_OpenSongInDebug.Text = "Open in Debug";
+            this.Org_OpenSongInDebug.UseVisualStyleBackColor = true;
+            this.Org_OpenSongInDebug.Visible = false;
+            this.Org_OpenSongInDebug.Click += new System.EventHandler(this.organizer_debugSelectedSong);
+            // 
             // bCopyLevelButton
             // 
-            this.bCopyLevelButton.Location = new System.Drawing.Point(711, 256);
+            this.bCopyLevelButton.Location = new System.Drawing.Point(765, 233);
             this.bCopyLevelButton.Name = "bCopyLevelButton";
             this.bCopyLevelButton.Size = new System.Drawing.Size(121, 24);
             this.bCopyLevelButton.TabIndex = 26;
@@ -1444,7 +1698,7 @@
             // mSaveLevelInfo
             // 
             this.mSaveLevelInfo.Enabled = false;
-            this.mSaveLevelInfo.Location = new System.Drawing.Point(711, 142);
+            this.mSaveLevelInfo.Location = new System.Drawing.Point(765, 142);
             this.mSaveLevelInfo.Name = "mSaveLevelInfo";
             this.mSaveLevelInfo.Size = new System.Drawing.Size(121, 24);
             this.mSaveLevelInfo.TabIndex = 25;
@@ -1454,7 +1708,7 @@
             // 
             // mPasteLevelInfo
             // 
-            this.mPasteLevelInfo.Location = new System.Drawing.Point(711, 112);
+            this.mPasteLevelInfo.Location = new System.Drawing.Point(765, 112);
             this.mPasteLevelInfo.Name = "mPasteLevelInfo";
             this.mPasteLevelInfo.Size = new System.Drawing.Size(121, 24);
             this.mPasteLevelInfo.TabIndex = 24;
@@ -1464,7 +1718,7 @@
             // 
             // mCopyLevelInfo
             // 
-            this.mCopyLevelInfo.Location = new System.Drawing.Point(711, 89);
+            this.mCopyLevelInfo.Location = new System.Drawing.Point(765, 89);
             this.mCopyLevelInfo.Name = "mCopyLevelInfo";
             this.mCopyLevelInfo.Size = new System.Drawing.Size(121, 24);
             this.mCopyLevelInfo.TabIndex = 23;
@@ -1475,7 +1729,7 @@
             // debugLabel
             // 
             this.debugLabel.AutoSize = true;
-            this.debugLabel.Location = new System.Drawing.Point(550, 18);
+            this.debugLabel.Location = new System.Drawing.Point(604, 18);
             this.debugLabel.MinimumSize = new System.Drawing.Size(260, 0);
             this.debugLabel.Name = "debugLabel";
             this.debugLabel.Size = new System.Drawing.Size(260, 13);
@@ -1487,6 +1741,9 @@
             // 
             // supportedLevelsGroup
             // 
+            this.supportedLevelsGroup.Controls.Add(this.L0Settings);
+            this.supportedLevelsGroup.Controls.Add(this.organizer_songDirLbl);
+            this.supportedLevelsGroup.Controls.Add(this.org_openSongDir);
             this.supportedLevelsGroup.Controls.Add(this.groupBox11);
             this.supportedLevelsGroup.Controls.Add(this.groupBox14);
             this.supportedLevelsGroup.Controls.Add(this.L8Settings);
@@ -1497,13 +1754,49 @@
             this.supportedLevelsGroup.Controls.Add(this.L4Settings);
             this.supportedLevelsGroup.Controls.Add(this.L3Settings);
             this.supportedLevelsGroup.Controls.Add(this.L1Settings);
-            this.supportedLevelsGroup.Location = new System.Drawing.Point(164, 34);
+            this.supportedLevelsGroup.Location = new System.Drawing.Point(218, 34);
             this.supportedLevelsGroup.Name = "supportedLevelsGroup";
             this.supportedLevelsGroup.Size = new System.Drawing.Size(541, 342);
             this.supportedLevelsGroup.TabIndex = 10;
             this.supportedLevelsGroup.TabStop = false;
             this.supportedLevelsGroup.Text = "Supported Levels";
             this.supportedLevelsGroup.MouseHover += new System.EventHandler(this.supportedLevelsGroup_MouseOver);
+            // 
+            // L0Settings
+            // 
+            this.L0Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.L0Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.L0Settings.Location = new System.Drawing.Point(1, 20);
+            this.L0Settings.Name = "L0Settings";
+            this.L0Settings.Size = new System.Drawing.Size(43, 23);
+            this.L0Settings.TabIndex = 9;
+            this.L0Settings.Text = "Tut.";
+            this.L0Settings.UseVisualStyleBackColor = true;
+            this.L0Settings.Click += new System.EventHandler(this.L0Settings_Click);
+            // 
+            // organizer_songDirLbl
+            // 
+            this.organizer_songDirLbl.Location = new System.Drawing.Point(97, 316);
+            this.organizer_songDirLbl.MaximumSize = new System.Drawing.Size(600, 0);
+            this.organizer_songDirLbl.MinimumSize = new System.Drawing.Size(300, 18);
+            this.organizer_songDirLbl.Name = "organizer_songDirLbl";
+            this.organizer_songDirLbl.Size = new System.Drawing.Size(438, 18);
+            this.organizer_songDirLbl.TabIndex = 41;
+            this.organizer_songDirLbl.Text = "...";
+            this.organizer_songDirLbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // org_openSongDir
+            // 
+            this.org_openSongDir.Enabled = false;
+            this.org_openSongDir.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.org_openSongDir.Location = new System.Drawing.Point(6, 315);
+            this.org_openSongDir.Name = "org_openSongDir";
+            this.org_openSongDir.Size = new System.Drawing.Size(90, 21);
+            this.org_openSongDir.TabIndex = 42;
+            this.org_openSongDir.Text = "Open Directory";
+            this.org_openSongDir.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.org_openSongDir.UseVisualStyleBackColor = true;
+            this.org_openSongDir.Click += new System.EventHandler(this.OpenSongDir_click);
             // 
             // groupBox11
             // 
@@ -1526,9 +1819,9 @@
             this.groupBox11.Controls.Add(this.label13);
             this.groupBox11.Controls.Add(this.label14);
             this.groupBox11.Controls.Add(this.label15);
-            this.groupBox11.Location = new System.Drawing.Point(6, 189);
+            this.groupBox11.Location = new System.Drawing.Point(6, 184);
             this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(504, 128);
+            this.groupBox11.Size = new System.Drawing.Size(529, 128);
             this.groupBox11.TabIndex = 1;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Boss Fight";
@@ -1557,6 +1850,7 @@
             this.bTrueBankPath.Text = "bankPath:";
             this.bTrueBankPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bTrueBankPath.Visible = false;
+            this.bTrueBankPath.TextChanged += new System.EventHandler(this.bankInfoModified);
             // 
             // bBankPathLabel
             // 
@@ -1568,6 +1862,7 @@
             this.bBankPathLabel.TabIndex = 24;
             this.bBankPathLabel.Text = "bankPath:";
             this.bBankPathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.bBankPathLabel.Click += new System.EventHandler(this.BankPathFirstClick);
             this.bBankPathLabel.DoubleClick += new System.EventHandler(this.BankPathDblClick);
             // 
             // BFEventBox
@@ -1746,9 +2041,9 @@
             this.groupBox14.Controls.Add(this.label18);
             this.groupBox14.Controls.Add(this.label19);
             this.groupBox14.Controls.Add(this.label20);
-            this.groupBox14.Location = new System.Drawing.Point(6, 55);
+            this.groupBox14.Location = new System.Drawing.Point(6, 50);
             this.groupBox14.Name = "groupBox14";
-            this.groupBox14.Size = new System.Drawing.Size(504, 128);
+            this.groupBox14.Size = new System.Drawing.Size(529, 128);
             this.groupBox14.TabIndex = 0;
             this.groupBox14.TabStop = false;
             this.groupBox14.Text = "Main Level";
@@ -1777,6 +2072,7 @@
             this.mTrueBankPath.Text = "bankPath:";
             this.mTrueBankPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.mTrueBankPath.Visible = false;
+            this.mTrueBankPath.TextChanged += new System.EventHandler(this.bankInfoModified);
             // 
             // mBankPathLabel
             // 
@@ -1788,6 +2084,7 @@
             this.mBankPathLabel.TabIndex = 23;
             this.mBankPathLabel.Text = "bankPath:";
             this.mBankPathLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.mBankPathLabel.Click += new System.EventHandler(this.BankPathFirstClick);
             this.mBankPathLabel.DoubleClick += new System.EventHandler(this.BankPathDblClick);
             // 
             // MLLHBEBox
@@ -1950,9 +2247,9 @@
             this.L8Settings.BackColor = System.Drawing.Color.Transparent;
             this.L8Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L8Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L8Settings.Location = new System.Drawing.Point(471, 20);
+            this.L8Settings.Location = new System.Drawing.Point(477, 20);
             this.L8Settings.Name = "L8Settings";
-            this.L8Settings.Size = new System.Drawing.Size(68, 23);
+            this.L8Settings.Size = new System.Drawing.Size(63, 23);
             this.L8Settings.TabIndex = 8;
             this.L8Settings.Text = "Sheol";
             this.L8Settings.UseVisualStyleBackColor = false;
@@ -1963,9 +2260,9 @@
             this.L7Settings.BackColor = System.Drawing.Color.Transparent;
             this.L7Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L7Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L7Settings.Location = new System.Drawing.Point(404, 20);
+            this.L7Settings.Location = new System.Drawing.Point(415, 20);
             this.L7Settings.Name = "L7Settings";
-            this.L7Settings.Size = new System.Drawing.Size(68, 23);
+            this.L7Settings.Size = new System.Drawing.Size(63, 23);
             this.L7Settings.TabIndex = 7;
             this.L7Settings.Text = "Acheron";
             this.L7Settings.UseVisualStyleBackColor = false;
@@ -1976,9 +2273,9 @@
             this.L6Settings.BackColor = System.Drawing.Color.Transparent;
             this.L6Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L6Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L6Settings.Location = new System.Drawing.Point(337, 20);
+            this.L6Settings.Location = new System.Drawing.Point(353, 20);
             this.L6Settings.Name = "L6Settings";
-            this.L6Settings.Size = new System.Drawing.Size(68, 23);
+            this.L6Settings.Size = new System.Drawing.Size(63, 23);
             this.L6Settings.TabIndex = 6;
             this.L6Settings.Text = "Nihil";
             this.L6Settings.UseVisualStyleBackColor = false;
@@ -1988,9 +2285,9 @@
             // 
             this.L2Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L2Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L2Settings.Location = new System.Drawing.Point(69, 20);
+            this.L2Settings.Location = new System.Drawing.Point(105, 20);
             this.L2Settings.Name = "L2Settings";
-            this.L2Settings.Size = new System.Drawing.Size(68, 23);
+            this.L2Settings.Size = new System.Drawing.Size(63, 23);
             this.L2Settings.TabIndex = 2;
             this.L2Settings.Text = "Stygia";
             this.L2Settings.UseVisualStyleBackColor = true;
@@ -2000,9 +2297,9 @@
             // 
             this.L5Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L5Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L5Settings.Location = new System.Drawing.Point(270, 20);
+            this.L5Settings.Location = new System.Drawing.Point(291, 20);
             this.L5Settings.Name = "L5Settings";
-            this.L5Settings.Size = new System.Drawing.Size(68, 23);
+            this.L5Settings.Size = new System.Drawing.Size(63, 23);
             this.L5Settings.TabIndex = 5;
             this.L5Settings.Text = "Gehenna";
             this.L5Settings.UseVisualStyleBackColor = true;
@@ -2012,9 +2309,9 @@
             // 
             this.L4Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L4Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L4Settings.Location = new System.Drawing.Point(203, 20);
+            this.L4Settings.Location = new System.Drawing.Point(229, 20);
             this.L4Settings.Name = "L4Settings";
-            this.L4Settings.Size = new System.Drawing.Size(68, 23);
+            this.L4Settings.Size = new System.Drawing.Size(63, 23);
             this.L4Settings.TabIndex = 4;
             this.L4Settings.Text = "Incaustis";
             this.L4Settings.UseVisualStyleBackColor = true;
@@ -2024,9 +2321,9 @@
             // 
             this.L3Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L3Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L3Settings.Location = new System.Drawing.Point(136, 20);
+            this.L3Settings.Location = new System.Drawing.Point(167, 20);
             this.L3Settings.Name = "L3Settings";
-            this.L3Settings.Size = new System.Drawing.Size(68, 23);
+            this.L3Settings.Size = new System.Drawing.Size(63, 23);
             this.L3Settings.TabIndex = 3;
             this.L3Settings.Text = "Yhelm";
             this.L3Settings.UseVisualStyleBackColor = true;
@@ -2036,32 +2333,33 @@
             // 
             this.L1Settings.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.L1Settings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.L1Settings.Location = new System.Drawing.Point(2, 20);
+            this.L1Settings.Location = new System.Drawing.Point(43, 20);
             this.L1Settings.Name = "L1Settings";
-            this.L1Settings.Size = new System.Drawing.Size(68, 23);
+            this.L1Settings.Size = new System.Drawing.Size(63, 23);
             this.L1Settings.TabIndex = 1;
             this.L1Settings.Text = "Voke";
             this.L1Settings.UseVisualStyleBackColor = true;
             this.L1Settings.Click += new System.EventHandler(this.L1Settings_Click);
             // 
-            // button2
+            // restoredLabel
             // 
-            this.button2.Location = new System.Drawing.Point(958, 22);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 35);
-            this.button2.TabIndex = 32;
-            this.button2.Text = "Get Rid of Tabs";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.tabRemoval);
+            this.restoredLabel.Location = new System.Drawing.Point(765, 42);
+            this.restoredLabel.Name = "restoredLabel";
+            this.restoredLabel.Size = new System.Drawing.Size(121, 13);
+            this.restoredLabel.TabIndex = 47;
+            this.restoredLabel.Text = "Success — Restored!";
+            this.restoredLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.restoredLabel.Visible = false;
             // 
             // testBuddy
             // 
-            this.testBuddy.Location = new System.Drawing.Point(870, 22);
+            this.testBuddy.Location = new System.Drawing.Point(958, 22);
             this.testBuddy.Name = "testBuddy";
             this.testBuddy.Size = new System.Drawing.Size(75, 35);
             this.testBuddy.TabIndex = 31;
             this.testBuddy.Text = "Show csSupports";
             this.testBuddy.UseVisualStyleBackColor = true;
+            this.testBuddy.Visible = false;
             this.testBuddy.Click += new System.EventHandler(this.testBuddyClick);
             // 
             // panel2
@@ -2121,7 +2419,7 @@
             this.radioButton3.Appearance = System.Windows.Forms.Appearance.Button;
             this.radioButton3.AutoSize = true;
             this.radioButton3.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton3.Image = global::WindowsFormsApp1.Properties.Resources.B;
+            this.radioButton3.Image = global::MetalManager.Properties.Resources.B;
             this.radioButton3.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
             this.radioButton3.Location = new System.Drawing.Point(1, 1);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(0);
@@ -2158,7 +2456,7 @@
             this.radioButton5.Appearance = System.Windows.Forms.Appearance.Button;
             this.radioButton5.AutoSize = true;
             this.radioButton5.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton5.Image = global::WindowsFormsApp1.Properties.Resources.M;
+            this.radioButton5.Image = global::MetalManager.Properties.Resources.M;
             this.radioButton5.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
             this.radioButton5.Location = new System.Drawing.Point(24, 1);
             this.radioButton5.Margin = new System.Windows.Forms.Padding(0);
@@ -2234,7 +2532,7 @@
             this.ML1RadioPanel.Controls.Add(this.NihilRadioButtonM1);
             this.ML1RadioPanel.Controls.Add(this.YhelmRadioButtonM1);
             this.ML1RadioPanel.Controls.Add(this.IncaustisRadioButtonM1);
-            this.ML1RadioPanel.Location = new System.Drawing.Point(565, 301);
+            this.ML1RadioPanel.Location = new System.Drawing.Point(565, 251);
             this.ML1RadioPanel.Name = "ML1RadioPanel";
             this.ML1RadioPanel.Size = new System.Drawing.Size(94, 48);
             this.ML1RadioPanel.TabIndex = 25;
@@ -2400,6 +2698,7 @@
             this.testFindJson.Name = "testFindJson";
             this.testFindJson.Size = new System.Drawing.Size(338, 394);
             this.testFindJson.TabIndex = 16;
+            this.testFindJson.Visible = false;
             // 
             // button1
             // 
@@ -2409,115 +2708,467 @@
             this.button1.TabIndex = 26;
             this.button1.Text = "Clear";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.clearDebug);
+            this.button1.Visible = false;
             // 
-            // debugButton
+            // menuStrip1
             // 
-            this.debugButton.Location = new System.Drawing.Point(1068, 34);
-            this.debugButton.Name = "debugButton";
-            this.debugButton.Size = new System.Drawing.Size(75, 23);
-            this.debugButton.TabIndex = 32;
-            this.debugButton.Text = "Debug";
-            this.debugButton.UseVisualStyleBackColor = true;
-            this.debugButton.Click += new System.EventHandler(this.debugButtonClick);
+            this.menuStrip1.AutoSize = false;
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.topTSM_File,
+            this.tsm_tools,
+            this.toolStripMenuItem5,
+            this.tsm_help});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 1, 0, 0);
+            this.menuStrip1.Size = new System.Drawing.Size(960, 21);
+            this.menuStrip1.TabIndex = 40;
+            this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.Click += new System.EventHandler(this.TopMenuFocus);
             // 
-            // label23
+            // topTSM_File
             // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(87, 503);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(76, 13);
-            this.label23.TabIndex = 33;
-            this.label23.Text = "Mod Directory:";
+            this.topTSM_File.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_linkGameDir,
+            this.tsm_setModFolder,
+            this.tsm_openStrmgAssts,
+            this.tsm_openModFolder,
+            this.tsm_FileSep1,
+            this.tsm_revertSetList,
+            this.tsm_reloadMods,
+            this.tsm_clearSetList,
+            this.tsm_FileSep2,
+            this.tsm_changeModFolder,
+            this.tsm_FileSep3,
+            this.tsm_quitMM});
+            this.topTSM_File.Name = "topTSM_File";
+            this.topTSM_File.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F)));
+            this.topTSM_File.Size = new System.Drawing.Size(37, 20);
+            this.topTSM_File.Text = "File";
             // 
-            // ModDirLabel
+            // tsm_linkGameDir
             // 
-            this.ModDirLabel.AutoSize = true;
-            this.ModDirLabel.Location = new System.Drawing.Point(163, 503);
-            this.ModDirLabel.MaximumSize = new System.Drawing.Size(500, 0);
-            this.ModDirLabel.MinimumSize = new System.Drawing.Size(300, 0);
-            this.ModDirLabel.Name = "ModDirLabel";
-            this.ModDirLabel.Size = new System.Drawing.Size(300, 13);
-            this.ModDirLabel.TabIndex = 34;
-            this.ModDirLabel.Text = "No Mod Folder Set";
-            this.ModDirLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tsm_linkGameDir.Name = "tsm_linkGameDir";
+            this.tsm_linkGameDir.Size = new System.Drawing.Size(193, 22);
+            this.tsm_linkGameDir.Text = "Link Game Directory";
+            this.tsm_linkGameDir.Click += new System.EventHandler(this.SetGameDir);
             // 
-            // gameDirInfo
+            // tsm_setModFolder
             // 
-            this.gameDirInfo.AutoSize = true;
-            this.gameDirInfo.Location = new System.Drawing.Point(87, 480);
-            this.gameDirInfo.Name = "gameDirInfo";
-            this.gameDirInfo.Size = new System.Drawing.Size(116, 13);
-            this.gameDirInfo.TabIndex = 35;
-            this.gameDirInfo.Text = "Game Directory Found!";
+            this.tsm_setModFolder.Name = "tsm_setModFolder";
+            this.tsm_setModFolder.Size = new System.Drawing.Size(193, 22);
+            this.tsm_setModFolder.Text = "Set Mod Folder";
+            this.tsm_setModFolder.Click += new System.EventHandler(this.SetModDir);
             // 
-            // button3
+            // tsm_openStrmgAssts
             // 
-            this.button3.Location = new System.Drawing.Point(63, 474);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(24, 23);
-            this.button3.TabIndex = 36;
-            this.button3.Text = "...";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.SetGameDir);
+            this.tsm_openStrmgAssts.Name = "tsm_openStrmgAssts";
+            this.tsm_openStrmgAssts.Size = new System.Drawing.Size(193, 22);
+            this.tsm_openStrmgAssts.Text = "Open StreamingAssets";
+            this.tsm_openStrmgAssts.Click += new System.EventHandler(this.OpenGameDir);
             // 
-            // button4
+            // tsm_openModFolder
             // 
-            this.button4.Location = new System.Drawing.Point(63, 497);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(24, 23);
-            this.button4.TabIndex = 37;
-            this.button4.Text = "...";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.SetModDir);
+            this.tsm_openModFolder.Name = "tsm_openModFolder";
+            this.tsm_openModFolder.Size = new System.Drawing.Size(193, 22);
+            this.tsm_openModFolder.Text = "Open Mods Folder";
+            this.tsm_openModFolder.Click += new System.EventHandler(this.OpenModDir);
             // 
-            // button5
+            // tsm_FileSep1
             // 
-            this.button5.Location = new System.Drawing.Point(18, 474);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(44, 23);
-            this.button5.TabIndex = 38;
-            this.button5.Text = "Open";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.OpenGameDir);
+            this.tsm_FileSep1.Name = "tsm_FileSep1";
+            this.tsm_FileSep1.Size = new System.Drawing.Size(190, 6);
             // 
-            // button6
+            // tsm_revertSetList
             // 
-            this.button6.Location = new System.Drawing.Point(18, 497);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(44, 23);
-            this.button6.TabIndex = 39;
-            this.button6.Text = "Open";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.OpenModDir);
+            this.tsm_revertSetList.Name = "tsm_revertSetList";
+            this.tsm_revertSetList.Size = new System.Drawing.Size(193, 22);
+            this.tsm_revertSetList.Text = "Revert Set List";
+            this.tsm_revertSetList.ToolTipText = "Reverts Set List to current selections";
+            this.tsm_revertSetList.Click += new System.EventHandler(this.revertSetList_click);
+            // 
+            // tsm_reloadMods
+            // 
+            this.tsm_reloadMods.Name = "tsm_reloadMods";
+            this.tsm_reloadMods.Size = new System.Drawing.Size(193, 22);
+            this.tsm_reloadMods.Text = "Reload Mods List";
+            this.tsm_reloadMods.ToolTipText = "Reloads custom songs/Music.bank entries";
+            this.tsm_reloadMods.Click += new System.EventHandler(this.reloadModsList_click);
+            // 
+            // tsm_clearSetList
+            // 
+            this.tsm_clearSetList.Name = "tsm_clearSetList";
+            this.tsm_clearSetList.Size = new System.Drawing.Size(193, 22);
+            this.tsm_clearSetList.Text = "Clear Set List";
+            this.tsm_clearSetList.ToolTipText = "Resets all music selections on Set List back to default";
+            this.tsm_clearSetList.Click += new System.EventHandler(this.clearSetList_click);
+            // 
+            // tsm_FileSep2
+            // 
+            this.tsm_FileSep2.Name = "tsm_FileSep2";
+            this.tsm_FileSep2.Size = new System.Drawing.Size(190, 6);
+            // 
+            // tsm_changeModFolder
+            // 
+            this.tsm_changeModFolder.Name = "tsm_changeModFolder";
+            this.tsm_changeModFolder.Size = new System.Drawing.Size(193, 22);
+            this.tsm_changeModFolder.Text = "Change Mods Folder";
+            this.tsm_changeModFolder.ToolTipText = "Sets a new directory as Mods folder";
+            this.tsm_changeModFolder.Click += new System.EventHandler(this.ChangeModDir);
+            // 
+            // tsm_FileSep3
+            // 
+            this.tsm_FileSep3.Name = "tsm_FileSep3";
+            this.tsm_FileSep3.Size = new System.Drawing.Size(190, 6);
+            // 
+            // tsm_quitMM
+            // 
+            this.tsm_quitMM.Name = "tsm_quitMM";
+            this.tsm_quitMM.Size = new System.Drawing.Size(193, 22);
+            this.tsm_quitMM.Text = "Quit";
+            this.tsm_quitMM.ToolTipText = "Close Metal Manager";
+            this.tsm_quitMM.Click += new System.EventHandler(this.QuitMM);
+            // 
+            // tsm_tools
+            // 
+            this.tsm_tools.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsm_tools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.debugPanelToolStripMenuItem});
+            this.tsm_tools.Name = "tsm_tools";
+            this.tsm_tools.Size = new System.Drawing.Size(46, 20);
+            this.tsm_tools.Text = "Tools";
+            // 
+            // debugPanelToolStripMenuItem
+            // 
+            this.debugPanelToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.debugPanelToolStripMenuItem.Name = "debugPanelToolStripMenuItem";
+            this.debugPanelToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.debugPanelToolStripMenuItem.Text = "Debug Panel";
+            this.debugPanelToolStripMenuItem.Click += new System.EventHandler(this.OpenDebugPanel);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_SetListOptions,
+            this.tsm_OrganizerOptions,
+            this.tsm_Debug});
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(61, 20);
+            this.toolStripMenuItem5.Text = "Options";
+            // 
+            // tsm_SetListOptions
+            // 
+            this.tsm_SetListOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_showTutSetList,
+            this.tsm_AllowAutoSelect});
+            this.tsm_SetListOptions.Name = "tsm_SetListOptions";
+            this.tsm_SetListOptions.Size = new System.Drawing.Size(141, 22);
+            this.tsm_SetListOptions.Text = "Set List";
+            // 
+            // tsm_showTutSetList
+            // 
+            this.tsm_showTutSetList.Checked = true;
+            this.tsm_showTutSetList.CheckOnClick = true;
+            this.tsm_showTutSetList.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsm_showTutSetList.Name = "tsm_showTutSetList";
+            this.tsm_showTutSetList.Size = new System.Drawing.Size(202, 22);
+            this.tsm_showTutSetList.Text = "Show Tutorial Selections";
+            this.tsm_showTutSetList.CheckedChanged += new System.EventHandler(this.ShowTutInSetListChecked);
+            // 
+            // tsm_AllowAutoSelect
+            // 
+            this.tsm_AllowAutoSelect.Checked = true;
+            this.tsm_AllowAutoSelect.CheckOnClick = true;
+            this.tsm_AllowAutoSelect.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsm_AllowAutoSelect.Name = "tsm_AllowAutoSelect";
+            this.tsm_AllowAutoSelect.Size = new System.Drawing.Size(202, 22);
+            this.tsm_AllowAutoSelect.Text = "Allow Auto-Select";
+            this.tsm_AllowAutoSelect.ToolTipText = "When selecting a mod that has no info for the\r\nLevel we\'re changing, this will au" +
+    "tomatically\r\nselect the most similar level we can find.";
+            this.tsm_AllowAutoSelect.Click += new System.EventHandler(this.AllowAutoSelect_click);
+            // 
+            // tsm_OrganizerOptions
+            // 
+            this.tsm_OrganizerOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_showTutOrganizer,
+            this.toolStripSeparator1,
+            this.whenSelectingSongToolStripMenuItem});
+            this.tsm_OrganizerOptions.Name = "tsm_OrganizerOptions";
+            this.tsm_OrganizerOptions.Size = new System.Drawing.Size(141, 22);
+            this.tsm_OrganizerOptions.Text = "Organizer";
+            // 
+            // tsm_showTutOrganizer
+            // 
+            this.tsm_showTutOrganizer.Checked = true;
+            this.tsm_showTutOrganizer.CheckOnClick = true;
+            this.tsm_showTutOrganizer.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsm_showTutOrganizer.Name = "tsm_showTutOrganizer";
+            this.tsm_showTutOrganizer.Size = new System.Drawing.Size(202, 22);
+            this.tsm_showTutOrganizer.Text = "Show Tutorial Selections";
+            this.tsm_showTutOrganizer.Click += new System.EventHandler(this.ShowTutInOrganizerChecked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(199, 6);
+            // 
+            // whenSelectingSongToolStripMenuItem
+            // 
+            this.whenSelectingSongToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_orgSlctFirstLevel,
+            this.tsm_orgSlctFirstSupprtdLvl,
+            this.tsm_orgDntChngLvlSlct});
+            this.whenSelectingSongToolStripMenuItem.Name = "whenSelectingSongToolStripMenuItem";
+            this.whenSelectingSongToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.whenSelectingSongToolStripMenuItem.Text = "When selecting song...";
+            // 
+            // tsm_orgSlctFirstLevel
+            // 
+            this.tsm_orgSlctFirstLevel.Checked = true;
+            this.tsm_orgSlctFirstLevel.CheckOnClick = true;
+            this.tsm_orgSlctFirstLevel.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsm_orgSlctFirstLevel.Name = "tsm_orgSlctFirstLevel";
+            this.tsm_orgSlctFirstLevel.Size = new System.Drawing.Size(233, 22);
+            this.tsm_orgSlctFirstLevel.Text = "...select first level.";
+            this.tsm_orgSlctFirstLevel.Click += new System.EventHandler(this.Org_ChLvlIndx_byFirstLvl);
+            // 
+            // tsm_orgSlctFirstSupprtdLvl
+            // 
+            this.tsm_orgSlctFirstSupprtdLvl.CheckOnClick = true;
+            this.tsm_orgSlctFirstSupprtdLvl.Name = "tsm_orgSlctFirstSupprtdLvl";
+            this.tsm_orgSlctFirstSupprtdLvl.Size = new System.Drawing.Size(233, 22);
+            this.tsm_orgSlctFirstSupprtdLvl.Text = "...select first supported level.";
+            this.tsm_orgSlctFirstSupprtdLvl.Click += new System.EventHandler(this.Org_ChLvlIndx_by1stSupported);
+            // 
+            // tsm_orgDntChngLvlSlct
+            // 
+            this.tsm_orgDntChngLvlSlct.CheckOnClick = true;
+            this.tsm_orgDntChngLvlSlct.Name = "tsm_orgDntChngLvlSlct";
+            this.tsm_orgDntChngLvlSlct.Size = new System.Drawing.Size(233, 22);
+            this.tsm_orgDntChngLvlSlct.Text = "...don\'t change level selection.";
+            this.tsm_orgDntChngLvlSlct.Click += new System.EventHandler(this.Org_ChLvlIndx_noChng);
+            // 
+            // tsm_Debug
+            // 
+            this.tsm_Debug.Name = "tsm_Debug";
+            this.tsm_Debug.Size = new System.Drawing.Size(141, 22);
+            this.tsm_Debug.Text = "Debug Panel";
+            this.tsm_Debug.Visible = false;
+            // 
+            // tsm_help
+            // 
+            this.tsm_help.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsm_getLHLibrary,
+            this.getLHLibrarySeparator,
+            this.tsm_viewHelp,
+            this.sendFeedbackToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.tsm_about});
+            this.tsm_help.Name = "tsm_help";
+            this.tsm_help.Size = new System.Drawing.Size(44, 20);
+            this.tsm_help.Text = "Help";
+            // 
+            // tsm_getLHLibrary
+            // 
+            this.tsm_getLHLibrary.Name = "tsm_getLHLibrary";
+            this.tsm_getLHLibrary.Size = new System.Drawing.Size(194, 22);
+            this.tsm_getLHLibrary.Text = "Get Low Health Library";
+            this.tsm_getLHLibrary.Click += new System.EventHandler(this.openGetLHLibraryPage);
+            // 
+            // getLHLibrarySeparator
+            // 
+            this.getLHLibrarySeparator.Name = "getLHLibrarySeparator";
+            this.getLHLibrarySeparator.Size = new System.Drawing.Size(191, 6);
+            // 
+            // tsm_viewHelp
+            // 
+            this.tsm_viewHelp.Name = "tsm_viewHelp";
+            this.tsm_viewHelp.Size = new System.Drawing.Size(194, 22);
+            this.tsm_viewHelp.Text = "View Help";
+            this.tsm_viewHelp.Click += new System.EventHandler(this.openHelpPage);
+            // 
+            // sendFeedbackToolStripMenuItem
+            // 
+            this.sendFeedbackToolStripMenuItem.Name = "sendFeedbackToolStripMenuItem";
+            this.sendFeedbackToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.sendFeedbackToolStripMenuItem.Text = "Send Feedback";
+            this.sendFeedbackToolStripMenuItem.Click += new System.EventHandler(this.openSendFeedback);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(191, 6);
+            // 
+            // tsm_about
+            // 
+            this.tsm_about.Name = "tsm_about";
+            this.tsm_about.Size = new System.Drawing.Size(194, 22);
+            this.tsm_about.Text = "About Metal Manager";
+            this.tsm_about.Click += new System.EventHandler(this.openAboutPage);
+            // 
+            // listSlctnRightClickMenu
+            // 
+            this.listSlctnRightClickMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.moveUpToolStripMenuItem,
+            this.moveDownToolStripMenuItem,
+            this.moveToTopToolStripMenuItem,
+            this.moveToBottomToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.tsm_customSort,
+            this.tsm_sortAtoZ,
+            this.tsm_sortZtoA});
+            this.listSlctnRightClickMenu.Name = "listSlctnRightClickMenu";
+            this.listSlctnRightClickMenu.Size = new System.Drawing.Size(162, 164);
+            // 
+            // moveUpToolStripMenuItem
+            // 
+            this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
+            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.moveUpToolStripMenuItem.Text = "Move Up";
+            this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.LBMoveSongUp);
+            // 
+            // moveDownToolStripMenuItem
+            // 
+            this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
+            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.moveDownToolStripMenuItem.Text = "Move Down";
+            this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.LBMoveSongDown);
+            // 
+            // moveToTopToolStripMenuItem
+            // 
+            this.moveToTopToolStripMenuItem.Name = "moveToTopToolStripMenuItem";
+            this.moveToTopToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.moveToTopToolStripMenuItem.Text = "Move to Top";
+            this.moveToTopToolStripMenuItem.Click += new System.EventHandler(this.LBMoveSong2Top);
+            // 
+            // moveToBottomToolStripMenuItem
+            // 
+            this.moveToBottomToolStripMenuItem.Name = "moveToBottomToolStripMenuItem";
+            this.moveToBottomToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.moveToBottomToolStripMenuItem.Text = "Move to Bottom";
+            this.moveToBottomToolStripMenuItem.Click += new System.EventHandler(this.LBMoveSong2Bot);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(158, 6);
+            // 
+            // tsm_customSort
+            // 
+            this.tsm_customSort.Checked = true;
+            this.tsm_customSort.CheckOnClick = true;
+            this.tsm_customSort.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsm_customSort.Name = "tsm_customSort";
+            this.tsm_customSort.Size = new System.Drawing.Size(161, 22);
+            this.tsm_customSort.Text = "Custom Sort";
+            this.tsm_customSort.Click += new System.EventHandler(this.tsm_customSort_click);
+            // 
+            // tsm_sortAtoZ
+            // 
+            this.tsm_sortAtoZ.CheckOnClick = true;
+            this.tsm_sortAtoZ.Name = "tsm_sortAtoZ";
+            this.tsm_sortAtoZ.Size = new System.Drawing.Size(161, 22);
+            this.tsm_sortAtoZ.Text = "Sort A to Z";
+            this.tsm_sortAtoZ.Click += new System.EventHandler(this.tsm_sortAtoZ_click);
+            // 
+            // tsm_sortZtoA
+            // 
+            this.tsm_sortZtoA.CheckOnClick = true;
+            this.tsm_sortZtoA.Name = "tsm_sortZtoA";
+            this.tsm_sortZtoA.Size = new System.Drawing.Size(161, 22);
+            this.tsm_sortZtoA.Text = "Sort Z to A";
+            this.tsm_sortZtoA.Click += new System.EventHandler(this.tsm_sortZtoA_click);
+            // 
+            // setList_topLabel
+            // 
+            this.setList_topLabel.Location = new System.Drawing.Point(266, 24);
+            this.setList_topLabel.MinimumSize = new System.Drawing.Size(260, 0);
+            this.setList_topLabel.Name = "setList_topLabel";
+            this.setList_topLabel.Size = new System.Drawing.Size(534, 13);
+            this.setList_topLabel.TabIndex = 33;
+            this.setList_topLabel.Text = "Starting Metal Manager...";
+            this.setList_topLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.setList_topLabel.Visible = false;
+            // 
+            // testBuddy2
+            // 
+            this.testBuddy2.Location = new System.Drawing.Point(870, 22);
+            this.testBuddy2.Name = "testBuddy2";
+            this.testBuddy2.Size = new System.Drawing.Size(75, 35);
+            this.testBuddy2.TabIndex = 42;
+            this.testBuddy2.Text = "Get Low Healths";
+            this.testBuddy2.UseVisualStyleBackColor = true;
+            this.testBuddy2.Visible = false;
+            this.testBuddy2.Click += new System.EventHandler(this.getLowHealthsTestClick);
+            // 
+            // BfGWorkerMain
+            // 
+            this.BfGWorkerMain.WorkerReportsProgress = true;
+            this.BfGWorkerMain.WorkerSupportsCancellation = true;
+            this.BfGWorkerMain.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BfGWorkerMain_DoWork);
+            this.BfGWorkerMain.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BfGWorkerMain_ProgressChanged);
+            this.BfGWorkerMain.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BfGWorkerMain_RunWorkerCompleted);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(1039, 22);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 35);
+            this.button2.TabIndex = 43;
+            this.button2.Text = "Show Old Set Info";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Visible = false;
+            this.button2.Click += new System.EventHandler(this.getOldSetTest);
+            // 
+            // mDeleteLevelInfo
+            // 
+            this.mDeleteLevelInfo.Enabled = false;
+            this.mDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.mDeleteLevelInfo.Location = new System.Drawing.Point(765, 165);
+            this.mDeleteLevelInfo.Name = "mDeleteLevelInfo";
+            this.mDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
+            this.mDeleteLevelInfo.TabIndex = 48;
+            this.mDeleteLevelInfo.Text = "Delete Main Level Info";
+            this.mDeleteLevelInfo.UseVisualStyleBackColor = true;
+            this.mDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
+            // 
+            // bDeleteLevelInfo
+            // 
+            this.bDeleteLevelInfo.Enabled = false;
+            this.bDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bDeleteLevelInfo.Location = new System.Drawing.Point(765, 309);
+            this.bDeleteLevelInfo.Name = "bDeleteLevelInfo";
+            this.bDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
+            this.bDeleteLevelInfo.TabIndex = 49;
+            this.bDeleteLevelInfo.Text = "Delete Boss Fight Info";
+            this.bDeleteLevelInfo.UseVisualStyleBackColor = true;
+            this.bDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1320, 536);
-            this.Controls.Add(this.button6);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.gameDirInfo);
+            this.ClientSize = new System.Drawing.Size(960, 477);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.ModDirLabel);
-            this.Controls.Add(this.label23);
-            this.Controls.Add(this.debugButton);
+            this.Controls.Add(this.testBuddy2);
+            this.Controls.Add(this.setList_topLabel);
             this.Controls.Add(this.testBuddy);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.ML1RadioPanel);
             this.Controls.Add(this.testFindJson);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.createjson);
             this.Controls.Add(this.panel2);
+            this.Controls.Add(this.menuStrip1);
             this.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = global::MetalManager.Properties.Resources._256;
+            this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Metal Manager";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MMCurtainClosing);
             this.Load += new System.EventHandler(this.FormLoad);
+            this.Shown += new System.EventHandler(this.FormShown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -2535,13 +3186,17 @@
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             this.groupBox9.ResumeLayout(false);
-            this.groupBox9.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.tutorialGroupBox.ResumeLayout(false);
+            this.tutorialGroupBox.PerformLayout();
             this.groupBox12.ResumeLayout(false);
+            this.sL_noCSFoundPanel.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.groupBox13.ResumeLayout(false);
+            this.org_noCSFoundPanel.ResumeLayout(false);
             this.supportedLevelsGroup.ResumeLayout(false);
             this.groupBox11.ResumeLayout(false);
             this.groupBox11.PerformLayout();
@@ -2551,16 +3206,15 @@
             this.panel2.PerformLayout();
             this.ML1RadioPanel.ResumeLayout(false);
             this.ML1RadioPanel.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.listSlctnRightClickMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button createjson;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button getmodsdir;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.ComboBox mainCombo1;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -2601,7 +3255,6 @@
         private System.Windows.Forms.CheckBox checkm8;
         private System.Windows.Forms.ComboBox mainCombo8;
         private System.Windows.Forms.GroupBox groupBox9;
-        private System.Windows.Forms.CheckBox checkBox15;
         private System.Windows.Forms.ComboBox customMusicBankCombo;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
@@ -2698,21 +3351,81 @@
         private System.Windows.Forms.Button mPasteLevelInfo;
         private System.Windows.Forms.Button mCopyLevelInfo;
         private System.Windows.Forms.Label SetList_DebugLabel3;
-        private System.Windows.Forms.CheckBox autoSelectGrabLvl;
         private System.Windows.Forms.Label bTrueBankPath;
         private System.Windows.Forms.Label mTrueBankPath;
         private System.Windows.Forms.TextBox mBankPathTextbox;
         private System.Windows.Forms.TextBox bBankPathTextbox;
         private System.Windows.Forms.Button testBuddy;
+        private System.Windows.Forms.Button L0Settings;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem topTSM_File;
+        private System.Windows.Forms.ToolStripMenuItem tsm_openStrmgAssts;
+        private System.Windows.Forms.ToolStripMenuItem tsm_openModFolder;
+        private System.Windows.Forms.ToolStripSeparator tsm_FileSep3;
+        private System.Windows.Forms.ToolStripMenuItem tsm_quitMM;
+        private System.Windows.Forms.ToolStripMenuItem tsm_tools;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem debugPanelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsm_help;
+        private System.Windows.Forms.ToolStripMenuItem tsm_viewHelp;
+        private System.Windows.Forms.ToolStripMenuItem sendFeedbackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem tsm_about;
+        private System.Windows.Forms.GroupBox tutorialGroupBox;
+        private System.Windows.Forms.Button ML9ModLvlButton;
+        private System.Windows.Forms.CheckBox checkm9;
+        private System.Windows.Forms.ComboBox mainCombo9;
+        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.ToolStripMenuItem tsm_SetListOptions;
+        private System.Windows.Forms.ToolStripMenuItem tsm_OrganizerOptions;
+        private System.Windows.Forms.ToolStripMenuItem tsm_Debug;
+        private System.Windows.Forms.ToolStripMenuItem tsm_showTutSetList;
+        private System.Windows.Forms.ToolStripMenuItem tsm_AllowAutoSelect;
+        private System.Windows.Forms.ToolStripMenuItem tsm_showTutOrganizer;
+        private System.Windows.Forms.ToolStripSeparator tsm_FileSep1;
+        private System.Windows.Forms.ToolStripMenuItem tsm_reloadMods;
+        private System.Windows.Forms.GroupBox groupBox13;
+        private System.Windows.Forms.Button org_openSongDir;
+        private System.Windows.Forms.Button Org_OpenSongInDebug;
+        private System.Windows.Forms.Label organizer_songDirLbl;
+        private System.Windows.Forms.Button organizer_restoreJson;
+        private System.Windows.Forms.Label org_modHasErrorsLbl;
+        private System.Windows.Forms.ContextMenuStrip listSlctnRightClickMenu;
+        private System.Windows.Forms.ToolStripMenuItem moveUpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveDownToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem tsm_customSort;
+        private System.Windows.Forms.ToolStripMenuItem tsm_sortAtoZ;
+        private System.Windows.Forms.ToolStripMenuItem tsm_sortZtoA;
+        private System.Windows.Forms.ToolStripMenuItem tsm_linkGameDir;
+        private System.Windows.Forms.ToolStripMenuItem tsm_setModFolder;
+        private System.Windows.Forms.ToolStripSeparator tsm_FileSep2;
+        private System.Windows.Forms.ToolStripMenuItem tsm_changeModFolder;
+        private System.Windows.Forms.Label setList_topLabel;
+        private System.Windows.Forms.ToolStripMenuItem moveToTopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveToBottomToolStripMenuItem;
+        private System.Windows.Forms.Button testBuddy2;
+        private System.Windows.Forms.Button copySLButton;
+        private System.Windows.Forms.Button saveCurrSLButton;
+        private System.Windows.Forms.ToolStripMenuItem tsm_revertSetList;
+        private System.Windows.Forms.ToolStripMenuItem tsm_clearSetList;
+        private System.ComponentModel.BackgroundWorker BfGWorkerMain;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button debugButton;
+        private System.Windows.Forms.ToolStripMenuItem whenSelectingSongToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsm_orgSlctFirstLevel;
+        private System.Windows.Forms.ToolStripMenuItem tsm_orgSlctFirstSupprtdLvl;
+        private System.Windows.Forms.ToolStripMenuItem tsm_orgDntChngLvlSlct;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.Label successLabel;
+        private System.Windows.Forms.Label restoredLabel;
+        private System.Windows.Forms.Panel sL_noCSFoundPanel;
+        private System.Windows.Forms.Label noSongsFoundLabel;
+        private System.Windows.Forms.Panel org_noCSFoundPanel;
         private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Label ModDirLabel;
-        private System.Windows.Forms.Label gameDirInfo;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.ToolStripMenuItem tsm_getLHLibrary;
+        private System.Windows.Forms.ToolStripSeparator getLHLibrarySeparator;
+        private System.Windows.Forms.Button mDeleteLevelInfo;
+        private System.Windows.Forms.Button bDeleteLevelInfo;
     }
 }
 
