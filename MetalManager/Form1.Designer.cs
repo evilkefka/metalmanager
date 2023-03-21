@@ -103,6 +103,8 @@
             this.noSongsFoundLabel = new System.Windows.Forms.Label();
             this.setListCatalog = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.bDeleteLevelInfo = new System.Windows.Forms.Button();
+            this.mDeleteLevelInfo = new System.Windows.Forms.Button();
             this.org_modHasErrorsLbl = new System.Windows.Forms.Label();
             this.organizer_restoreJson = new System.Windows.Forms.Button();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
@@ -238,8 +240,6 @@
             this.testBuddy2 = new System.Windows.Forms.Button();
             this.BfGWorkerMain = new System.ComponentModel.BackgroundWorker();
             this.button2 = new System.Windows.Forms.Button();
-            this.mDeleteLevelInfo = new System.Windows.Forms.Button();
-            this.bDeleteLevelInfo = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -1597,6 +1597,30 @@
             this.tabPage2.Text = "Organizer";
             this.tabPage2.UseVisualStyleBackColor = true;
             this.tabPage2.Click += new System.EventHandler(this.FocusTabPage);
+            // 
+            // bDeleteLevelInfo
+            // 
+            this.bDeleteLevelInfo.Enabled = false;
+            this.bDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bDeleteLevelInfo.Location = new System.Drawing.Point(765, 309);
+            this.bDeleteLevelInfo.Name = "bDeleteLevelInfo";
+            this.bDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
+            this.bDeleteLevelInfo.TabIndex = 49;
+            this.bDeleteLevelInfo.Text = "Delete Boss Fight Info";
+            this.bDeleteLevelInfo.UseVisualStyleBackColor = true;
+            this.bDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
+            // 
+            // mDeleteLevelInfo
+            // 
+            this.mDeleteLevelInfo.Enabled = false;
+            this.mDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.mDeleteLevelInfo.Location = new System.Drawing.Point(765, 165);
+            this.mDeleteLevelInfo.Name = "mDeleteLevelInfo";
+            this.mDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
+            this.mDeleteLevelInfo.TabIndex = 48;
+            this.mDeleteLevelInfo.Text = "Delete Main Level Info";
+            this.mDeleteLevelInfo.UseVisualStyleBackColor = true;
+            this.mDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
             // 
             // org_modHasErrorsLbl
             // 
@@ -3119,30 +3143,6 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.getOldSetTest);
-            // 
-            // mDeleteLevelInfo
-            // 
-            this.mDeleteLevelInfo.Enabled = false;
-            this.mDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.mDeleteLevelInfo.Location = new System.Drawing.Point(765, 165);
-            this.mDeleteLevelInfo.Name = "mDeleteLevelInfo";
-            this.mDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
-            this.mDeleteLevelInfo.TabIndex = 48;
-            this.mDeleteLevelInfo.Text = "Delete Main Level Info";
-            this.mDeleteLevelInfo.UseVisualStyleBackColor = true;
-            this.mDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
-            // 
-            // bDeleteLevelInfo
-            // 
-            this.bDeleteLevelInfo.Enabled = false;
-            this.bDeleteLevelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bDeleteLevelInfo.Location = new System.Drawing.Point(765, 309);
-            this.bDeleteLevelInfo.Name = "bDeleteLevelInfo";
-            this.bDeleteLevelInfo.Size = new System.Drawing.Size(121, 22);
-            this.bDeleteLevelInfo.TabIndex = 49;
-            this.bDeleteLevelInfo.Text = "Delete Boss Fight Info";
-            this.bDeleteLevelInfo.UseVisualStyleBackColor = true;
-            this.bDeleteLevelInfo.Click += new System.EventHandler(this.deleteMusicInfo);
             // 
             // Form1
             // 

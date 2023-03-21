@@ -824,12 +824,13 @@ namespace MetalManager
             if (Directory.Exists(@exeVerifyPath))
             {
                 string look4Game = exeVerifyPath + "\\Metal.exe";
-                string look4Ignore = exeVerifyPath + "\\ignore.txt";
+                //string look4Ignore = exeVerifyPath + "\\ignore.txt";
                 if (File.Exists(@look4Game))
                 {
                     returnString = exeVerifyPath + "\\Metal_Data\\StreamingAssets";
                     return returnString;
                 }
+                /* Used before we had the checkbox
                 if (File.Exists(@look4Ignore))
                 {
                     returnString = exeVerifyPath;
@@ -838,7 +839,7 @@ namespace MetalManager
                 else
                 {
                     return null;
-                }
+                }*/
             }
 
             //if we got this far, something goofed
@@ -929,13 +930,25 @@ namespace MetalManager
         BindingSource ValidSongBindSrc = new BindingSource();
         List<ListItem> validSongsLI = new List<ListItem>();
 
+        /// <summary>
+        /// Recorded from loadModListFromConfig
+        /// </summary>
+        int numberOfModsWithErrors = 0;
+
+        /// <summary>
+        /// Reads the config file to load Catalog with song selections
+        /// </summary>
+        /// <param name="lBox">The only function that has this to null, isn't used in my program. Don't set this to null.</param>
+        /// <param name="storeCustomMusicBank"></param>
+        /// <returns></returns>
         private string[] loadModListFromConfig(ListBox lBox, bool storeCustomMusicBank = false)
         {
 
             validSongsLI = new List<ListItem>();
             List<string> validSongs = new List<string>();
+            numberOfModsWithErrors = 0;
 
-            if(lBox != null) lBox.Items.Clear();
+            if (lBox != null) lBox.Items.Clear();
             string modListString = "";
             if (di == null) { /*ModDirLabel.Text = "No Mod directory set!";*/ return null; }
             if (!di.Exists) { /*ModDirLabel.Text = "No Mod directory set!";*/ return null; }
@@ -989,9 +1002,14 @@ namespace MetalManager
                 //lBox.Items[lBox.Items.Count].Cont
                 if (sngInfo[0] != "(game)" && (sngInfo[3] == "1" || sngInfo[3] == "2"))
                 {
+                    //we have a song from config that isn't the game, and it's valid
                     modListString += sngInfo[0] + "::";//we return the modListString to know what to fill our ComboBoxes with in SetList; we don't use this anymore
                     validSongs.Add(sngInfo[0]);
                     validSongsLI.Add(new ListItem { Name = sngInfo[0], Path = di + sngInfo[1] + "\\customsongs.json" });
+                } else if(sngInfo[0] != "(game)" && ((sngInfo[3] != "1" && sngInfo[3] != "2")))
+                {
+                    //we found a mod with an error, we're going to just say so in case it's the only one(so we don't block it with "No custom songs found" panel)
+                    numberOfModsWithErrors++;
                 }
             }
 
@@ -2387,6 +2405,55 @@ namespace MetalManager
             return a;
         }
 
+        /// <summary>
+        /// Takes an item from Organizer's listbox and returns its Json
+        /// </summary>
+        /// <param name="orgListBoxIndex"></param>
+        /// <returns></returns>
+        public string GetJsonFromPath(string path, bool whiteSpaceNormalized = false)
+        {
+            //this gives us the JSON in its full, unaltered form
+            
+            /*
+            if (orgListBoxIndex != -1)
+                selectedSong = ((ListItem)listBox1.Items[orgListBoxIndex]).Path;
+            else
+                selectedSong = ((ListItem)listBox1.SelectedItem).Path; //we now store our path in the listbox with the modname, so we'll just grab that
+
+            if (orgListBoxIndex == -1 && listBox1.SelectedItem.ToString() == "Current customsongs.json")
+            {
+                //we want the current custom song
+                //selectedSong = gameDir + "\\customsongs.json"; We get this anyways now
+                currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
+            }
+            else if (orgListBoxIndex != -1 && listBox1.Items[orgListBoxIndex].ToString() == "Current customsongs.json")
+            {
+                currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
+            }*/
+
+            using (StreamReader sr = File.OpenText(@path))
+            {
+                string s = "";
+                string fullText = sr.ReadToEnd();
+
+                if (whiteSpaceNormalized)
+                {
+                    fullText = NormalizeWhiteSpace(fullText);
+                }
+                //fullText = currentGameJsonIndicator + fullText;
+
+
+                return fullText;
+            }
+
+        }
+
+
+        /// <summary>
+        /// Takes an item from Organizer's listbox and returns its Json with linebreaks
+        /// </summary>
+        /// <param name="orgListBoxIndex"></param>
+        /// <returns></returns>
         public string Injector_GetModJson(int orgListBoxIndex = -1)
         {
             //this gives us the JSON in its full, unaltered form
@@ -2400,7 +2467,7 @@ namespace MetalManager
                 //we want the current custom song
                 //selectedSong = gameDir + "\\customsongs.json"; We get this anyways now
                 currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
-            } else if(listBox1.Items[orgListBoxIndex].ToString() == "Current customsongs.json")
+            } else if(orgListBoxIndex != -1 && listBox1.Items[orgListBoxIndex].ToString() == "Current customsongs.json")
             {
                 currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
             }
@@ -2509,6 +2576,12 @@ namespace MetalManager
 
         }
 
+
+        /// <summary>
+        /// Looks for a certain item in the Set List catalog and gets its JSON
+        /// </summary>
+        /// <param name="modDirectory"></param>
+        /// <returns></returns>
         public string SetList_GetModJson(string modDirectory)
         {
             //Open Json file and retrieve info
@@ -2669,7 +2742,8 @@ namespace MetalManager
 
                 storeModListInfo(); //recheck our supported levels
                 setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
-                loadOldInfoIntoSetList(); //this loads the array from the previous line into the fields
+                //loadOldInfoIntoSetList(); //this loads the array from the previous line into the fields
+                RevertOldInfoIntoSetList();
                 setList_topLabel.Visible = false;
                 setList_topLabel.Text = "Starting Metal Manager...";
 
@@ -2690,6 +2764,18 @@ namespace MetalManager
 
         }
 
+        /// <summary>
+        /// Should be used if we ever alter a customsongs.json. Rechecks level support, and 
+        /// </summary>
+        private void refreshAfterSaving()
+        {
+            setList_topLabel.Visible = false;
+            setList_topLabel.Text = "Starting Metal Manager...";
+            storeModListInfo(); //recheck our supported levels
+            setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
+            //loadOldInfoIntoSetList(); //this loads the array from the previous line into the fields
+            RevertOldInfoIntoSetList();
+        }
 
 
         private bool forceSaveOrganizer()
@@ -4696,7 +4782,8 @@ namespace MetalManager
             DirectoryInfo possibleOgFolder = new DirectoryInfo(@possibleOriginalFolder);
             string possibleOriginalJson = thisModsFolder + "\\" + "_Original\\customsongs.json";
 
-            string fullSongJsonInfo = Injector_GetModJson();//gets the entire Json for the mod we're selecting
+            //string fSongJsonInfo = GetJsonFromPath(pathFromModFolder); 
+            //string fullSongJsonInfo = Injector_GetModJson(); This was causing errors and I made a new function and we didn't even NEED THIS!!!alsd;kfjsd;lfk
 
             if (!Directory.Exists(possibleOriginalFolder))
             {
@@ -5200,6 +5287,8 @@ namespace MetalManager
                 SetSelectedLevelColors(dontChangeLevel);
                 setSpecificLevelInfo_Org(songJsonInfo, dontChangeLevelName);
                 resetSongOriginalInfo("");
+
+                refreshAfterSaving();
             }
         }
 
@@ -5219,7 +5308,7 @@ namespace MetalManager
             if (m_or_b == "m") MusicString = "Main";
             else MusicString = "Boss";
 
-            string message = "Are you sure you want to clear the "+ MusicString + " Music on ";
+            string message = "Are you sure you want to delete the "+ MusicString + " Music on ";
             message += capFirst(allLevelNames[lvlInt]);
             message += " for " + modName + "?";
 
@@ -8976,6 +9065,10 @@ namespace MetalManager
                 Phase2Ticking = 0;
                 curColor = 0;
                 successLabel.ForeColor = Color.Black;
+
+                saveCurrSLButton.Text = "Saved to Game";
+                saveCurrSLButton.Enabled = false;
+                tabControl1.Focus();
                 phase++;
                 return;
             } else if(phase == 1)
@@ -8996,6 +9089,8 @@ namespace MetalManager
                 Phase2Ticking++;
                 if(Phase2Ticking >= 70)
                 {
+                    saveCurrSLButton.Text = "Save Current Set List";
+                    saveCurrSLButton.Enabled = true;
                     phase++;
                 }
                 return;
@@ -10161,17 +10256,31 @@ namespace MetalManager
 
             for (int m=0; m<mainCBox.Length; m++)
             {
-                if (!mainCheckBoxes[m].Checked || clearExisting)
+                if (!clearExisting)
                 {
-                    //if clearExisting is false, and the checkbox was checked, we don't fill it
-                    //if clearExisting is true, we don't give a fuck if it's checked
+                    if (!mainCheckBoxes[m].Checked)
+                    {
+                        //if clearExisting is false, and the checkbox was checked, we don't fill it
+                        //if clearExisting is true, we don't give a fuck if it's checked
+                        mainCBox[m].Text = currentSetListName_m[m];
+                        if (currentSetListIndexes_main[m] > -1) { getGrabLvlBtnFromCombo(mainCBox[m]).Enabled = true; } //when loading, if it's an actual mod, enable GrabLvlButton
+                    }
+                } else
+                {
                     mainCBox[m].Text = currentSetListName_m[m];
-                    if(currentSetListIndexes_main[m] > -1) { getGrabLvlBtnFromCombo(mainCBox[m]).Enabled = true; } //when loading, if it's an actual mod, enable GrabLvlButton
+                    if (currentSetListIndexes_main[m] > -1) { getGrabLvlBtnFromCombo(mainCBox[m]).Enabled = true; } //when loading, if it's an actual mod, enable GrabLvlButton
                 }
             }
             for (int b = 0; b < bossCBox.Length; b++)
             {
-                if (!bossCheckBoxes[b].Checked || clearExisting)
+                if (!clearExisting)
+                {
+                    if (!bossCheckBoxes[b].Checked)
+                    {
+                        bossCBox[b].Text = currentSetListName_b[b];
+                        if (currentSetListIndexes_boss[b] > -1) { getGrabLvlBtnFromCombo(bossCBox[b]).Enabled = true; } //when loading, if it's an actual mod, enable GrabLvlButton
+                    }
+                } else
                 {
                     bossCBox[b].Text = currentSetListName_b[b];
                     if (currentSetListIndexes_boss[b] > -1) { getGrabLvlBtnFromCombo(bossCBox[b]).Enabled = true; } //when loading, if it's an actual mod, enable GrabLvlButton
@@ -10517,6 +10626,9 @@ namespace MetalManager
                 SetSelectedLevelColors(dontChangeLevel);
                 setSpecificLevelInfo_Org(songJsonInfo, dontChangeLevelName);
                 resetSongOriginalInfo("");
+
+                refreshAfterSaving();
+
             }
 
         }
@@ -11330,14 +11442,19 @@ namespace MetalManager
 
         private void AddOrRemoveNoSongsFound(string[] modList)
         {
-            if (modList.Length == 0)
+            if (modList.Length == 0 && numberOfModsWithErrors == 0)
             {
+                //we had no songs to fill for Catalogs
+                //modList won't have songs with errors
                 sL_noCSFoundPanel.Visible = true;
+
+                //still might have the game's customsongs.json selection in organizer
                 if (!currentJsonExists())
                     org_noCSFoundPanel.Visible = true;
             }
             else
             {
+                //we had SOMETHING to fill into Catalogs
                 sL_noCSFoundPanel.Visible = false;
                 org_noCSFoundPanel.Visible = false;
             }

@@ -158,12 +158,13 @@ namespace MetalManager
             if (Directory.Exists(@exeVerifyPath))
             {
                 string look4Game = exeVerifyPath + "\\Metal.exe";
-                string look4Ignore = exeVerifyPath + "\\iGnore.txt";
+                //string look4Ignore = exeVerifyPath + "\\iGnore.txt";
                 if (File.Exists(@look4Game))
                 {
                     returnString = exeVerifyPath + "\\Metal_Data\\StreamingAssets";
                     return returnString;
                 }
+                /* Used before we had the checkbox
                 if (File.Exists(@look4Ignore))
                 {
                     returnString = exeVerifyPath;
@@ -173,7 +174,7 @@ namespace MetalManager
                 else
                 {
                     return null;
-                }
+                }*/
             }
 
             //if we got this far, something goofed
@@ -233,20 +234,32 @@ namespace MetalManager
         {
             string modPath = modDirTextbox.Text.Trim();
             //modPath = removeTrailingSlash(modPath);
-            modPath = FixPath(modPath);
+            if (!string.IsNullOrWhiteSpace(modPath))
+            {
+                modPath = FixPath(modPath);
+            }
+            else
+            {
+                modPath = null;
+            }
             string gamePath = gameDirTextbox.Text.Trim();
-            //gamePath = removeTrailingSlash(gamePath);
-            gamePath = FixPath(gamePath);
+            if (!string.IsNullOrWhiteSpace(gamePath))
+            {
+                gamePath = FixPath(gamePath);
+            } else
+            {
+                gamePath = null;
+            }
             bool ignoreGame = dontLinkGame.Checked;
 
             //check if both folders exists
-            if (!Directory.Exists(modPath))
+            if (modPath == null || !Directory.Exists(modPath))
             {
                 modDirFlagLabel.Text = "Directory doesn't exist";
                 modDirTextbox.BackColor = DirBErrC;
                 unlockGate("mod", false);
             }
-            if (!Directory.Exists(gamePath))
+            if (gamePath == null || !Directory.Exists(gamePath))
             {
                 //game directory doesn't exist and we weren't told to ignore it
                 if (!ignoreGame)
@@ -556,7 +569,9 @@ namespace MetalManager
 
         private string FixPath(string originalPath)
         {
-            
+            if (string.IsNullOrWhiteSpace(originalPath)) return null;
+            if (originalPath == "Copy directory and Paste it here, or click Browse...") return null;
+            if (!Directory.Exists(originalPath)) return null;
             string returnPath = removeTrailingSlash(originalPath); //remove \ if we had it at the end
             if (returnPath.Contains("\\\\"))
             {

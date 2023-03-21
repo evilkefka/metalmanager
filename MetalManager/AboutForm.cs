@@ -49,7 +49,7 @@ namespace MetalManager
                     aboutLabel2.Location = new Point(16, 29);
                     aboutLabel2.ForeColor = Color.FromArgb(255, 0, 0, 77);
 
-                    sendFdbkCopyText.Location = new Point(25, 42);
+                    sendFdbkCopyText.Location = new Point(30, 42);
                     sendFdbkCopyText.Visible = true;
 
                     aboutLabel3.Text = "Scroll down to Files, and download low_health_library.zip. Open the Zip, and";
@@ -117,7 +117,7 @@ namespace MetalManager
 
         private void GoToMHDiscord()
         {
-            ProcessStartInfo sInfo = new ProcessStartInfo("discord:///invite-proxy/jRrapbDA9x");
+            ProcessStartInfo sInfo = new ProcessStartInfo("https://discord.com/invite/jRrapbDA9x");
             Process.Start(sInfo);
         }
 

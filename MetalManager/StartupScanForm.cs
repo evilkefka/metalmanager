@@ -30,19 +30,25 @@ namespace MetalManager
         private void GetDirectoriesFromMainForm()
         {
             gDir = ((Form1)MyParentForm).gameDir;
-            if (!Directory.Exists(gDir.ToString()))
+            if (gDir != null)
             {
-                gDir = null;
-                ((Form1)MyParentForm).gameDir = null;
-                Form1.AddOrUpdateAppSettings("gameDirectory", "");
+                if (!Directory.Exists(gDir.ToString()))
+                {
+                    gDir = null;
+                    ((Form1)MyParentForm).gameDir = null;
+                    Form1.AddOrUpdateAppSettings("gameDirectory", "");
+                }
             }
 
             modDi = ((Form1)MyParentForm).di;
-            if (!Directory.Exists(modDi.ToString()))
+            if (modDi != null)
             {
-                modDi = null;
-                ((Form1)MyParentForm).di = null;
-                Form1.AddOrUpdateAppSettings("modDirectory", "");
+                if (!Directory.Exists(modDi.ToString()))
+                {
+                    modDi = null;
+                    ((Form1)MyParentForm).di = null;
+                    Form1.AddOrUpdateAppSettings("modDirectory", "");
+                }
             }
         }
 
@@ -73,13 +79,13 @@ namespace MetalManager
         List<string[]> SongsToBeIgnored;
         List<string[]> SuspendedSongs;
         List<string[]> SongsToDeleteFromConfig;
-        
 
+        string errTrack = "";
         private void CompareSongsBtwnConfigAndModDir()
         {
             //We're going to compare our lists, and decide what to do with each song. If we can't find a match, we need to add or delete a song from Config
             //Or we edit if we see a matching name (this assumes program has prompted user to rename any matching song names)
-
+            
             
             
 
@@ -88,7 +94,9 @@ namespace MetalManager
             SuspendedSongs = new List<string[]>();
             SongsToDeleteFromConfig = new List<string[]>();
             SongsToDeleteFromConfig.AddRange(CurrCustomSongsInConfig);//we'll slowly remove this as we find our entries
-            
+
+            errTrack += "past inits. ";
+
             foreach (string[] ModDirSongInfo in CurrentSongsInModFolder)
             {
                 //first check if there's no songs in Config; if there isn't, we're going to just add everything
@@ -96,6 +104,7 @@ namespace MetalManager
                 {
                     AddSongToConfigFile(ModDirSongInfo[0], ModDirSongInfo[1], ModDirSongInfo[2], "");
                     SongsToBeScanned.Add(ModDirSongInfo);
+                    errTrack += "a. ";
                     continue;
                 }
 
@@ -104,7 +113,7 @@ namespace MetalManager
                 for (int i = 0; i < CurrCustomSongsInConfig.Count; i++)
                 {
                     string[] CnfgSongInfo = CurrCustomSongsInConfig[i];
-
+                    errTrack += "b" + i + " " + CnfgSongInfo[0];
 
                     if (CnfgSongInfo[0] == ModDirSongInfo[0])
                     {
@@ -140,7 +149,7 @@ namespace MetalManager
                         goto FoundDecision; //break out of for loop, and stay away from AddSongToConfig
                     }
                 }
-
+                errTrack += "c. ";
                 //We are done with our for loop. If we don't know what to do with this ModDirSongInfo, it means 
                 //it's new/wasn't in our Config, we want to add it (and error scan)
                 AddSongToConfigFile(ModDirSongInfo[0], ModDirSongInfo[1], ModDirSongInfo[2], "");
@@ -148,18 +157,22 @@ namespace MetalManager
                 continue; //Goes to next ModDir custom song (after adding a new Mod)
 
             FoundDecision:
+                errTrack += "d. ";
                 continue; //Check next song in Mod dir
 
             }
-
+            errTrack += "e. ";
             //we have gone through every entry in our Mod's folder and found matches to our Config songs
             //if there's anything that wasn't just touched in our Config file, we deleted a Mod, we need to delete its entry from the Config file
             foreach (string[] deletedMod in SongsToDeleteFromConfig)
             {
-                if (deletedMod == null) continue;
+                errTrack += "f. ";
+                if (deletedMod == null) { errTrack += "x. "; continue; }
                 //if we got this far, it isn't null
                 DeleteSongFromConfigFile(deletedMod[0]); //delete the song from the config file
+                
             }
+            errTrack += "g. ";
         }
 
         List<string[]> SongsWithErrors;
@@ -403,15 +416,24 @@ namespace MetalManager
         private void GetCustomSongsInConfig()
         {
             CurrCustomSongsInConfig = new List<string[]>();
-            
+
 
             //DeleteAllUnfoundSongsInConfig();
+            
 
+            string[][] songListScrapedFromConfig = Form1.ReadTheGODDAMNConfigFile();
+
+            foreach (string[] sngInfo in songListScrapedFromConfig)
+            {
+                CurrCustomSongsInConfig.Add(sngInfo);
+            }
+
+            /*
             foreach (var endpoint in ConfigDataDaddy.Customsongs.CustomsongsList)
             {
                 string[] endpointsSongInfo = { endpoint.Name, endpoint.SongInfo.Path, endpoint.SongInfo.LastWriteTime, endpoint.SongInfo.LastVerifiedTime };
                 CurrCustomSongsInConfig.Add(endpointsSongInfo);
-            }
+            }*/
             
         }
         /*
@@ -599,15 +621,23 @@ namespace MetalManager
         /// <param name="sName">Name of custom song</param>
         public static void DeleteSongFromConfigFile(string sName)
         {
-            var xmlDoc = new XmlDocument();
-            xmlDoc.Load(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+            try
+            {
+                var xmlDoc = new XmlDocument();
 
-            XmlNode nodeSongName = xmlDoc.SelectSingleNode("//CustomSongsConfig/Customsongs/add[@name='" + sName + "']");
-            nodeSongName.ParentNode.RemoveChild(nodeSongName);
+                xmlDoc.Load(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
 
-            xmlDoc.Save(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("CustomSongsConfig/Customsongs");
+                XmlNode nodeSongName = xmlDoc.SelectSingleNode("//CustomSongsConfig/Customsongs/add[@name='" + sName + "']");
+                nodeSongName.ParentNode.RemoveChild(nodeSongName);
+
+                xmlDoc.Save(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("CustomSongsConfig/Customsongs");
+            } 
+            catch
+            {
+                MessageBox.Show("It's failing here");
+            }
         }
 
         private void StartUpVerify()
@@ -2312,10 +2342,12 @@ namespace MetalManager
 
         }
 
+        int currentProcess = -1;
         private void BfGStartupWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             for(int i=0; i < progressReports.Length; i++)
             {
+                currentProcess = i;
                 if (i == 0)
                 {
                     GetDirectoriesFromMainForm();
@@ -2381,7 +2413,7 @@ namespace MetalManager
                     errMsg = errMsg.Substring(0, 1000) + "...";
                 }
                 MessageBox.Show("Metal Manager encountered a fatal error and cannot continue:\n" + e.Error.Message);
-                CloseManagerFromError("totalCalamity-01");
+                CloseManagerFromError("totalCalamity-Z"+ currentProcess+"\n"+ errTrack);
             } else
             {
                 //we successfully got through all work!
