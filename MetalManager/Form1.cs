@@ -4687,10 +4687,13 @@ namespace MetalManager
 
             string LvlNameCapd = allLevelNames[zeroIndexLevel].Substring(0, 1).ToUpper() + allLevelNames[zeroIndexLevel].Substring(1).ToLower(); //voke->Voke
             string newJson = getJsonWithInjection(fullSongJsonInfo, LvlNameCapd, m_or_b, newInfo);
+            
 
             newJson = newJson.Replace("\n\n", "\n"); //having too many returns is easy. having not enough is stupid
+            
             newJson = fixAllCommas(newJson);
             
+
             bool newJsonHasErrors = verifyNoErrors(newJson.ToString());
             if (newJsonHasErrors)
             {
@@ -5100,88 +5103,7 @@ namespace MetalManager
             return returnString;
         }
 
-        private string getFullInfoForLevel(string fullJson, string Level)
-        {
-            //retrieves the entire info block for one level, with all whitespace and linebreaks
 
-
-            bool isCurrentJson = false;
-            //if we see <> at the beginning, it's just an indicator to know we're looking at a Json in the game folder, meaning the one the game's currently using
-            if (fullJson.Substring(0, 2) == "<>")
-            {
-                isCurrentJson = true;//this doesn't do anything at the moment
-                fullJson = fullJson.Substring(2);
-            }
-
-            string[] jsonLines = fullJson.Split('\n');
-            if (jsonLines.Length == 1)
-            {
-                //MessageBox.Show("Hm..");
-            }
-            int lineWithLevel = findNextLineWith(jsonLines, Level);
-            int lastLevelLine = lineWithLevel;//we're about to find out what our last line of our level is
-
-            if (lineWithLevel == -1)
-            {
-                return "";
-            }
-
-            //if we got this far, we have info for this level; either the Main, the Boss, or both
-            if (jsonLines[lastLevelLine + 1].Contains("MainMusic"))
-            {
-                //we have info for the MainMusic on this level
-                //that means we have Bank, Event, LowHealth, Offset, and BPM; we also MIGHT have BankPath
-                lastLevelLine += 1; //this puts us the "MainMusic" line
-                lastLevelLine += 5; //1 would put us on Bank, 5 puts us on the BPM line
-                if (jsonLines[lastLevelLine + 1].Contains("bankPath")) lastLevelLine++; //we do have a bankPath, add a line
-
-                lastLevelLine += 1; //this puts us at MainMusic's }
-
-                if (jsonLines[lastLevelLine + 1].Contains("BossMusic"))
-                {
-                    //we have both MainMusic AND BossMusic in the Json for this Level
-                    lastLevelLine += 1; //this puts us at the opening { for "BossMusic"
-                    lastLevelLine += 1; //this puts us the "BossMusic" line
-                    lastLevelLine += 5; //1 would put us on Bank, 5 puts us on the BPM line
-                    if (jsonLines[lastLevelLine + 1].Contains("bankPath")) lastLevelLine++; //we do have a bankPath, add a line
-                }
-
-
-            }
-            else
-            {
-                //the level does NOT have information for the MainMusic
-                if (jsonLines[lastLevelLine + 1].Contains("BossMusic"))
-                {
-                    //we have only BossMusic in the Json for this Level
-                    lastLevelLine += 1; //this puts us the "BossMusic" line
-                    lastLevelLine += 5; //1 would put us on Bank, 5 puts us on the BPM line
-                    if (jsonLines[lastLevelLine + 1].Contains("bankPath")) lastLevelLine++; //we do have a bankPath, add a line
-
-                    lastLevelLine += 1; //this puts us at BossMusic's first closing }
-                } else
-                {
-                    //we don't have boss music, and we don't have main music
-                    return "error";
-                }
-            }
-
-            //wherever we are, we add one more } to close the level
-            lastLevelLine++;
-
-            string returnString = "";
-            //we want lineWithLevel-1 because we want the { before that
-            int numberOfLines = 0;
-            for (int i = lineWithLevel - 1; i <= lastLevelLine; i++)
-            {
-                returnString += jsonLines[i] + "\n";
-                //if (i != lastLevelLine) returnString += "\n"; extra \n extra n
-                numberOfLines++;
-            }
-            return returnString;
-
-
-        }
 
 
         //need to create a function to inject code into a JSON that already exists
@@ -5210,6 +5132,7 @@ namespace MetalManager
                 //the level we're editing had info in the JSON already
                 //replace the info
                 string replacementBlock = replaceInfoForExistingLevel(fullJson, Level, m_or_b, newLevelInfoNugget); //make a chunk that has new level info
+                
                 replacementBlock = replacementBlock.Replace("/n/n", "/n"); //we're going to get rid of all double-returns...
 
                 string originalBlock = getTrueFullLevelBlock(fullJson, Level); //used to be getTRUEFullInfoForLevel(fullJson, Level);
@@ -5228,7 +5151,10 @@ namespace MetalManager
                 string returnString = fullJson;
                 //returnString = returnString.Replace("\r", "");
                 //string testString = fullJson;
+                
+                
                 returnString = returnString.Replace(originalBlock, replacementBlock); //replace the original chunk with the new level info chunk
+                
 
 
                 //if (!returnString.Contains(originalBlock)) { MessageBox.Show("We couldn't find the original block in the JSON file"); }
@@ -5609,12 +5535,49 @@ namespace MetalManager
                     continue;
                 }
 
+
+
+                
+                //we're also going to fix any bpms that don't get their bankPaths properly put in
+                string lineNoWhtSpc = NormalizeWhiteSpace(lines[i], true);
+                if (lineNoWhtSpc.Contains("\"BPM\":"))
+                {
+                    string nxtLnNS = NormalizeWhiteSpace(lines[i + 1], true);
+                    if (nxtLnNS.Contains("\"bankPath\":"))
+                    {
+
+                        if (!lines[i].Contains(","))
+                        {
+                            fixedText += lines[i] + ",\n";
+                        }
+                        else
+                        {
+                            fixedText += lines[i] + "\n";
+                        }
+                        continue;
+                    }
+                    else if (!nxtLnNS.Contains("\"bankPath\":"))
+                    {
+                        //this line has BPM, and next line does not have bankPath. Make sure we have no comma
+                        if (lines[i].Contains(","))
+                        {
+                            fixedText += lines[i].Replace(",", "") + "\n";
+                        } else
+                        {
+                            fixedText += lines[i] + "\n";
+                        }
+                        
+                    }
+                    continue; //dont do more work if this was BPM
+                }
+
                 if ((lines[i].Contains("}") && !lines[i].Contains("{"))
                     && !squareBracketFound)
                 {
                     //the line we're on is either a Music closing line, or level closing line
                     string previousLineNoSpaces = NormalizeWhiteSpace(lines[i - 1], true);
                     string nextLineNoSpaces = NormalizeWhiteSpace(lines[i + 1], true);
+
                     if (previousLineNoSpaces.Contains("\"BPM\":") || lines[i - 1].Contains("\"bankPath\":"))
                     {
                         //previous line says has BPM or bankPath, we're on the Music Closing line
@@ -5655,7 +5618,7 @@ namespace MetalManager
                             }
                         } else
                         {
-                            //next line does not open another level, make sure there's no comma
+                            //next line does not open another level, make sure there's no comma. If user put a comma in the middle, this might even throw it away
                             fixedText += lines[i].Replace(",", "") + "\n";
                         }
                     }
@@ -5809,15 +5772,18 @@ namespace MetalManager
             //this code takes a JSON and changes only the individual lines for a level that already exists
             //MessageBox.Show("New Level info: " + newLevelInfoNugget);
             string returnString = "";
+            
 
             string fullSongJsonInfo = fullJson;
-            string fullInfo = getFullInfoForLevel(fullSongJsonInfo, Level); //level must be capped; this gives us the chunk of the level with all the whitespace and linebreaks
+            string fullInfo = getTrueFullLevelBlock(fullSongJsonInfo, Level);//level must be capped; this gives us the chunk of the level with all the whitespace and linebreaks
+            //string fullInfo = getFullInfoForLevel(fullSongJsonInfo, Level); //why did i have like 5 of these that don't work!?!
 
             string[] levelChunkLines = fullInfo.Split('\n'); //breaks up the lines into an array of strings
             if (levelChunkLines.Length == 1)
             {
                 levelChunkLines = fullInfo.Split('\r'); //all of a sudden the program keeps crashing when this isn't here... hmmmmmm......
             }
+            
 
             //first line is { ... index 0
             //second line is "LevelName" : "Stygia", index 1
@@ -5832,8 +5798,8 @@ namespace MetalManager
                 {
                     //we found the info we want to change!
 
-                    bool addingNewLine = false;
-
+                    //bool addingNewLine = false;
+                    int lineToAddBankpath = -1;
                     lineWereOn += 1; //now we're on the Bank line
                     string[] newLevelInfoLines = newLevelInfoNugget.Split('\n'); //the first line is going to be "Bank":
                     //newLevelInfoLines.Length can be 5 or 6, if we have a bankPath or not
@@ -5845,11 +5811,11 @@ namespace MetalManager
                             if (levelChunkLines[lineWereOn].Contains("bankPath"))
                             {
                                 //the line has a "bankPath" in it already, so just replace it as normal
-
+                                //this won't get called if we didn't have a bankPath entered when saving in Organizer
                             } else
                             {
                                 //we don't have a bank path in here, we need to stop this code before it hits the code to replace the line
-                                addingNewLine = true;
+                                lineToAddBankpath = lineWereOn;
                                 break;
                             }
 
@@ -5859,8 +5825,20 @@ namespace MetalManager
 
                         lineWereOn++;
                     }
+                    
+                    if (newLevelInfoLines.Length == 5)
+                    {
+                        //we did not have a bankPath being added. if we had one, make it blank
+                        if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
+                        {
+                            
+                            levelChunkLines[lineWereOn] = "";
+                            lineWereOn++;
+                        }
+                    }
 
-                    if (addingNewLine)
+
+                    if (lineToAddBankpath != -1)
                     {
                         levelChunkLines = addToStringArray(levelChunkLines, newLevelInfoLines[5], lineWereOn); //runs a for loop that gives us a new string[] with newLevelInfoLines[5] added
                     }
@@ -5917,6 +5895,7 @@ namespace MetalManager
                     //newLevelInfoLines.Length can be 5 or 6, if we have a bankPath or not
                     for (int i = 0; i < newLevelInfoLines.Length; i++)
                     {
+                        //i will be 5 if we were trying to change or add a bankpath
                         if (i == 5)
                         {
                             //if i is 5, it means we had a bankPath; make sure there's one here too, or make a new line if not
@@ -5930,16 +5909,24 @@ namespace MetalManager
                                 //we don't have a bank path in here, we need to stop this code before it hits the code to replace the line
 
                                 lineToAddBankpath = lineWereOn;
-                                continue;
+                                break;
                             }
 
                         }
 
-
-
                         levelChunkLines[lineWereOn] = newLevelInfoLines[i];
-
                         lineWereOn++;
+                    }
+                    
+                    if (newLevelInfoLines.Length == 5)
+                    {
+                        //we did not have a bankPath being added. if we had one, make it blank
+                        if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
+                        {
+                            
+                            levelChunkLines[lineWereOn] = "";
+                            lineWereOn++;
+                        }
                     }
 
                     if (lineToAddBankpath != -1)
@@ -5955,7 +5942,7 @@ namespace MetalManager
                     int lineToAddBankpath = -1;
 
                     //we're editing or adding BossMusic, but we have all this MainMusic info in the way already
-                    bool addingNewLine = false; //for bankPath
+                    //bool addingNewLine = false; //for bankPath, uneeded since we use actual lineToAddBankPath
                     string[] newLevelInfoLines = newLevelInfoNugget.Split('\n'); //the first line is going to be "Bank":
 
                     lineWereOn += 6; //+1 puts us on Bank, +5 puts us on BPM, +6 is either "bankPath", or MainMusic's closing }
@@ -5963,7 +5950,7 @@ namespace MetalManager
                     {
                         lineWereOn += 1;
                     }
-                    //now we're 100% on MainMusic's closing }
+                    //now we're 100% on BossMusic's closing }
                     lineWereOn += 1; //now we're on the Level's closing } or existing BossMusic info
 
                     if (levelChunkLines[lineWereOn].Contains("\"BossMusic\""))
@@ -5987,6 +5974,7 @@ namespace MetalManager
                                     //we don't have a bank path in here, we need to stop this code before it hits the code to replace the line
 
                                     lineToAddBankpath = lineWereOn;
+                                    
                                     continue;
                                 }
 
@@ -5996,9 +5984,20 @@ namespace MetalManager
 
                             lineWereOn++;
                         }
+                        
+                        if (newLevelInfoLines.Length == 5)
+                        {
+                            //we did not have a bankPath being added. if we had one, make it blank
+                            if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
+                            {
+                                
+                                levelChunkLines[lineWereOn] = "";
+                                lineWereOn++;
+                            }
+                        }
 
 
-                        if (addingNewLine)
+                        if (lineToAddBankpath != -1)
                         {
                             levelChunkLines = addToStringArray(levelChunkLines, newLevelInfoLines[5], lineWereOn); //runs a for loop that gives us a new string[] with newLevelInfoLines[5] added
                         }
@@ -6032,11 +6031,12 @@ namespace MetalManager
                 //if (line != null && line != "") <-used to be
                 if (!string.IsNullOrWhiteSpace(line))
                 {
+                    
                     returnString += line + '\n'; //I don't get how Join works
                 }
             }
 
-
+            
             //this gives me an extra return after BPM for replacing Boss Music with a Bankpath
 
             return returnString;
