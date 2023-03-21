@@ -288,7 +288,10 @@ namespace MetalManager
             }
 
             //if we got this far, we're golden!
+            //this is the last stop before we write to the config, making sure our game directory isn't bugged and doesn't look stupid
             streamingAssetsDir = streamingAssetsDir.Substring(0, 1).ToUpper() + streamingAssetsDir.Substring(1); //make the first letter CAPPED!!
+            streamingAssetsDir = streamingAssetsDir.Replace("\\\\", "\\"); //i know we do this already, but these keep popping up....
+
             gameDi = new DirectoryInfo(@streamingAssetsDir);
             AddOrUpdateAppSettings("gameDirectory", streamingAssetsDir);
 

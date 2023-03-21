@@ -449,6 +449,7 @@ namespace MetalManager
                 if (thisMusicBanksFileSize == gameMBFileSize)
                 {
                     if (foundGameMusicBank) continue;
+                    
                     if (foundLHLibrary)
                     {
                         SongsWithCustomMusicBanks.Insert(1, new ListItem { Name = "Game's Default", Path = musicBankpath });
@@ -484,11 +485,37 @@ namespace MetalManager
                 }
             }
 
-            ModFolderHoldsOrgnlMusicBank = foundGameMusicBank; 
+
+
+
+            ModFolderHoldsOrgnlMusicBank = foundGameMusicBank;
             //if we've ever seen the game's original Music.bank in Mods folder, ModFolderHoldsOriginalMusicBank gets set to true until mods reload
             //we'll store this boolean for later if we're replacing the Music.bank
 
+            //if we never found and added the gameMusic bank from the Mods folder, we'll see if it's sitting in the actual game folder
+            if (!foundGameMusicBank)
+            {
+                if (gameDir == null) return;
+                if (!Directory.Exists(gameDir.ToString())) return;
+                if (!File.Exists(gameDir + "\\Music.bank")) return;
 
+                string gameMusicBankPath = gameDir.ToString() + "\\Music.bank";
+                FileInfo gamesMusicBankFile = new System.IO.FileInfo(gameMusicBankPath);
+                long gamesCrntMusicBanksFileSize = gamesMusicBankFile.Length;
+                if (gamesCrntMusicBanksFileSize != gameMBFileSize) return;
+                
+                //if we got this far, we just found the game's original Music.bank in its StreamingAssets folder, allow it to be a selection
+
+                if (foundLHLibrary)
+                {
+                    SongsWithCustomMusicBanks.Insert(1, new ListItem { Name = "Game's Default", Path = gameMusicBankPath });
+                }
+                else
+                {
+                    SongsWithCustomMusicBanks.Insert(0, new ListItem { Name = "Game's Default", Path = gameMusicBankPath });
+                }
+            }
+            
         }
 
 
@@ -10450,6 +10477,7 @@ namespace MetalManager
             string musicBankpath = gameDir + "\\Music.bank";
             if (!File.Exists(musicBankpath)) { return; }
 
+            /* We do this somewhere else now
             FileInfo musicBankFile = new System.IO.FileInfo(musicBankpath);
             long gamesCurrMusicBanksFiSz = musicBankFile.Length;
 
@@ -10468,7 +10496,7 @@ namespace MetalManager
                 {
                     customMusicBankCombo.Items.Insert(1, new ListItem { Name = "Game's Default .Bank", Path = musicBankpath });
                 }
-            }
+            }*/
 
             //after going this far, if we have NO items in musicBank, we can't leave the user stranded. So just add the game's current
             AddCurrentMusicBankIfComboEmpty();
@@ -12626,7 +12654,14 @@ namespace MetalManager
                     //If it is, we're going to automatically store it in Mods folder before rewriting it
                     if (slctdMusicBankName != "Game's Default .Bank")
                     {
-                        CheckToMakeDefaultMusicBankBackup();
+                        //CheckToMakeDefaultMusicBankBackup will return false if we needed to make a backup and it failed doing so
+                        if(CheckToMakeDefaultMusicBankBackup() == false)
+                        {
+                            string bankBackupUnsuccessful = "Set List creation was cancelled because we hit an error when\n" +
+                                                         "attemping to backup the game's default Music.bank";
+                            MessageBox.Show(bankBackupUnsuccessful);
+                            return null;
+                        }
                     }
 
                     verificationFromMusicBankCreation = ReplaceCurrentMusicDotBank(musicBankPath);
@@ -12721,13 +12756,13 @@ namespace MetalManager
         /// <summary>
         /// If about to rewrite Music.bank, checks if we should and can create a backup of game's default Music.bank, before doing so
         /// </summary>
-        private void CheckToMakeDefaultMusicBankBackup()
+        private bool CheckToMakeDefaultMusicBankBackup()
         {
-            if (customMusicBankCombo.SelectedIndex <= -1) return; //Music.bank combo box wasn't selected to anything, we're not overwriting it
+            if (customMusicBankCombo.SelectedIndex <= -1) return true; //Music.bank combo box wasn't selected to anything, we're not overwriting it
 
             string slctdMBankName = ((ListItem)customMusicBankCombo.SelectedItem).Name;
 
-            //Game's Default .Bank selection shows up if it sees we have the game's default bank in Mods folder OR game's StreamingAssets folder 
+            //Game's Default .Bank selection shows up if it sees we have the game's default bank in Mods folder OR game's StreamingAssets folder<-No it doesn't!
             if (slctdMBankName != "Game's Default .Bank")
             {
                 if (!ModFolderHoldsOrgnlMusicBank)
@@ -12741,30 +12776,36 @@ namespace MetalManager
                     {
                         //We have the game in our StreamingAssets folder and we're about to rewrite the only known copy
                         //Make a backup of game's default Music.bank
-                        BackupDefaultMusicBankFile();
+                        if (BackupDefaultMusicBankFile())
+                            return true;
+                        else
+                            return false;
                     }
                     else
                     {
                         // The game isn't using its default Music.bank, and we don't have it in mods folder
                         // Hopefully it wasn't our fault and also: we're kinda SOL if we ever need it
+                        return true;
                     }
                 }
                 else
                 {
                     //mod folder already has backup of default Music.bank
+                    return true;
                 }
             }
+            return true; //we're seleting the game's default Music.bank, we're not going to replace it
         }
 
 
         /// <summary>
         /// Copies the game's current Music.bank file and puts it in a folder called _DefaultMusicBank
         /// </summary>
-        private void BackupDefaultMusicBankFile()
+        private bool BackupDefaultMusicBankFile()
         {
             string possibleDfltMscBnkFldr = di + "\\_DefaultMusicBank";
 
-            if (!File.Exists(gameDir + "\\Music.bank")) return; //there's nothing to copy
+            if (!File.Exists(gameDir + "\\Music.bank")) return true; //there's nothing to copy
 
             if (!Directory.Exists(@possibleDfltMscBnkFldr)) goto CopyBank;
 
@@ -12774,7 +12815,14 @@ namespace MetalManager
             if (fileCount == 0)
             {
                 //no files, delete it and continue
-                Directory.Delete(DirPath.ToString(), true);
+                try
+                {
+                    Directory.Delete(DirPath.ToString(), true);
+                }
+                catch
+                {
+                    return false;
+                }
             } else
             {
                 //there's something in here. We've already verified game's default doesn't exist in Mods folder, though
@@ -12787,8 +12835,18 @@ namespace MetalManager
             Directory.CreateDirectory(possibleDfltMscBnkFldr);
             string ogPath = gameDir + "\\Music.bank";
             string newPath = possibleDfltMscBnkFldr + "\\Music.bank";
-            File.Move(ogPath, newPath);
+            try
+            {
+                File.Move(ogPath, newPath);
+            }
+            catch
+            {
+                return false;
+            }
             //File.Copy(ogPath, newPath);
+            //if we got this far, it was successful
+            ModFolderHoldsOrgnlMusicBank = true;
+            return true;
         }
 
 
@@ -13593,7 +13651,7 @@ namespace MetalManager
                 return;
             }
 
-            string newJson = MakeSetList();
+            string newJson = MakeSetList(true); //if MakeSetList has true, we're going to copy the Music.bank
             if (newJson == null)
             {
                 SetList_DebugLabel1.Text = "Something prevented customsongs.json from being written. :(";
