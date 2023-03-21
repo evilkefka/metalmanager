@@ -12380,7 +12380,10 @@ namespace MetalManager
                         int lvlToGetFromModInt = getLevelNumFromModGrabLvlButton(mainLvlGrabButton[i]);
                         string capdLvlToGrab = allLevelNames[lvlToGetFromModInt].Substring(0, 1).ToUpper() + allLevelNames[lvlToGetFromModInt].Substring(1);
 
-                        string[] sInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, "m");
+                        string mainOrBoss = "m";
+                        if (mainLvlGrabButton[i].Image != null) mainOrBoss = "b";
+
+                        string[] sInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, mainOrBoss);
                         if (sInfo == null) continue;
 
                         string lhEvent = "";
@@ -12477,7 +12480,10 @@ namespace MetalManager
 
                         if (songsJson != null)
                         {
-                            mSongInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, "m");
+                            string mainOrBoss = "m";
+                            if (mainLvlGrabButton[i].Image != null) mainOrBoss = "b";
+
+                            mSongInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, mainOrBoss);
                             if (mSongInfo != null)
                             {
                                 string bankPathValue = getPathFromComboBoxSlctn(mainCBox[i].Text, mSongInfo[0]);
@@ -12517,7 +12523,9 @@ namespace MetalManager
 
                         if (songsJson != null)
                         {
-                            bSongInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, "b");
+                            string mainOrBoss = "b";
+                            if (bossLvlGrabButton[i].Image != null) mainOrBoss = "m";
+                            bSongInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, mainOrBoss);
                             if (bSongInfo != null)
                             {
                                 string bankPathValue = getPathFromComboBoxSlctn(bossCBox[i].Text, bSongInfo[0]);
