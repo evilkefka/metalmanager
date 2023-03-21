@@ -10453,8 +10453,9 @@ namespace MetalManager
             FileInfo musicBankFile = new System.IO.FileInfo(musicBankpath);
             long gamesCurrMusicBanksFiSz = musicBankFile.Length;
 
-            if (gamesCurrMusicBanksFiSz == gameMBFileSize &&
-                customMusicBankCombo.Items[0].ToString() != "Game's Default .Bank" && customMusicBankCombo.Items[1].ToString() != "Game's Default .Bank")
+            if (customMusicBankCombo.Items.Count > 0 &&
+                gamesCurrMusicBanksFiSz == gameMBFileSize &&
+                customMusicBankCombo.Items[0].ToString() != "Game's Default .Bank" && (customMusicBankCombo.Items.Count > 1 && customMusicBankCombo.Items[1].ToString() != "Game's Default .Bank"))
             {
                 //up until this moment, we didn't know we had the Game's Default bank. The user probably doesn't have a back up in Mod's folder.
                 //if we overwrite this, we need to copy it to the ModsFolder
@@ -10468,7 +10469,7 @@ namespace MetalManager
                     customMusicBankCombo.Items.Insert(1, new ListItem { Name = "Game's Default .Bank", Path = musicBankpath });
                 }
             }
-            
+
             //after going this far, if we have NO items in musicBank, we can't leave the user stranded. So just add the game's current
             AddCurrentMusicBankIfComboEmpty();
 
@@ -13560,13 +13561,14 @@ namespace MetalManager
             {
                 if (mBtn.Text == "?") continue;
                 mBtn.Text = "";
+                mBtn.Image = null;
             }
             foreach (Button bBtn in bossLvlGrabButton)
             {
                 if (bBtn.Text == "?") continue;
                 bBtn.Text = "";
+                bBtn.Image = null;
             }
-
         }
 
 
