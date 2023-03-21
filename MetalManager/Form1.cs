@@ -4226,7 +4226,7 @@ namespace MetalManager
 
                 }
                 bPasteLevelInfo.Enabled = false;
-
+                bDeleteLevelInfo.Enabled = false;
             }
             else if ((Level != "Sheol" && Level != "Tutorial") && !BFNameBox.Enabled)
             {
