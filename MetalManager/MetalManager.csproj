@@ -60,6 +60,12 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CleanUpSAForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CleanUpSAForm.Designer.cs">
+      <DependentUpon>CleanUpSAForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigCreator.cs" />
     <Compile Include="ConfigDataDaddy\Configuration\CustomConfigurationSection.cs" />
     <Compile Include="ConfigDataDaddy\Configuration\EndpointsConfiguration.cs" />
@@ -78,6 +84,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetDirsForm.cs">
@@ -94,6 +101,9 @@
     </Compile>
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CleanUpSAForm.resx">
+      <DependentUpon>CleanUpSAForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DebugForm.resx">
       <DependentUpon>DebugForm.cs</DependentUpon>
@@ -118,7 +128,9 @@
     <EmbeddedResource Include="StartupScanForm.resx">
       <DependentUpon>StartupScanForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Properties\DataSources\StringValue.datasource" />
+    <None Include="Properties\DataSources\StringValue.datasource">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -172,6 +184,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\start.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pause.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\reset.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

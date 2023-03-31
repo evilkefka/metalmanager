@@ -389,11 +389,11 @@ namespace MetalManager
         /// <summary>
         /// Known filesize of Metal Hellsinger's default Music.bank
         /// </summary>
-        long gameMBFileSize;
+        public long gameMBFileSize;
         /// <summary>
         /// Known filesize of Low Health Library's Music.bank
         /// </summary>
-        long LHLibraryFileSize;
+        public long LHLibraryFileSize;
         private void GetMusicBankFilesizes()
         {
             string origMusicBankFileSz = ConfigurationManager.AppSettings["gmbfs"];
@@ -806,6 +806,8 @@ namespace MetalManager
                         }
 
                         saveCurrSLButton.Enabled = true; //this was disabled when we didn't have a game linked yet
+                        reApplyAllBanksBtn.Enabled = true;
+                        cleanUpSABtn.Enabled = true;
 
                         //gameDirInfo.Text = "Game Directory Found!";
                     } else
@@ -8713,6 +8715,10 @@ namespace MetalManager
             //find the full level info
             //look for main music
             //look for boss music
+            if (fullJson.Contains("\n"))
+            {
+                fullJson = NormalizeWhiteSpace(fullJson);
+            }
             int firstLevelSupported = -1;
 
             //right now, level L0 is considered Level 9 or index 8 in certain spots.
@@ -8726,6 +8732,7 @@ namespace MetalManager
 
             for (int i = 0; i < numberOfLevels; i++)
             {
+                
                 string capitalizeLevelName = "\"" + allLevelNames[i].Substring(0, 1).ToUpper() + allLevelNames[i].Substring(1) + "\"";
                 int indexOfLevelInfo = fullJson.IndexOf(capitalizeLevelName);
 
@@ -8757,7 +8764,7 @@ namespace MetalManager
                 }
 
 
-                if (indexOfLevelInfoEnd == -1) return -1; //we found start of a level, but couldn't find } }, there must be formatting errors
+                if (indexOfLevelInfoEnd == -1) { MessageBox.Show("BOOBOO");  return -1; }//we found start of a level, but couldn't find } }, there must be formatting errors
                 
                 //at this point, we have information for whatever level this is
 
@@ -8793,6 +8800,7 @@ namespace MetalManager
                     //wtf? We have an entry for the level but don't have any info for main level or boss fight?
                     LevelButtons[i].BackColor = Color.RosyBrown;
                 }
+                
             }
 
 
@@ -9093,7 +9101,10 @@ namespace MetalManager
                 curColor = 0;
                 successLabel.ForeColor = Color.Black;
 
-                saveCurrSLButton.Text = "Saved to Game";
+                if (successLabel.Text == "Success — Saved!")
+                {
+                    //saveCurrSLButton.Text = "Saved to Game";
+                }
                 saveCurrSLButton.Enabled = false;
                 tabControl1.Focus();
                 phase++;
@@ -9214,6 +9225,7 @@ namespace MetalManager
                     restoredLabel.Top = 42;
                     curColor = 0;
                     phase = 0;
+                    successLabel.Text = "Success — Saved!";
                 }
                 else
                 {
@@ -11196,8 +11208,53 @@ namespace MetalManager
                     {
                         SaveJsonFromDebug(cleanJson, sPath);
                         RepeatStartup();
+                        refreshAfterSaving();
+
+                        clearSongInfoBoxes();
+                        organizer_enableLevelButtons();
+                        enableOrganizerFields();
+                        
+
+                        string songJsonInfo = cleanJson;
+
+                        
+                        int levelToGoto = -1;
+                        int firstLevelSupportedIndex = setSupportedLevelColors(songJsonInfo);//sets level button colors, and gets first supported level
+                        
+                        if (org_selectIndexLevelChoice == "first")
+                        {
+                            levelToGoto = 0;
+                            if (tsm_showTutOrganizer.Checked)
+                            {
+                                levelToGoto = 8;
+                            }
+                        }
+                        else if (org_selectIndexLevelChoice == "supported")
+                        {
+                            levelToGoto = firstLevelSupportedIndex;
+                        }
+                        else if (org_selectIndexLevelChoice == "none")
+                        {
+                            levelToGoto = 0; //not selected to anything, select first level
+                        }
+
+                        if (levelToGoto == -1) levelToGoto = 0; //set it to Voke if it screwed up somehow
+
+                        
+                        SetSelectedLevelColors(levelToGoto);
+                        
+                        string firstShownLvlNm = allLevelNames[levelToGoto]; //gets name of level we're going to
+                        firstShownLvlNm = capFirst(firstShownLvlNm); //capitalize said level
+                        setSpecificLevelInfo_Org(songJsonInfo, firstShownLvlNm); //resets values to have given level's info
+                        
+                        resetSongOriginalInfo("");
+                        org_modHasErrorsLbl.Visible = false;
+                        Org_OpenSongInDebug.Visible = false;
+
                         int slctIndxAgain = listBox1.FindStringExact(sName);
                         listBox1.SelectedIndex = slctIndxAgain;
+                        currentListSelection = listBox1.SelectedIndex;
+                        
                     }
                 }
             }
@@ -11379,6 +11436,8 @@ namespace MetalManager
             if (gameDir == null)
             {
                 saveCurrSLButton.Enabled = false;
+                reApplyAllBanksBtn.Enabled = false;
+                cleanUpSABtn.Enabled = false;
             }
 
             /* I didn't have to do all this....
@@ -12323,7 +12382,7 @@ namespace MetalManager
         /// Reads the Set List, and fetches the info of each selection's .json, returning a full customsongs.json. :D
         /// </summary>
         /// <returns></returns>
-        private string MakeSetList(bool copyMusicBank = false)
+        private string MakeSetList(bool moveFiles = false)
         {
             
 
@@ -12337,6 +12396,7 @@ namespace MetalManager
             int numberOfDefaultSong = 0;
 
             List<double> customBPMs = new List<double>();
+            List<FileInfo> bankPaths = new List<FileInfo>();
 
             string newSetList = "{\n";
             newSetList += "    \"customLevelMusic\" : [\n";
@@ -12386,6 +12446,8 @@ namespace MetalManager
                         string[] sInfo = getCustomInfo_MakeSetList(songsJson, capdLvlToGrab, mainOrBoss);
                         if (sInfo == null) continue;
 
+                        
+
                         string lhEvent = "";
                         if (musicBankPath != null)
                         {
@@ -12397,6 +12459,10 @@ namespace MetalManager
                         else cantVerifyBankEvents = true;
 
                         string bankPathValue = getPathFromComboBoxSlctn(mainCBox[i].Text, sInfo[0]);
+
+                        string modsBankPath = bankPathValue.Replace("\\\\", "\\");
+                        bankPaths.Add(new FileInfo(modsBankPath));
+
 
                         newSetList += "        {\n"; //need to add the closing one as well
                         newSetList += "            \"LevelName\" : \"" + capdLevelName + "\",\n";
@@ -12568,6 +12634,10 @@ namespace MetalManager
                         if (lhEvent != null) mSongInfo[2] = lhEvent;
                         else cantVerifyBankEvents = true;
 
+                        
+                        string modsBankPath = shaveSurroundingQuotesAndSpaces(mSongInfo[5]).Replace("\\\\", "\\");
+                        bankPaths.Add(new FileInfo(modsBankPath));
+
                         newSetList += "            \"MainMusic\" : {\n"; //need to add closing one as well
                         newSetList += getNewLevelInfoLines("", "m",
                             shaveSurroundingQuotesAndSpaces(mSongInfo[0]), shaveSurroundingQuotesAndSpaces(mSongInfo[1]),
@@ -12594,6 +12664,9 @@ namespace MetalManager
 
                         if (lhEvent != null) bSongInfo[2] = lhEvent;
                         else cantVerifyBankEvents = true;
+
+                        string modsBankPath = shaveSurroundingQuotesAndSpaces(bSongInfo[5]).Replace("\\\\", "\\");
+                        bankPaths.Add(new FileInfo(modsBankPath));
 
                         newSetList += "            \"BossMusic\" : {\n"; //need to add closing one as well
                         newSetList += getNewLevelInfoLines("", "b",
@@ -12644,8 +12717,8 @@ namespace MetalManager
 
             int verificationFromMusicBankCreation = 0;
 
-            //Copy Music Bank is true if we're writing this json with the intention of saving it
-            if (copyMusicBank)
+            //moveFiles is true if we're writing this json with the intention of saving it
+            if (moveFiles)
             {
                 //musicBankPath is null if Combo box wasn't selected to anything
                 if (musicBankPath == null)
@@ -12677,6 +12750,19 @@ namespace MetalManager
                     //if it was a negative number, we can stop the process, or alert the user, etc.
                 }
 
+                
+                string m = "";
+                foreach(FileInfo b in bankPaths)
+                {
+                    m += b.FullName + "\n";
+                }
+
+                //string[] allBanksWanted = GetBanksMissingFromSA(bankPaths.ToArray());
+                string[] allBanksWanted = GetBanksMissingFromSA(bankPaths.ToArray());
+                string[] banksMissingInThePit = allBanksWanted.Distinct().ToArray(); //I don't think this is doing anything
+                //MessageBox.Show("New bankPaths:\n" + m);
+                MoveAllNewBankFiles(banksMissingInThePit);
+
             }
 
             if (verificationFromMusicBankCreation != 0)
@@ -12691,7 +12777,46 @@ namespace MetalManager
                 return null;
             }
 
+
+
             return newSetList;
+        }
+
+        public string[] getAllBanksUsedByCSJson(string fromLabel = "Bank")
+        {
+            if (!File.Exists(gameDir.ToString() + "\\customsongs.json")) { MessageBox.Show("Operation halted: no customsongs.json exists in StreamingAssets"); return null; }
+            if (gameJsonHasErrors()) { MessageBox.Show("Operation halted: cannot read customsongs.json in StreamingAssets while it contains errors. Visit Organizer or DebugPanel to remove them."); return null; }
+
+            List<string> banksInSA = new List<string>();
+
+            string fullJson = "";
+            using (StreamReader sr = File.OpenText(gameDir.ToString() + "\\customsongs.json"))
+            {
+                fullJson = sr.ReadToEnd();
+            }
+
+            string[] fullJsonLines = fullJson.Split('\n');
+            foreach (string line in fullJsonLines)
+            {
+                int indexOfBankInQuotes = line.IndexOf("\"" + fromLabel + "\"");
+                if (indexOfBankInQuotes == -1) continue;
+                int indexOfColon = line.IndexOf(":");
+                if (indexOfColon < indexOfBankInQuotes) continue;
+
+                int indexOfValueStart = line.IndexOf("\"", indexOfColon) + 1;
+                int indexOfValueEnd = line.IndexOf("\"", indexOfValueStart + 1);
+                int valueLength = indexOfValueEnd - indexOfValueStart;
+                string bankPulledFromCustomInfo = line.Substring(indexOfValueStart, valueLength);
+                if(!bankPulledFromCustomInfo.Contains(".bank"))
+                {
+                    bankPulledFromCustomInfo += ".bank";
+                }
+                if (bankPulledFromCustomInfo.Contains("\\\\")) bankPulledFromCustomInfo = bankPulledFromCustomInfo.Replace("\\\\", "\\");
+
+                banksInSA.Add(bankPulledFromCustomInfo);
+            }
+            banksInSA = banksInSA.Distinct().ToList();
+            return banksInSA.ToArray();
         }
 
 
@@ -13165,6 +13290,10 @@ namespace MetalManager
             mmLoading = false;
         }
 
+
+        
+
+        /*
         /// <summary>
         /// Deprecated. Swing and a miss.
         /// </summary>
@@ -13246,6 +13375,331 @@ namespace MetalManager
             setList_topLabel.Visible = false;
             mmLoading = false;
         }
+        */
+
+        private void MoveAllNewBankFiles(string[] enteringThePit)
+        {
+            if(enteringThePit != null && enteringThePit.Length > 0)
+            {
+                //setList_topLabel.Visible = true;
+                //setList_topLabel.Text = "Copying new .banks to StreamingAssets";
+
+                /*Random rnd = new Random();
+                int msgToShow = rnd.Next(1, metalMessages.Length);
+                copyingBanksLabel.Text = metalMessages[msgToShow] + ",\nPlease wait...";*/
+
+                copyingBanksLabel.Text = "Assigning .bank files to StreamingAssets,\n0/"+ enteringThePit.Length;
+
+                copyingBanksLabel.Visible = true;
+                //copyProgressBar.Visible = true;
+
+                BfGWorkerMain.RunWorkerAsync(argument: enteringThePit);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Using the list of .banks collected when making a set list, checks for the songs being modified into MH, returning a 
+        /// list of full paths to .banks needing to be copied
+        /// </summary>
+        /// <param name="joiningThePit"></param>
+        /// <returns></returns>
+        private string[] GetBanksMissingFromSA(FileInfo[] joiningThePit)
+        {
+            //joiningThePit will be the .bank files we're setting in the customsongs.json
+            string[] alreadyInThePit = GetAnomaliesInSA();//gives us an instance of all custom .bank files in StreamingAssets
+
+            List<string> newToThePit = new List<string>();
+            foreach(FileInfo mosher in joiningThePit)
+            {
+                //string bankFileName = mosher.Split('\\').Last(); //this is for strings, below is for FileInfo
+                string bankFileName = mosher.Name;
+
+                if (alreadyInThePit.Contains(bankFileName))
+                {
+                    //the file we're trying to add is already in the StreamingAssets folder
+
+                    //check to see if they're the same (er same file size at least)
+                    string bankInGameDir = gameDir.ToString() + "\\" + bankFileName;
+                    bool fileSizesMatch = verifyMatchingFileSizes(mosher.Length.ToString(), bankInGameDir);
+
+                    if (!fileSizesMatch)
+                    {
+                        //they're different files, we need the current one to move out of the way
+                        if (moveOldFile(bankInGameDir) == false)
+                            return null;
+
+                        newToThePit.Add(mosher.FullName);
+                        //moving a file should be lightning fast, but everything in newToThePit is going to be copied, which takes longer
+                    }
+
+                    
+                } else
+                {
+                    //the file we're trying to add isn't in StreamingAssets yet
+                    newToThePit.Add(mosher.FullName);
+                }
+
+            }
+            return newToThePit.ToArray();
+            
+        }
+
+        /// <summary>
+        /// Renames a file from "Filename" to "Filename_Old", or "..._Old2", increasing till finding a free spot. Returns true if successful
+        /// </summary>
+        /// <param name="originalPath"></param>
+        /// <returns></returns>
+        private bool moveOldFile(string originalPath)
+        {
+            int currentCheck = 1;
+            int maximumChecks = 99;
+            string newPath = "";
+
+            while (currentCheck <= maximumChecks)
+            {
+                //we're looking for a file that DOESN'T exist
+                
+                string pathToCheck = originalPath + "_Old";
+                if (currentCheck > 1) pathToCheck += currentCheck.ToString(); //if this becomes greater than one, we'll start putting/looking for DuHast_Old2
+
+                if (!File.Exists(@pathToCheck))
+                {
+                    try
+                    {
+                        File.Move(originalPath, pathToCheck);
+                        return true;
+                    }
+                    catch(IOException)
+                    {
+                        //IOException means Windows hit an error when trying to be able to read/write the file
+                        string fileInUseMsg = "Metal Manager is trying to rename an old .bank file (" + originalPath.Split('\\').Last() + ") in the StreamingAssets folder to replace it with a different variation," +
+                            "but the file seems to be locked. It may be in use by Metal Hellsinger. If you're currently playing a level using this .bank, please return to Hell Select screen for Metal Hellsinger before continuing" +
+                            "\n\nHit Retry to Continue, Cancel to stop all operations.";
+                        MessageBoxButtons fileInUseButtons = MessageBoxButtons.RetryCancel;
+                        DialogResult retryRename = MessageBox.Show(fileInUseMsg, "Error moving old bank", fileInUseButtons);
+                        if (retryRename == DialogResult.Retry)
+                        {
+                            try
+                            {
+                                if (!File.Exists(originalPath))
+                                    throw new FileNotFoundException();
+
+                                File.Move(originalPath, pathToCheck);
+                                return true;
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                //the file isn't here anymore...? we just want the green light to move the .bank we want in StreamingAssets, so...
+                                return true;
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Error moving " + originalPath.Split('\\').Last() + " to " + pathToCheck.Split('\\').Last() + ", operation was halted." +
+                                    "\n" + ex.Message);
+                                return false;
+                            }
+
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error moving " + originalPath.Split('\\').Last() + " to " + pathToCheck.Split('\\').Last() + ", operation was halted." +
+                            "\n" + ex.Message);
+                        return false;
+                    }
+
+
+                } else
+                {
+                    //file we just checked already exists, we're about to try another name
+                    currentCheck++;
+                }
+            }
+
+            string fileNm = originalPath.Split('\\').Last();
+            MessageBox.Show("Metal Manager encountered an error:\n100 variations of " + fileNm + "_Old.bank already exist.");
+            return false;
+        }
+
+
+        /// <summary>
+        /// Checks if two files have the same filesize, using either their paths, or one's path and one's size
+        /// </summary>
+        /// <param name="file1PathOrSize"></param>
+        /// <param name="file2Path"></param>
+        /// <returns></returns>
+        private bool verifyMatchingFileSizes(string file1PathOrSize, string file2Path)
+        {
+            long file1Size = new long();
+            if (file1PathOrSize.Contains('\\'))
+            {
+                file1Size = new FileInfo(file2Path).Length;
+            } else
+            {
+                file1Size = long.Parse(file1PathOrSize);
+            }
+
+            long file2Size = new FileInfo(file2Path).Length;
+            if (file1Size == file2Size)
+                return true;
+            else
+                return false;
+
+        }
+
+
+        /// <summary>
+        /// Returns an array of strings with the full path to all .bank files in StreamingAssets that aren't there by default
+        /// </summary>
+        /// <returns></returns>
+        private string[] GetAnomaliesInSA(bool report = false, bool deleet = false)
+        {
+            //this does not look for a custom Music.bank. Music.bank can be the game's, the LowHealth Library, or an unrecognized custom one
+            //the following .banks are default .banks, at least for non-DLC 
+
+            var banks = Directory.EnumerateFiles(gameDir.ToString(), "*.bank", SearchOption.TopDirectoryOnly)
+            .Where(s => !s.Contains("AcheronChallengeSongBank.bank") &&
+            !s.Contains("AcheronSongBank.bank") &&
+            !s.Contains("Ambience.bank") &&
+            !s.Contains("BeatTrackBank.bank") &&
+            !s.Contains("BossSongBank.bank") &&
+            !s.Contains("BossVariation01SongBank.bank") &&
+            !s.Contains("BossVariation02SongBank.bank") &&
+            !s.Contains("BossVariation03SongBank.bank") &&
+            !s.Contains("Cutscenes.bank") && 
+            !s.Contains("DLC01SongBank.bank") &&
+            !s.Contains("DLC02SongBank.bank") &&
+            !s.Contains("ExtrasSongBank.bank") &&
+            !s.Contains("FinalBossSongBank.bank") &&
+            !s.Contains("GehennaChallengeSongBank.bank") &&
+            !s.Contains("GehennaSongBank.bank") &&
+            !s.Contains("IncaustisChallengeSongBank.bank") &&
+            !s.Contains("IncaustisSongBank.bank") &&
+            !s.Contains("IngameSFX.bank") &&
+            !s.Contains("Master.bank") &&
+            !s.Contains("Master.strings.bank") &&
+            !s.Contains("Music.bank") &&
+            !s.Contains("NihilChallengeSongBank.bank") &&
+            !s.Contains("NihilSongBank.bank") &&
+            !s.Contains("PlayerWeaponsBank.bank") &&
+            !s.Contains("PreviewSongBank.bank") &&
+            !s.Contains("PrototypeSongBank.bank") &&
+            !s.Contains("SheolBossSongBank.bank") &&
+            !s.Contains("SheolSongBank.bank") &&
+            !s.Contains("StygiaChallengeSongBank.bank") &&
+            !s.Contains("StygiaSongBank.bank") &&
+            !s.Contains("TempBossSongBank.bank") &&
+            !s.Contains("TestSong.bank") &&
+            !s.Contains("TitleMusicBank.bank") &&
+            !s.Contains("TutorialSongBank.bank") &&
+            !s.Contains("UI.bank") &&
+            !s.Contains("VO.bank") &&
+            !s.Contains("VokeChallengeSongBank.bank") &&
+            !s.Contains("VokeSongBank.bank") &&
+            !s.Contains("YhelmChallengeSongBank.bank") &&
+            !s.Contains("YhelmSongBank"));
+
+            
+            if (deleet)
+            {
+                bool foundGameDefaultBank = false;
+                string undeletableMsg = "";
+                //List<string> cantBeDeleted = new List<string>();
+                //List<string> readOnlyBanks = new List<string>();
+
+                foreach (string bank in banks)
+                {
+                    if (ModFolderHoldsOrgnlMusicBank || foundGameDefaultBank)
+                    {
+                        try
+                        {
+                            File.Delete(bank);
+                        }
+                        catch
+                        {
+                            //doing this because some people set their mods to be READ ONLY.. WHY!?!?!
+                            FileInfo fi = new FileInfo(@bank);
+                            if (fi.IsReadOnly)
+                            {
+                                File.SetAttributes(bank, ~FileAttributes.ReadOnly);
+                                try
+                                {
+                                    File.Delete(bank);
+                                }
+                                catch
+                                {
+                                    undeletableMsg += "(Read Only) " + bank.Replace(gameDir + "\\", "") + "\n";
+                                }
+                                //readOnlyBanks.Add(bank);
+                                //cantBeDeleted.Add("(Read Only) " + bank.Replace(gameDir + "\\", ""));
+                                
+                            } else
+                            {
+                                //cantBeDeleted.Add(bank.Replace(gameDir + "\\", ""));
+                                undeletableMsg += bank.Replace(gameDir + "\\", "") + "\n";
+                            }
+                        }
+                    } else
+                    {
+                        //we want to ensure we're not deleting our original
+                        long banksFileSz = new FileInfo(bank).Length;
+                        if (banksFileSz == gameMBFileSize)
+                        {
+                            //we just found the game's default Music.bank, most likely renamed as a backup by the user. Don't delete it.
+                            foundGameDefaultBank = true; //We could just keep all of them, or comment/uncomment this to make it go once...
+                            continue;
+                        } else
+                        {
+                            try
+                            {
+                                File.Delete(bank);
+                            }
+                            catch
+                            {
+                                FileInfo fi = new FileInfo(@bank);
+                                if (fi.IsReadOnly)
+                                {
+                                    File.SetAttributes(bank, ~FileAttributes.ReadOnly);
+                                    try
+                                    {
+                                        File.Delete(bank);
+                                    }
+                                    catch
+                                    {
+                                        undeletableMsg += "(Read Only) " + bank.Replace(gameDir + "\\", "") + "\n";
+                                    }
+                                    //readOnlyBanks.Add(bank);
+                                    //cantBeDeleted.Add("(Read Only) " + bank.Replace(gameDir + "\\", ""));
+                                }
+                                else
+                                {
+                                    //cantBeDeleted.Add(bank.Replace(gameDir + "\\", ""));
+                                    undeletableMsg += bank.Replace(gameDir + "\\", "") + "\n";
+                                }
+                            }
+                        }
+                    }
+                    
+                    
+                }
+
+                if (!string.IsNullOrWhiteSpace(undeletableMsg))
+                {
+                    MessageBox.Show("Couldn't be deleted:\n" + undeletableMsg);
+                }
+                
+                return null;
+            }
+
+            return banks.ToArray();
+        }
+
+        
+
 
         string[] sequenceReport =
             {
@@ -13257,17 +13711,91 @@ namespace MetalManager
                 "Setting selections to current...",
                 "Starting Metal Manager..."
             };
+
+        string[] metalMessages = new string[] { "Turning it up to 11", "Intensifying head banging", "Taking care of business",
+        "Settling this in the parking lot", "Posing for a bad ass album cover", "Smoking the last of what we got",
+        "Acquiring more cow bell", "Releasing the bulls on parade", "Raising the horns", "Sharpening axes and tightening skins",
+        "Using music to save a mortal soul", "Finishing this last bottle", "Tearing normality", "Consuming Fire", "Wondering where this tug of war will end",
+        "Taking a bullet for JB", "Remembering, before we forget", "Dropping plates"};
+
+
+        private void BfGWorkerMain_DoWork(object sender, DoWorkEventArgs e)
+        {
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WatchForCancel);
+            //WatchForCancel just looks for Escape if we're running the worker
+
+            string[] newToThePit = e.Argument as string[]; //this won't get called if this was empty
+
+
+            for (int i = 0; i < newToThePit.Length; i++)
+            {
+                //double currentPercentage = (i + 1 / newToThePit.Length)*100;
+                //int percInt = Convert.ToInt32(currentPercentage);
+                //if (percInt > copyProgressBar.Maximum) percInt = copyProgressBar.Maximum;
+
+                BfGWorkerMain.ReportProgress(i+1);
+
+
+                string newBankDestination = gameDir.ToString() + "\\" + newToThePit[i].Split('\\').Last();
+                if (File.Exists(newBankDestination))
+                {
+                    if(!verifyMatchingFileSizes(newToThePit[i], newBankDestination))
+                    {
+                        File.Copy(newToThePit[i], newBankDestination);
+                    }
+
+                } else
+                {
+                    File.Copy(newToThePit[i], newBankDestination);
+                }
+                
+
+                /* Apparently it isn't necessary or wise to do this
+                try
+                {
+                  string newBankDestination = gameDir.ToString() + "\\" + newToThePit[i].Split('\\').Last();
+                    File.Copy(newToThePit[i], newBankDestination);  
+                }
+                catch (Exception ex)
+                {
+                    string errorCode = ex.Message;
+                    if (errorCode.Length > 500) errorCode = errorCode.Substring(0, 497) + "...";
+                    MessageBox.Show("The operation was halted because an error occured when trying to copy " + newToThePit[i].Split('\\').Last() + " to the StreamingAssets folder." +
+                        "\n" + errorCode);
+
+                    cancelBfGWorker();
+
+                }*/
+
+                if (BfGWorkerMain.CancellationPending)
+                {
+                    //we cancelled the process (close or hitting Esc)
+                    e.Cancel = true;
+                    BfGWorkerMain.ReportProgress(0);
+                    return;
+                }
+
+            }
+
+            
+
+        }
+
         private void BfGWorkerMain_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            int sequence = e.ProgressPercentage;
-            setList_topLabel.Text = sequenceReport[sequence];
+            //copyProgressBar.Value = e.ProgressPercentage;
+            //setList_topLabel.Text = e.ProgressPercentage.ToString() + "%";
+            //copyingBanksLabel.Text = "Assigning .bank files to StreamingAssets,\n0/" + enteringThePit.Length;
         }
 
         private void BfGWorkerMain_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            this.KeyDown -= this.WatchForCancel;//we don't need this anymore
+
             if (e.Cancelled)
             {
-                CloseManagerFromError("user-cancelled");
+                MessageBox.Show("Operation was cancelled.");
+                Text_NotifyAnim("Cancelled :(");
             }
             else if (e.Error != null)
             {
@@ -13276,15 +13804,17 @@ namespace MetalManager
                 {
                     errMsg = errMsg.Substring(0, 1000) + "...";
                 }
-                MessageBox.Show("Metal Manager encountered a fatal error and cannot continue:\n" + e.Error.Message);
-                CloseManagerFromError("totalCalamity-02");
+                MessageBox.Show("Metal Manager encountered an error when trying to copy new .bank files to the StreamingAssets folder.\n" + e.Error.Message);
+                Text_NotifyAnim("Error :(");
             }
             else
             {
                 //we successfully got through all work!
 
-                this.KeyDown -= this.WatchForCancel;//we don't need this anymore
+                //copyProgressBar.Visible = false;
+                copyingBanksLabel.Visible = false;
                 setList_topLabel.Visible = false;
+                //Text_NotifyAnim();
                 mmLoading = false;
             }
         }
@@ -13411,7 +13941,7 @@ namespace MetalManager
 
         private void RestoreOriginalJson(object sender, EventArgs e)
         {
-            string message = "Are you sure you want to store the original .json for " + ((ListItem)listBox1.SelectedItem).Name + "?\n\nThis action cannot be undone.";
+            string message = "Are you sure you want to restore the original .json for " + ((ListItem)listBox1.SelectedItem).Name + "?\n\nThis action cannot be undone.";
             string title = "Restore original .json?";
             MessageBoxButtons buttons = MessageBoxButtons.YesNoCancel;
             DialogResult result = MessageBox.Show(message, title, buttons);
@@ -13659,10 +14189,15 @@ namespace MetalManager
                 return;
             }
 
+            //we're set to start trying to make a new Set List
+            saveCurrSLButton.Enabled = false;
+
             string newJson = MakeSetList(true); //if MakeSetList has true, we're going to copy the Music.bank
             if (newJson == null)
             {
                 SetList_DebugLabel1.Text = "Something prevented customsongs.json from being written. :(";
+                Text_NotifyAnim("Error :(");
+                mmLoading = false;
                 return;
             }
             if (SetList_DebugLabel2.Text == "Could not verify LowHealthBeatEvents")
@@ -13682,9 +14217,12 @@ namespace MetalManager
             {
                 File.WriteAllText(gameDir + "\\customsongs.json", newJson);
             }
-            catch
+            catch(Exception ex)
             {
-                MessageBox.Show("An error occured when saving game's Set List. :(");
+                MessageBox.Show("An error occured when saving game's Set List. :(\n"+ex.Message);
+                mmLoading = false;
+                Text_NotifyAnim("Error :(");
+                return;
             }
 
             mmLoading = true;
@@ -13692,6 +14230,7 @@ namespace MetalManager
             setList_uncheckAll();
             clearAllGrabBoxes();
 
+            //if a customsongs.json didn't exist in StreamingAssets before, we'll add it to the Organizer catalog now
             if (listBox1.Items[0].ToString() != "Current customsongs.json")
             {
                 listBox1.Items.Insert(0, new ListItem { Name = "Current customsongs.json", Path = gameDir + "\\customsongs.json" });
@@ -13703,7 +14242,280 @@ namespace MetalManager
 
         }
 
+        private void whocares(object sender, EventArgs e)
+        {
+            GetAnomaliesInSA(true);
+        }
+
+        private void dltCstmBanks(object sender, EventArgs e)
+        {
+            GetAnomaliesInSA(false, true);
+        }
+
+        int currntCntdwnCount = 0;
+        private Timer odTimer;
+        private TimeSpan odTimespan = TimeSpan.FromSeconds(10); //we're wanting to have it so if the user types in 6:66, it'll go to 6:65, 6:64, etc. because trollolol
+
+        public void odTimerGo()
+        {
+            if (odUseMain.Checked)
+            {
+                //we want to use custom main music and game's Song Selector boss music
+                odExplainLbl.TextAlign = ContentAlignment.BottomCenter;
+                odExplainLbl.Text = "Custom music mods enabled until timer ends.";
+                odExplainLbl.Visible = true;
+            }
+            else if (odUseBoss.Checked)
+            {
+                //we want to use game's Song Selector main music and custom boss music
+                odExplainLbl.TextAlign = ContentAlignment.BottomCenter;
+                odExplainLbl.Text = "Custom music mods disabled until timer ends.";
+                odExplainLbl.Visible = true;
+
+            }
+            else
+            {
+                return;
+            }
+
+            odTimeLabel.Text = odTimeTextbox.Text;
+            odTimeLabel.Visible = true;
+            odTimeTextbox.Visible = false;
+
+            odRadioPanel.Enabled = false;
+
+            odStart.Enabled = false;
+            odPause.Enabled = true;
+            odStop.Enabled = true;
+            odReset.Enabled = true;
+            odMMSS.Visible = false;
+
+            
+
+            string[] minSec = odTimeTextbox.Text.Split(':');
+            int minutesLeft = Int32.Parse(minSec[0]);
+            int secondsLeft = Int32.Parse(minSec[1]);
+            odTimespan = TimeSpan.FromSeconds((minutesLeft * 60) + secondsLeft);
+
+            currntCntdwnCount = 0;
+            odTimer = new Timer();
+            odTimer.Tick += new EventHandler(odCntdwnUpdate);
+            odTimer.Interval = 1000; // in miliseconds
+            odTimer.Start();
+        }
+        public void odCntdwnUpdate(object sender, EventArgs e)
+        {
+            int minutesLeft = 0;
+            int secondsLeft = 0;
+            if (odTimeLabel.Text.Contains(":"))
+            {
+                string[] minSec = odTimeLabel.Text.Split(':');
+                minutesLeft = Int32.Parse(minSec[0]);
+                secondsLeft = Int32.Parse(minSec[1]);
+            } else
+            {
+                secondsLeft = Int32.Parse(odTimeLabel.Text.Replace("in ", ""));
+            }
+
+            if (minutesLeft == 0 && secondsLeft <= 10)
+            {
+                if(secondsLeft == 10)
+                {
+                    Random rnd = new Random();
+                    int msgToShow = rnd.Next(1, metalMessages.Length);
+                    odExplainLbl.Text = metalMessages[msgToShow];
+                    odExplainLbl.TextAlign = ContentAlignment.BottomLeft;
+                }
+                goto FinalTen;
+            }
+
+            //we won't allow our count down to start at less than 10 seconds
+            if (currntCntdwnCount < 10)
+            {
+
+                string lblText = "";
+                if(secondsLeft > 0)
+                {
+                    secondsLeft--;
+                    
+                } else
+                {
+                    minutesLeft--;
+                    secondsLeft = 59;
+                }
+
+                
+                if (secondsLeft >= 10)
+                    lblText = minutesLeft.ToString() + ":" + secondsLeft.ToString();    
+                 else
+                    lblText = minutesLeft.ToString() + ":0" + secondsLeft.ToString();
+                
+                
+                odTimeLabel.Text = lblText;
+
+                currntCntdwnCount++;
+                return;
+            } else
+            {
+                if (secondsLeft > 0)
+                {
+                    secondsLeft--;
+
+                }
+                else
+                {
+                    minutesLeft--;
+                    secondsLeft = 59;
+                }
+                string lblText = "";
+                if (secondsLeft >= 10)
+                    lblText = minutesLeft.ToString() + ":" + secondsLeft.ToString();
+                else
+                    lblText = minutesLeft.ToString() + ":0" + secondsLeft.ToString();
+                odTimeLabel.Text = lblText;
+                return;
+            }
+
+
+        FinalTen:
+            string lblTxt = "in " + secondsLeft;
+            odTimeTextbox.Text = lblTxt;
+
+
+            if (secondsLeft > 0)
+            {
+                secondsLeft--;
+                return;
+            } else
+            {
+                Timer odTmr = sender as Timer;
+                odTmr.Stop();
+                odTmr.Dispose();
+
+                //odTimeLabel.Text = odTimeTextbox.Text;
+                odTimeLabel.Visible = false;
+                odTimeTextbox.Visible = true;
+
+                odRadioPanel.Enabled = true;
+
+                odStart.Enabled = true;
+                odPause.Enabled = false;
+                odStop.Enabled = false;
+                odReset.Enabled = false;
+                odMMSS.Visible = true;
+            }
+
+        }
+
+
+        private void odStartClick(object sender, EventArgs e)
+        {
+            
+            if(odStop.Enabled)
+            {
+                odTimer.Start();
+                odStart.Enabled = false;
+                odPause.Enabled = true;
+            } else
+            {
+                odTimerGo();
+            }
+            
+            
+
+
+        }
+
         
+        private void odPauseClick(object sender, EventArgs e)
+        {
+            odTimer.Stop();
+            odPause.Enabled = false;
+            odStart.Enabled = true;
+        }
+        private void odStopClick(object sender, EventArgs e)
+        {
+            odTimer.Stop();
+            odTimer.Dispose();
+
+            odExplainLbl.Visible = false;
+            odTimeLabel.Visible = false;
+            odTimeTextbox.Visible = true;
+
+            odRadioPanel.Enabled = true;
+
+            odStart.Enabled = true;
+            odPause.Enabled = false;
+            odStop.Enabled = false;
+            odReset.Enabled = false;
+            odMMSS.Visible = true;
+        }
+        private void odResetClick(object sender, EventArgs e)
+        {
+            odTimer.Stop();
+            odTimer.Dispose();
+
+            odPause.Enabled = true;
+            odStart.Enabled = false;
+
+            odTimeLabel.Text = odTimeTextbox.Text;
+            currntCntdwnCount = 0;
+            odTimer = new Timer();
+            odTimer.Tick += new EventHandler(odCntdwnUpdate);
+            odTimer.Interval = 1000; // in miliseconds
+            odTimer.Start();
+        }
+
+        private void cleanUpSAClick(object sender, EventArgs e)
+        {
+            using (CleanUpSAForm cleanSA = new CleanUpSAForm(null))
+            {
+                cleanSA.Icon = this.Icon;
+                cleanSA.MyParentForm = this;
+                cleanSA.StartPosition = FormStartPosition.CenterParent;
+                cleanSA.ShowDialog();
+            }
+        }
+
+        private void reApplyAllBanksClick(object sender, EventArgs e)
+        {
+            string[] currentlyUsingBanks = getAllBanksUsedByCSJson("bankPath");
+            if (currentlyUsingBanks == null || currentlyUsingBanks.Length == 0) return;
+
+            MoveAllNewBankFiles(currentlyUsingBanks);
+            if (!successLabel.Text.Contains("Error"))
+            {
+                MessageBox.Show("All .banks used by game's music customization have been sucessfully applied to StreamingAssets folder.");
+            }
+        }
+
+        private void reApplyAllBanks_mouseOver(object sender, MouseEventArgs e)
+        {
+            CustomBanksExplainLbl.Text = "Copies all .bank files in use by game's customsongs.json that can't be found in the StreamingAssets folder.";
+            CustomBanksExplainLbl.Visible = true;
+        }
+
+        private void cleanUpSA_mouseOver(object sender, MouseEventArgs e)
+        {
+            CustomBanksExplainLbl.Text = "Deletes unused .bank files from StreamingAssets. You will be asked for confirmation before deleting.";
+            CustomBanksExplainLbl.Visible = true;
+        }
+
+        private void reApplyAllBanks_mouseOut(object sender, EventArgs e)
+        {
+            if(CustomBanksExplainLbl.Text == "Copies all .bank files in use by game's customsongs.json that can't be found in the StreamingAssets folder.")
+            {
+                CustomBanksExplainLbl.Visible = false;
+            }
+        }
+        private void cleanUpSA_mouseOut(object sender, EventArgs e)
+        {
+            if (CustomBanksExplainLbl.Text == "Deletes unused .bank files from StreamingAssets. You will be asked for confirmation before deleting.")
+            {
+                CustomBanksExplainLbl.Visible = false;
+            }
+        }
+    
     }
     //making this ListItem class to harbor a Name and a hidden Value for listbox selections
     public class ListItem

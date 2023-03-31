@@ -88,6 +88,22 @@
             this.customMusicBankCombo = new System.Windows.Forms.ComboBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.CustomBanksExplainLbl = new System.Windows.Forms.Label();
+            this.cleanUpSABtn = new System.Windows.Forms.Button();
+            this.reApplyAllBanksBtn = new System.Windows.Forms.Button();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.odExplainLbl = new System.Windows.Forms.Label();
+            this.odTimeLabel = new System.Windows.Forms.Label();
+            this.odRadioPanel = new System.Windows.Forms.Panel();
+            this.odUseBoss = new System.Windows.Forms.RadioButton();
+            this.odUseMain = new System.Windows.Forms.RadioButton();
+            this.odReset = new System.Windows.Forms.Button();
+            this.odStop = new System.Windows.Forms.Button();
+            this.odPause = new System.Windows.Forms.Button();
+            this.odStart = new System.Windows.Forms.Button();
+            this.odMMSS = new System.Windows.Forms.Label();
+            this.odTimeTextbox = new System.Windows.Forms.TextBox();
+            this.copyingBanksLabel = new System.Windows.Forms.Label();
             this.saveCurrSLButton = new System.Windows.Forms.Button();
             this.successLabel = new System.Windows.Forms.Label();
             this.copySLButton = new System.Windows.Forms.Button();
@@ -212,6 +228,7 @@
             this.tsm_SetListOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_showTutSetList = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_AllowAutoSelect = new System.Windows.Forms.ToolStripMenuItem();
+            this.showOverdriveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_OrganizerOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.tsm_showTutOrganizer = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -251,6 +268,8 @@
             this.groupBox9.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.groupBox10.SuspendLayout();
+            this.odRadioPanel.SuspendLayout();
             this.tutorialGroupBox.SuspendLayout();
             this.groupBox12.SuspendLayout();
             this.sL_noCSFoundPanel.SuspendLayout();
@@ -1360,6 +1379,11 @@
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.SystemColors.Window;
+            this.tabPage1.Controls.Add(this.CustomBanksExplainLbl);
+            this.tabPage1.Controls.Add(this.cleanUpSABtn);
+            this.tabPage1.Controls.Add(this.reApplyAllBanksBtn);
+            this.tabPage1.Controls.Add(this.groupBox10);
+            this.tabPage1.Controls.Add(this.copyingBanksLabel);
             this.tabPage1.Controls.Add(this.saveCurrSLButton);
             this.tabPage1.Controls.Add(this.successLabel);
             this.tabPage1.Controls.Add(this.copySLButton);
@@ -1385,6 +1409,218 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Set List";
             this.tabPage1.Click += new System.EventHandler(this.FocusTabPage);
+            // 
+            // CustomBanksExplainLbl
+            // 
+            this.CustomBanksExplainLbl.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.CustomBanksExplainLbl.Location = new System.Drawing.Point(568, 61);
+            this.CustomBanksExplainLbl.Name = "CustomBanksExplainLbl";
+            this.CustomBanksExplainLbl.Size = new System.Drawing.Size(143, 59);
+            this.CustomBanksExplainLbl.TabIndex = 58;
+            this.CustomBanksExplainLbl.Text = "Deletes unused .bank files from StreamingAssets. You will be asked for confirmati" +
+    "on before deleting.";
+            this.CustomBanksExplainLbl.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.CustomBanksExplainLbl.Visible = false;
+            // 
+            // cleanUpSABtn
+            // 
+            this.cleanUpSABtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.cleanUpSABtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.cleanUpSABtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.cleanUpSABtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cleanUpSABtn.ForeColor = System.Drawing.Color.Black;
+            this.cleanUpSABtn.Location = new System.Drawing.Point(569, 36);
+            this.cleanUpSABtn.Name = "cleanUpSABtn";
+            this.cleanUpSABtn.Size = new System.Drawing.Size(139, 24);
+            this.cleanUpSABtn.TabIndex = 57;
+            this.cleanUpSABtn.Text = "Clean up StreamingAssets";
+            this.cleanUpSABtn.UseVisualStyleBackColor = true;
+            this.cleanUpSABtn.Click += new System.EventHandler(this.cleanUpSAClick);
+            this.cleanUpSABtn.MouseLeave += new System.EventHandler(this.cleanUpSA_mouseOut);
+            this.cleanUpSABtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.cleanUpSA_mouseOver);
+            // 
+            // reApplyAllBanksBtn
+            // 
+            this.reApplyAllBanksBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.reApplyAllBanksBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.reApplyAllBanksBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.reApplyAllBanksBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.reApplyAllBanksBtn.ForeColor = System.Drawing.Color.Black;
+            this.reApplyAllBanksBtn.Location = new System.Drawing.Point(569, 11);
+            this.reApplyAllBanksBtn.Name = "reApplyAllBanksBtn";
+            this.reApplyAllBanksBtn.Size = new System.Drawing.Size(139, 24);
+            this.reApplyAllBanksBtn.TabIndex = 56;
+            this.reApplyAllBanksBtn.Text = "Re-apply all custom .banks";
+            this.reApplyAllBanksBtn.UseVisualStyleBackColor = true;
+            this.reApplyAllBanksBtn.Click += new System.EventHandler(this.reApplyAllBanksClick);
+            this.reApplyAllBanksBtn.MouseLeave += new System.EventHandler(this.reApplyAllBanks_mouseOut);
+            this.reApplyAllBanksBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.reApplyAllBanks_mouseOver);
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.odExplainLbl);
+            this.groupBox10.Controls.Add(this.odTimeLabel);
+            this.groupBox10.Controls.Add(this.odRadioPanel);
+            this.groupBox10.Controls.Add(this.odReset);
+            this.groupBox10.Controls.Add(this.odStop);
+            this.groupBox10.Controls.Add(this.odPause);
+            this.groupBox10.Controls.Add(this.odStart);
+            this.groupBox10.Controls.Add(this.odMMSS);
+            this.groupBox10.Controls.Add(this.odTimeTextbox);
+            this.groupBox10.Location = new System.Drawing.Point(562, 117);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(145, 103);
+            this.groupBox10.TabIndex = 55;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "Overdrive";
+            this.groupBox10.Visible = false;
+            // 
+            // odExplainLbl
+            // 
+            this.odExplainLbl.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.odExplainLbl.Location = new System.Drawing.Point(12, 48);
+            this.odExplainLbl.Name = "odExplainLbl";
+            this.odExplainLbl.Size = new System.Drawing.Size(129, 27);
+            this.odExplainLbl.TabIndex = 56;
+            this.odExplainLbl.Text = "Custom music mods disabled until timer ends.";
+            this.odExplainLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.odExplainLbl.Visible = false;
+            // 
+            // odTimeLabel
+            // 
+            this.odTimeLabel.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.odTimeLabel.Location = new System.Drawing.Point(18, 80);
+            this.odTimeLabel.Name = "odTimeLabel";
+            this.odTimeLabel.Size = new System.Drawing.Size(37, 13);
+            this.odTimeLabel.TabIndex = 60;
+            this.odTimeLabel.Text = "88:88";
+            this.odTimeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.odTimeLabel.Visible = false;
+            // 
+            // odRadioPanel
+            // 
+            this.odRadioPanel.Controls.Add(this.odUseBoss);
+            this.odRadioPanel.Controls.Add(this.odUseMain);
+            this.odRadioPanel.Location = new System.Drawing.Point(3, 13);
+            this.odRadioPanel.Name = "odRadioPanel";
+            this.odRadioPanel.Size = new System.Drawing.Size(136, 36);
+            this.odRadioPanel.TabIndex = 56;
+            // 
+            // odUseBoss
+            // 
+            this.odUseBoss.AutoSize = true;
+            this.odUseBoss.Location = new System.Drawing.Point(3, 19);
+            this.odUseBoss.Name = "odUseBoss";
+            this.odUseBoss.Size = new System.Drawing.Size(139, 17);
+            this.odUseBoss.TabIndex = 1;
+            this.odUseBoss.TabStop = true;
+            this.odUseBoss.Text = "Use Custom Boss Music";
+            this.odUseBoss.UseVisualStyleBackColor = true;
+            // 
+            // odUseMain
+            // 
+            this.odUseMain.AutoSize = true;
+            this.odUseMain.Location = new System.Drawing.Point(3, 3);
+            this.odUseMain.Margin = new System.Windows.Forms.Padding(0);
+            this.odUseMain.Name = "odUseMain";
+            this.odUseMain.Size = new System.Drawing.Size(139, 17);
+            this.odUseMain.TabIndex = 0;
+            this.odUseMain.TabStop = true;
+            this.odUseMain.Text = "Use Custom Main Music";
+            this.odUseMain.UseVisualStyleBackColor = true;
+            // 
+            // odReset
+            // 
+            this.odReset.Enabled = false;
+            this.odReset.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.odReset.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.odReset.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.odReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.odReset.ForeColor = System.Drawing.Color.Black;
+            this.odReset.Image = global::MetalManager.Properties.Resources.reset;
+            this.odReset.Location = new System.Drawing.Point(119, 76);
+            this.odReset.Name = "odReset";
+            this.odReset.Size = new System.Drawing.Size(22, 22);
+            this.odReset.TabIndex = 59;
+            this.odReset.UseVisualStyleBackColor = true;
+            this.odReset.Click += new System.EventHandler(this.odResetClick);
+            // 
+            // odStop
+            // 
+            this.odStop.Enabled = false;
+            this.odStop.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.odStop.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.odStop.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.odStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.odStop.ForeColor = System.Drawing.Color.Black;
+            this.odStop.Image = global::MetalManager.Properties.Resources.stop;
+            this.odStop.Location = new System.Drawing.Point(98, 76);
+            this.odStop.Name = "odStop";
+            this.odStop.Size = new System.Drawing.Size(22, 22);
+            this.odStop.TabIndex = 58;
+            this.odStop.UseVisualStyleBackColor = true;
+            this.odStop.Click += new System.EventHandler(this.odStopClick);
+            // 
+            // odPause
+            // 
+            this.odPause.Enabled = false;
+            this.odPause.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.odPause.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.odPause.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.odPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.odPause.ForeColor = System.Drawing.Color.Black;
+            this.odPause.Image = global::MetalManager.Properties.Resources.pause;
+            this.odPause.Location = new System.Drawing.Point(77, 76);
+            this.odPause.Name = "odPause";
+            this.odPause.Size = new System.Drawing.Size(22, 22);
+            this.odPause.TabIndex = 57;
+            this.odPause.UseVisualStyleBackColor = true;
+            this.odPause.Click += new System.EventHandler(this.odPauseClick);
+            // 
+            // odStart
+            // 
+            this.odStart.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.odStart.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(175)))), ((int)(((byte)(100)))));
+            this.odStart.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
+            this.odStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.odStart.ForeColor = System.Drawing.Color.Black;
+            this.odStart.Image = global::MetalManager.Properties.Resources.start;
+            this.odStart.Location = new System.Drawing.Point(56, 76);
+            this.odStart.Margin = new System.Windows.Forms.Padding(0);
+            this.odStart.Name = "odStart";
+            this.odStart.Size = new System.Drawing.Size(22, 22);
+            this.odStart.TabIndex = 56;
+            this.odStart.UseVisualStyleBackColor = true;
+            this.odStart.Click += new System.EventHandler(this.odStartClick);
+            // 
+            // odMMSS
+            // 
+            this.odMMSS.ForeColor = System.Drawing.SystemColors.WindowFrame;
+            this.odMMSS.Location = new System.Drawing.Point(9, 63);
+            this.odMMSS.Name = "odMMSS";
+            this.odMMSS.Size = new System.Drawing.Size(50, 13);
+            this.odMMSS.TabIndex = 46;
+            this.odMMSS.Text = "Min:Sec";
+            this.odMMSS.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // odTimeTextbox
+            // 
+            this.odTimeTextbox.Location = new System.Drawing.Point(18, 77);
+            this.odTimeTextbox.Name = "odTimeTextbox";
+            this.odTimeTextbox.Size = new System.Drawing.Size(35, 20);
+            this.odTimeTextbox.TabIndex = 54;
+            this.odTimeTextbox.Text = "05:00";
+            this.odTimeTextbox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // copyingBanksLabel
+            // 
+            this.copyingBanksLabel.Location = new System.Drawing.Point(569, 286);
+            this.copyingBanksLabel.Name = "copyingBanksLabel";
+            this.copyingBanksLabel.Size = new System.Drawing.Size(138, 42);
+            this.copyingBanksLabel.TabIndex = 53;
+            this.copyingBanksLabel.Text = "Settling some business in the parking lot,\r\nPlease wait...";
+            this.copyingBanksLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.copyingBanksLabel.Visible = false;
             // 
             // saveCurrSLButton
             // 
@@ -2556,7 +2792,7 @@
             this.ML1RadioPanel.Controls.Add(this.NihilRadioButtonM1);
             this.ML1RadioPanel.Controls.Add(this.YhelmRadioButtonM1);
             this.ML1RadioPanel.Controls.Add(this.IncaustisRadioButtonM1);
-            this.ML1RadioPanel.Location = new System.Drawing.Point(565, 251);
+            this.ML1RadioPanel.Location = new System.Drawing.Point(565, 178);
             this.ML1RadioPanel.Name = "ML1RadioPanel";
             this.ML1RadioPanel.Size = new System.Drawing.Size(94, 48);
             this.ML1RadioPanel.TabIndex = 25;
@@ -2884,7 +3120,8 @@
             // 
             this.tsm_SetListOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsm_showTutSetList,
-            this.tsm_AllowAutoSelect});
+            this.tsm_AllowAutoSelect,
+            this.showOverdriveToolStripMenuItem});
             this.tsm_SetListOptions.Name = "tsm_SetListOptions";
             this.tsm_SetListOptions.Size = new System.Drawing.Size(141, 22);
             this.tsm_SetListOptions.Text = "Set List";
@@ -2910,6 +3147,16 @@
             this.tsm_AllowAutoSelect.ToolTipText = "When selecting a mod that has no info for the\r\nLevel we\'re changing, this will au" +
     "tomatically\r\nselect the most similar level we can find.";
             this.tsm_AllowAutoSelect.Click += new System.EventHandler(this.AllowAutoSelect_click);
+            // 
+            // showOverdriveToolStripMenuItem
+            // 
+            this.showOverdriveToolStripMenuItem.Checked = true;
+            this.showOverdriveToolStripMenuItem.CheckOnClick = true;
+            this.showOverdriveToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showOverdriveToolStripMenuItem.Name = "showOverdriveToolStripMenuItem";
+            this.showOverdriveToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.showOverdriveToolStripMenuItem.Text = "Show Overdrive";
+            this.showOverdriveToolStripMenuItem.Visible = false;
             // 
             // tsm_OrganizerOptions
             // 
@@ -3116,7 +3363,7 @@
             // 
             // testBuddy2
             // 
-            this.testBuddy2.Location = new System.Drawing.Point(870, 22);
+            this.testBuddy2.Location = new System.Drawing.Point(1120, 22);
             this.testBuddy2.Name = "testBuddy2";
             this.testBuddy2.Size = new System.Drawing.Size(75, 35);
             this.testBuddy2.TabIndex = 42;
@@ -3189,6 +3436,10 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
+            this.odRadioPanel.ResumeLayout(false);
+            this.odRadioPanel.PerformLayout();
             this.tutorialGroupBox.ResumeLayout(false);
             this.tutorialGroupBox.PerformLayout();
             this.groupBox12.ResumeLayout(false);
@@ -3426,6 +3677,23 @@
         private System.Windows.Forms.ToolStripSeparator getLHLibrarySeparator;
         private System.Windows.Forms.Button mDeleteLevelInfo;
         private System.Windows.Forms.Button bDeleteLevelInfo;
+        private System.Windows.Forms.Label copyingBanksLabel;
+        private System.Windows.Forms.Button odStart;
+        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.Label odMMSS;
+        private System.Windows.Forms.TextBox odTimeTextbox;
+        private System.Windows.Forms.Button odReset;
+        private System.Windows.Forms.Button odStop;
+        private System.Windows.Forms.Panel odRadioPanel;
+        private System.Windows.Forms.RadioButton odUseBoss;
+        private System.Windows.Forms.RadioButton odUseMain;
+        private System.Windows.Forms.Label odExplainLbl;
+        private System.Windows.Forms.ToolStripMenuItem showOverdriveToolStripMenuItem;
+        private System.Windows.Forms.Label odTimeLabel;
+        private System.Windows.Forms.Button odPause;
+        private System.Windows.Forms.Button cleanUpSABtn;
+        private System.Windows.Forms.Button reApplyAllBanksBtn;
+        private System.Windows.Forms.Label CustomBanksExplainLbl;
     }
 }
 

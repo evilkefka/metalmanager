@@ -38,7 +38,6 @@
             this.LineCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ErrorCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dgJsonEditor = new System.Windows.Forms.DataGridView();
-            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.titleLabel = new System.Windows.Forms.Label();
             this.songTitleLabel = new System.Windows.Forms.Label();
@@ -61,12 +60,13 @@
             this.debugPasteBoxPanel = new System.Windows.Forms.Panel();
             this.debugGoButton = new System.Windows.Forms.Button();
             this.clearDebugTxtbx = new System.Windows.Forms.Button();
+            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dgJsonEditor)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.debugSJBtnPanel.SuspendLayout();
             this.debugPasteBoxPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // jsonAnomalyList
@@ -141,10 +141,6 @@
             this.dgJsonEditor.TabIndex = 3;
             this.dgJsonEditor.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.JsonCellUpdate);
             this.dgJsonEditor.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgJsonEditor_RowPostPaint);
-            // 
-            // stringValueBindingSource
-            // 
-            this.stringValueBindingSource.DataSource = typeof(MetalManager.StringValue);
             // 
             // panel1
             // 
@@ -353,7 +349,7 @@
             this.debugVersionLabel.Name = "debugVersionLabel";
             this.debugVersionLabel.Size = new System.Drawing.Size(482, 16);
             this.debugVersionLabel.TabIndex = 22;
-            this.debugVersionLabel.Text = "Metal Manager Debug Panel v0.1.0  ";
+            this.debugVersionLabel.Text = "Metal Manager Debug Panel v0.1.2  ";
             this.debugVersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // debugPastebox
@@ -412,6 +408,10 @@
             this.clearDebugTxtbx.UseVisualStyleBackColor = true;
             this.clearDebugTxtbx.Click += new System.EventHandler(this.clearDebugPastebox);
             // 
+            // stringValueBindingSource
+            // 
+            this.stringValueBindingSource.DataSource = typeof(MetalManager.StringValue);
+            // 
             // DebugForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -441,11 +441,11 @@
             this.Text = "Debug";
             this.Load += new System.EventHandler(this.DebugFormLoad);
             ((System.ComponentModel.ISupportInitialize)(this.dgJsonEditor)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).EndInit();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.debugSJBtnPanel.ResumeLayout(false);
             this.debugPasteBoxPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
