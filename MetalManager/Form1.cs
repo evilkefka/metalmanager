@@ -37,7 +37,7 @@ namespace MetalManager
 
             DateTime releaseOfDLC = new DateTime(2023, 3, 13, 0, 0, 1);
             DateTime today = DateTime.Today;
-            
+
             if (today >= releaseOfDLC)
             {
                 string dlcWarningTitle = "Warning: New Flames Found!";
@@ -123,11 +123,11 @@ namespace MetalManager
                 {
                     newIndex = csSupLvls.Count - 1;
                 }
-                
+
                 goto GotIndex;
-                
+
             }
-            
+
 
             // Calculate new index using direction
             newIndex = origIndex + direction;
@@ -135,13 +135,13 @@ namespace MetalManager
             // Checking bounds of the range
             if (newIndex < 0 || newIndex >= csSupLvls.Count)
                 return; // Index out of range - nothing to do
-            
-        GotIndex:
+
+            GotIndex:
 
             string originalSupportLine = csSupLvls[origIndex];
             csSupLvls.RemoveAt(origIndex);
             csSupLvls.Insert(newIndex, originalSupportLine);
-            
+
         }
 
         private void swapCSSupportSpots(int firstIndex, int secondIndex)
@@ -167,7 +167,7 @@ namespace MetalManager
             fillSongSelection(modList);
             storeModListInfo(); //this stores the info for our song; specifically which levels it supports; the info is hidden and is used to quickly know what levels each mod has info for
             setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
-            
+
             mmLoading = false;
         }
 
@@ -178,14 +178,14 @@ namespace MetalManager
         {
             mmLoading = true;
             List<string> modList = new List<string>();
-            foreach(ListItem item in setListCatalog.Items)
+            foreach (ListItem item in setListCatalog.Items)
             {
                 modList.Add(item.Name);
             }
             fillSongSelection(modList.ToArray());
             storeModListInfo(); //this stores the info for our song; specifically which levels it supports; the info is hidden and is used to quickly know what levels each mod has info for
             setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
-            
+
             mmLoading = false;
         }
 
@@ -224,7 +224,7 @@ namespace MetalManager
         string catalogsort = null;
         bool slt = false;
         bool ort = false;
-        
+
 
         /// <summary>
         /// Looks for certain settings that can be saved. Reads config, and sets them
@@ -236,7 +236,7 @@ namespace MetalManager
             string ortStr = ConfigurationManager.AppSettings["showTutOr"];
             string allowASStr = ConfigurationManager.AppSettings["allowAS"];
             string org_slctIndxChngStr = ConfigurationManager.AppSettings["o_chnglvlindx"];
-            
+
 
             //Show SetList tutorial is initally true; if it's false, take it away
             if (sltStr == "false")
@@ -322,7 +322,7 @@ namespace MetalManager
                 tsm_AllowAutoSelect.Checked = true;
             } else
             {
-                if(allowASStr == "false")
+                if (allowASStr == "false")
                 {
                     tsm_AllowAutoSelect.Checked = false;
                 }
@@ -337,7 +337,7 @@ namespace MetalManager
                 tsm_sortZtoA.Checked = false;
                 tsm_customSort.Checked = false;
                 enableCustomSortButtons(false);
-            } else if(catalogsort == "z-a")
+            } else if (catalogsort == "z-a")
             {
                 tsm_sortZtoA.Checked = true;
                 tsm_sortAtoZ.Checked = false;
@@ -352,7 +352,7 @@ namespace MetalManager
         private void setFileMenuSelections()
         {
             //sets certain selections in File menu, based on if we have a game directory, and a mod directory
-            if(gameDir == null)
+            if (gameDir == null)
             {
                 tsm_openStrmgAssts.Visible = false;
                 tsm_linkGameDir.Visible = true;
@@ -364,7 +364,7 @@ namespace MetalManager
                 tsm_revertSetList.Visible = true;
             }
 
-            if(di == null)
+            if (di == null)
             {
                 tsm_changeModFolder.Visible = false;
                 tsm_reloadMods.Visible = false;
@@ -449,7 +449,7 @@ namespace MetalManager
                 if (thisMusicBanksFileSize == gameMBFileSize)
                 {
                     if (foundGameMusicBank) continue;
-                    
+
                     if (foundLHLibrary)
                     {
                         SongsWithCustomMusicBanks.Insert(1, new ListItem { Name = "Game's Default", Path = musicBankpath });
@@ -480,8 +480,8 @@ namespace MetalManager
                     }
 
 
-                    
-                    
+
+
                 }
             }
 
@@ -503,7 +503,7 @@ namespace MetalManager
                 FileInfo gamesMusicBankFile = new System.IO.FileInfo(gameMusicBankPath);
                 long gamesCrntMusicBanksFileSize = gamesMusicBankFile.Length;
                 if (gamesCrntMusicBanksFileSize != gameMBFileSize) return;
-                
+
                 //if we got this far, we just found the game's original Music.bank in its StreamingAssets folder, allow it to be a selection
 
                 if (foundLHLibrary)
@@ -515,7 +515,7 @@ namespace MetalManager
                     SongsWithCustomMusicBanks.Insert(0, new ListItem { Name = "Game's Default", Path = gameMusicBankPath });
                 }
             }
-            
+
         }
 
 
@@ -546,9 +546,9 @@ namespace MetalManager
         /// <summary>
         /// Runs StartUpScan Form. Adds/removes/edits song settings, scans songs for errors, and verifies no duplicates exist
         /// </summary>
-        private void OpenErrorGatekeeperDialogue()
+        private void OpenErrorGatekeeperDialogue(string summoner = null)
         {
-            using (StartupScanForm startupScanner = new StartupScanForm())
+            using (StartupScanForm startupScanner = new StartupScanForm(summoner))
             {
                 startupScanner.MyParentForm = this;
                 if (startupScanner.ShowDialog() == DialogResult.OK)
@@ -559,10 +559,10 @@ namespace MetalManager
                     string[][] songsWithProblems = startupScanner.SuspenededSongList;
                     int songsWithProbsNum = songsWithProblems.Count();
 
-                    
+
                     if (songsWithProbsNum > 0) {
                         ConfirmSuspendedSongs.AddRange(startupScanner.SuspenededSongList);
-                        
+
                     }
                 }
                 else
@@ -697,7 +697,7 @@ namespace MetalManager
             }
         }
 
-        
+
 
         List<ListItem> modsWithCustMusicBank = new List<ListItem>(); //we're going to store TWO things in here instead now—the mod name, and its path
 
@@ -705,7 +705,7 @@ namespace MetalManager
         string[] defaultMainSongNames = { "This Is the End", "Stygia", "Burial At Night", "This Devastation", "Poetry of Cinder", "Dissolution", "Acheron", "Silent No More", "Through You" };
         string[] defaultBossSongNames = { "Blood and Law", "Infernal Invocation I", "Infernal Invocation II", "Infernal Invocation III", "Infernal Invocation II", "Infernal Invocation I", "Infernal Invocation III", "No Tomorrow" };
 
-        
+
         /// <summary>
         /// Uses a string[] to fill all valid songs into each Level's music selection ComboBox
         /// </summary>
@@ -798,7 +798,7 @@ namespace MetalManager
                         setOldSongsArray(); //this stores an array of info of our current customsongs.json file in the game folder
                         loadOldInfoIntoSetList(false); //this loads the array from the previous line into the fields
                         setFileMenuSelections();
-                        if(getCurrentCustomsongsJson().Length > 2)
+                        if (getCurrentCustomsongsJson().Length > 2)
                         {
                             //getCurrentCustomsongsJson would have been "-1" or "-2" if there's nothing to grab
                             //we didn't have a "Current customsongs.json" in Organizer's Listbox yet, so we're adding one now
@@ -815,7 +815,7 @@ namespace MetalManager
                         MessageBox.Show("Please select Metal Hellsinger's game directory or its StreamingAssets folder.");
                         //gameDirInfo.Text = "No game directory found!";
                     }
-                    
+
                 }
             }
         }
@@ -1001,7 +1001,7 @@ namespace MetalManager
                 }  
             }
             */
-            
+
             foreach (string[] sngInfo in songListScrapedFromConfig)
             {
                 //if lbox was null, ignore this
@@ -1014,7 +1014,7 @@ namespace MetalManager
                         {
                             lBox.Items.Add(new ListItem { Name = sngInfo[0], Path = di + sngInfo[1] + "\\customsongs.json" });
                         }
-                    } else if(lBox.Name == "listBox1")
+                    } else if (lBox.Name == "listBox1")
                     {
                         if (sngInfo[0] == "(game)")
                         {
@@ -1035,7 +1035,7 @@ namespace MetalManager
                     modListString += sngInfo[0] + "::";//we return the modListString to know what to fill our ComboBoxes with in SetList; we don't use this anymore
                     validSongs.Add(sngInfo[0]);
                     validSongsLI.Add(new ListItem { Name = sngInfo[0], Path = di + sngInfo[1] + "\\customsongs.json" });
-                } else if(sngInfo[0] != "(game)" && ((sngInfo[3] != "1" && sngInfo[3] != "2")))
+                } else if (sngInfo[0] != "(game)" && ((sngInfo[3] != "1" && sngInfo[3] != "2")))
                 {
                     //we found a mod with an error, we're going to just say so in case it's the only one(so we don't block it with "No custom songs found" panel)
                     numberOfModsWithErrors++;
@@ -1121,7 +1121,7 @@ namespace MetalManager
                 hadCurrCSjson = true;
             }
 
-            SkipLookingForCurrentJson:
+        SkipLookingForCurrentJson:
 
             listBox1.Items.Clear();
             setListCatalog.Items.Clear();
@@ -1147,8 +1147,8 @@ namespace MetalManager
                 listBox1.Items.Add(new ListItem { Name = sngInfo[0], Path = di + sngInfo[1] + "\\customsongs.json" });
                 setListCatalog.Items.Add(new ListItem { Name = sngInfo[0], Path = di + sngInfo[1] + "\\customsongs.json" });
             }
-            
-            
+
+
 
         }
 
@@ -1168,7 +1168,7 @@ namespace MetalManager
             XmlNode parent = songBeingMoved.ParentNode;
             if (direction == -1)
             {
-                
+
                 if (topOrBottom == false) {
 
                     //move up
@@ -1188,14 +1188,14 @@ namespace MetalManager
                     parent.InsertBefore(songBeingMoved, parent.FirstChild);
                 }
 
-            } else if(direction == 1)
+            } else if (direction == 1)
             {
                 //move down
                 if (topOrBottom == false)
                 {
                     XmlNode nextNode = songBeingMoved.NextSibling;
                     if (nextNode == null) return;
-                    if(nextNode.Attributes["name"].Value.ToString() == "(game)")
+                    if (nextNode.Attributes["name"].Value.ToString() == "(game)")
                     {
                         nextNode = nextNode.NextSibling;
                     }
@@ -1209,7 +1209,7 @@ namespace MetalManager
                 }
             }
 
-            
+
 
             xmlDoc.Save(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
 
@@ -1260,17 +1260,17 @@ namespace MetalManager
             if (newIndex < 0 || newIndex >= listBox.Items.Count)
                 return; // Index out of range - nothing to do
 
-            if(newIndex == 0 && ((ListItem)listBox.Items[0]).Name == "Current customsongs.json")
+            if (newIndex == 0 && ((ListItem)listBox.Items[0]).Name == "Current customsongs.json")
             {
                 return;
             }
 
-            GotIndex:
+        GotIndex:
 
             object selected = listBox.SelectedItem;
 
             // Save checked state if it is applicable
-            
+
 
             // Removing removable element
             listBox.Items.Remove(selected);
@@ -1283,15 +1283,15 @@ namespace MetalManager
         private void Catalog_MouseDown(object sender, MouseEventArgs e)
         {
             ListBox lBox = sender as ListBox;
-            
-            if(e.Button == MouseButtons.Left)
+
+            if (e.Button == MouseButtons.Left)
             {
                 int indexOfItemUnderCursor = lBox.IndexFromPoint(e.Location);
                 if (lBox.Name == "listBox1" && indexOfItemUnderCursor != -1)
                 {
                     lBox.SelectedIndex = indexOfItemUnderCursor;
                 }
-                
+
                 //whatever we were selecting, yet it'll have the same information on the page (the selection is changing, but not the selected index)
             } else if (e.Button == MouseButtons.Right)
             {
@@ -1300,7 +1300,7 @@ namespace MetalManager
 
                 //select the item under the mouse pointer
                 int indexOfItemUnderCursor = lBox.IndexFromPoint(e.Location);
-                if(indexOfItemUnderCursor == -1)
+                if (indexOfItemUnderCursor == -1)
                 {
                     if (lBox.Name == "setListCatalog")
                     {
@@ -1311,7 +1311,7 @@ namespace MetalManager
                 {
                     lBox.SelectedIndex = lBox.IndexFromPoint(e.Location);
                 }
-                
+
                 if (indexOfItemUnderCursor != -1)
                 {
                     //we rightclicked over an item
@@ -1325,7 +1325,7 @@ namespace MetalManager
 
 
                     listSlctnRightClickMenu.Show(Cursor.Position);
-                    
+
 
                     //show these, whether enabled or not
                     moveToTopToolStripMenuItem.Visible = true;
@@ -1342,7 +1342,7 @@ namespace MetalManager
                     }
 
                     //if we're editing a song in Organizer, we don't want to allow sorting
-                    if(tabControl1.SelectedIndex == 1 &&
+                    if (tabControl1.SelectedIndex == 1 &&
                         (mSaveLevelInfo.Enabled || bSaveLevelInfo.Enabled))
                     {
                         enableCustomSortButtons(false, "Cannot move while editing song");
@@ -1366,7 +1366,7 @@ namespace MetalManager
                     listSlctnRightClickMenu.Show(Cursor.Position);
                     rightClickedListBox = lBox;
 
-                    
+
                     moveToTopToolStripMenuItem.Visible = false;
                     moveToBottomToolStripMenuItem.Visible = false;
                     moveUpToolStripMenuItem.Visible = false;
@@ -1381,8 +1381,8 @@ namespace MetalManager
             //makes the selection go away if we focus on something else
             ListBox lb = sender as ListBox;
             lb.SelectedItem = null;
-            
-            
+
+
         }
 
         Color standardSongLBColor = Color.FromArgb(255, 255, 255, 255);
@@ -1404,7 +1404,7 @@ namespace MetalManager
                     suspendedSng = true;
                     break;
                 }
-                if(suspendedSong[0] == "(game)" && songNameBeingDrawn == "Current customsongs.json")
+                if (suspendedSong[0] == "(game)" && songNameBeingDrawn == "Current customsongs.json")
                 {
                     suspendedSng = true;
                     break;
@@ -1434,7 +1434,7 @@ namespace MetalManager
                 }
                 e.Graphics.DrawString(lb.Items[e.Index].ToString(),
          e.Font, Brushes.White, e.Bounds, StringFormat.GenericDefault);
-                
+
             }
             else
             {
@@ -1462,7 +1462,7 @@ namespace MetalManager
          e.Font, Brushes.Black, e.Bounds, StringFormat.GenericDefault);
                 }
             }
-            
+
         }
 
 
@@ -1749,13 +1749,13 @@ namespace MetalManager
             //this checks a certain mod's grabLvlButton, and returns the 0-based index of the level we want to grab from it
             //this is only used to alert the user if mod integrity compromised
             string selectedLevelAbbreviation = whichButton.Text; //this gets whatever our mod's grabLvlButton is selected on
-            //int levelCurrentlySelected = Array.FindIndex(LvlAbbreviations, element => element == selectedLevelAbbreviation); //this converts the letter in our GrabLvl box to a number
-            //I hate findIndex so much
-            
+                                                                 //int levelCurrentlySelected = Array.FindIndex(LvlAbbreviations, element => element == selectedLevelAbbreviation); //this converts the letter in our GrabLvl box to a number
+                                                                 //I hate findIndex so much
+
 
             //levelCurrentlySelected = Array.FindIndex(LvlAbbreviations, t => t == whichButton.Text);
 
-            
+
             int levelCurrentlySelected = -1;
             for (int i = 0; i < LvlAbbreviations.Length; i++)
             {
@@ -1766,7 +1766,7 @@ namespace MetalManager
                     break;
                 }
             }
-            
+
             return levelCurrentlySelected;
         }
 
@@ -1848,7 +1848,7 @@ namespace MetalManager
                 }
                 if (indexOfComboBox == -1)
                 { ////testFindJson.Text += " no2 "; 
-                            return null;
+                    return null;
                 }
                 return bossLvlGrabButton[indexOfComboBox];
             }
@@ -1902,7 +1902,7 @@ namespace MetalManager
 
             string songString = "";
 
-            
+
             if (boxWasSelecting == null) //I actually have no idea why this would ever be null, unless there's just a flat error
                 return;
 
@@ -1934,7 +1934,7 @@ namespace MetalManager
                 boxWasSelecting.Text = getDefaultSong(whichLvl, m_or_b);
                 setCheckFromSelection(boxWasSelecting);
                 //getDefaultSong also disables the button. that's probably a bad idea
-                
+
                 return;
             }
 
@@ -2222,7 +2222,7 @@ namespace MetalManager
 
         private void musicSelectCombo_gainFocus(object sender, EventArgs e)
         {
-            
+
             setSongSelectionArray(sender as ComboBox);
 
             ////testFindJson.Text += someday++;
@@ -2263,18 +2263,18 @@ namespace MetalManager
 
             disableGrabLvlBox(boxCalled);//this disables our button and makes it blank
             setSongSelectionArray(boxCalled, " "); //it can't be ""; we can set it to "blah" if we want, it just CANNOT match any more
-            
+
         }
 
 
 
-        
+
         /// <summary>
         /// DEPRECATED: Replaced with musicComboSelect function
         /// </summary>
         private void musicSelectLostFocus(object sender, EventArgs e)
         {
-            
+
             if (mmLoading) return;
             ComboBox cBox = sender as ComboBox;
             ////testFindJson.Text += " .LostFocus. ";
@@ -2334,7 +2334,7 @@ namespace MetalManager
         private void TC1_Selecting(object sender, TabControlCancelEventArgs e)
         {
             int curTab = (sender as TabControl).SelectedIndex;
-            if(curTab == 0)
+            if (curTab == 0)
             {
                 if (!Organizer_checkAndAlertUnsavedChanges(true, "TCSelect"))
                 {
@@ -2344,7 +2344,7 @@ namespace MetalManager
         }
 
 
-        
+
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabControl1.SelectedIndex == 0)
@@ -2352,7 +2352,7 @@ namespace MetalManager
                 //string modList = loadModListFromConfig(setListCatalog); //this loads the contents into the setListCatalog ListBox
                 //fillSongSelection(modList);
                 //storeModListInfo(); //this stores the info for our song; specifically which levels it supports
-                
+
 
 
                 if (setList_topLabel.Text == "Saving any changes in Organizer will clear all unsaved changes in Set List.")
@@ -2368,7 +2368,7 @@ namespace MetalManager
                     setList_topLabel.Text = "Saving any changes in Organizer will clear all unsaved changes in Set List.";
                     setList_topLabel.Visible = true;
                 }
-                
+
                 organizer_enableLevelButtons(false); //a song is no longer selected, so disable buttons
                 clearSongInfoBoxes(); //song is no longer selected, clear the song info
                 //loadModListWithSubs(listBox1);
@@ -2442,7 +2442,7 @@ namespace MetalManager
         public string GetJsonFromPath(string path, bool whiteSpaceNormalized = false)
         {
             //this gives us the JSON in its full, unaltered form
-            
+
             /*
             if (orgListBoxIndex != -1)
                 selectedSong = ((ListItem)listBox1.Items[orgListBoxIndex]).Path;
@@ -2496,18 +2496,18 @@ namespace MetalManager
                 //we want the current custom song
                 //selectedSong = gameDir + "\\customsongs.json"; We get this anyways now
                 currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
-            } else if(orgListBoxIndex != -1 && listBox1.Items[orgListBoxIndex].ToString() == "Current customsongs.json")
+            } else if (orgListBoxIndex != -1 && listBox1.Items[orgListBoxIndex].ToString() == "Current customsongs.json")
             {
                 currentGameJsonIndicator = "<>"; //if we see this at the beginning of our string, we'll know we're accessing the game's current json
             }
-            
+
 
 
             //selectedSong = "\\" + listBox1.SelectedItem.ToString();
             //selectedSong = di + selectedSong + "\\customsongs.json";
-            
-            
-            if(orgListBoxIndex != -1)
+
+
+            if (orgListBoxIndex != -1)
                 selectedSong = ((ListItem)listBox1.Items[orgListBoxIndex]).Path;
             else
                 selectedSong = ((ListItem)listBox1.SelectedItem).Path; //we now store our path in the listbox with the modname, so we'll just grab that
@@ -2546,17 +2546,17 @@ namespace MetalManager
             //Open Json file and retrieve info
             //check what we're opening
 
-            
+
             //I don't think we need this anymore. We know we needed it when we weren't allowing bankPath changes unless we were on the game's main customsongs.json, but we allow it now
             if (listBox1.SelectedItem.ToString() == "Current customsongs.json")
             {
-                if(((ListItem)listBox1.SelectedItem).Path == "none")
+                if (((ListItem)listBox1.SelectedItem).Path == "none")
                 {
                     return "-2";
                 }
                 //we want the current custom song
                 //selectedSong = gameDir + "\\customsongs.json"; We get this anyways now
-                
+
             }
 
 
@@ -2644,7 +2644,7 @@ namespace MetalManager
         {
             //this doesn't work :(
             //return;
-            
+
             ComboBox[] allComboBoxes = { mainCombo1, mainCombo2, mainCombo3, mainCombo4, mainCombo5, mainCombo6, mainCombo7, mainCombo8,
                 bossCombo1, bossCombo2, bossCombo3, bossCombo4, bossCombo5, bossCombo6, bossCombo7, customMusicBankCombo, mainCombo9
             };
@@ -2820,7 +2820,7 @@ namespace MetalManager
                     //don't do this unless the first succeeds
                     bSaveSuccess = AttemptToSaveLevel_Organizer("b", true);
                 }
-            } else if(mSaveLevelInfo.Enabled)
+            } else if (mSaveLevelInfo.Enabled)
             {
                 mSaveSuccess = AttemptToSaveLevel_Organizer("m", true);
             } else if (bSaveLevelInfo.Enabled)
@@ -2828,7 +2828,7 @@ namespace MetalManager
                 bSaveSuccess = AttemptToSaveLevel_Organizer("b", true);
             }
             if (!mSaveSuccess || !bSaveSuccess) { return false; }
-            
+
             return true;
         }
 
@@ -2895,9 +2895,9 @@ namespace MetalManager
             {
                 //there's no game directory
                 if (fullModString == "-2")
-                { 
+                {
                     //fullModString == "-2"
-                    
+
                     SetList_DebugLabel1.Visible = true;
                     SetList_DebugLabel1.Text = "No current customsongs.json found—new slate loaded!";
                 } else if (gameJsonGoofed)
@@ -3032,12 +3032,12 @@ namespace MetalManager
 
             if (mainGrabLvlNum == -1)
             { //testFindJson.Text += " A0 "; 
-                        return true;
+                return true;
             } //right now, we're only running this checker with verfied Mods. Not when our grabLvlBox has a "?"
             if (bossGrabLvlNum == -1)
             {
-                        //testFindJson.Text += " B0 "; 
-                        return true;
+                //testFindJson.Text += " B0 "; 
+                return true;
             } //I guess we COULD get it to run if it had a "?" ...
 
 
@@ -3295,7 +3295,7 @@ namespace MetalManager
             //retrieves the info for one level's custom music; it's used to read the actual JSON in the game folder
             //it's either going to give us a directory name(the mod name), or a song title if no directory
 
-            
+
             // we're going to take the ListBox item's value, which is its JSON path. Now we're going to have to look through THAT and see if it matches the information! ***
             //this is because we can have a JSON with no .Bank file anywhere to be seen, pointing to another .Bank file in an another folder
             //if the bankPath in our Json ...^--(this one) matches with what we have in the game's current customsongs.json, we're golden!
@@ -3629,16 +3629,16 @@ namespace MetalManager
             {
                 for (int i = 0; i < storedOriginalInfo_m.Length; i++)
                 {
-                    if (i == 5) 
+                    if (i == 5)
                     {
                         storedOriginalInfo_m[5] = mTrueBankPath.Text;
                         continue;
                     }
-                
+
                     storedOriginalInfo_m[i] = mainLevelTextBoxes[i].Text;
 
                 }
-                
+
                 mSaveLevelInfo.Enabled = false;
 
             }
@@ -3653,7 +3653,7 @@ namespace MetalManager
                     }
                     storedOriginalInfo_b[i] = bossFightTextBoxes[i].Text;
                 }
-                
+
                 bSaveLevelInfo.Enabled = false;
             }
 
@@ -3770,36 +3770,36 @@ namespace MetalManager
         }*/
 
 
-            /*
-        List<int> customBPMs = new List<int>();
-        private void CheckToAddCustomBPM(string chunkToCheck)
+        /*
+    List<int> customBPMs = new List<int>();
+    private void CheckToAddCustomBPM(string chunkToCheck)
+    {
+        int indexAfterBPM = chunkToCheck.IndexOf("\"BPM\":") + "\"BPM\":".Length;
+        int indexOfNxtCma = chunkToCheck.IndexOf(",", indexAfterBPM);
+        int endOfBPMValue = -1;
+        if (indexOfNxtCma != -1)
         {
-            int indexAfterBPM = chunkToCheck.IndexOf("\"BPM\":") + "\"BPM\":".Length;
-            int indexOfNxtCma = chunkToCheck.IndexOf(",", indexAfterBPM);
-            int endOfBPMValue = -1;
-            if (indexOfNxtCma != -1)
-            {
-                endOfBPMValue = indexOfNxtCma;
-            }
+            endOfBPMValue = indexOfNxtCma;
+        }
 
-            if (endOfBPMValue == -1) { endOfBPMValue = chunkToCheck.Length; }
-            if (endOfBPMValue == -1) return;
-            int lengthOfBPMValue = endOfBPMValue - indexAfterBPM;
-            string allegedBPMValue = chunkToCheck.Substring(indexAfterBPM, lengthOfBPMValue);
+        if (endOfBPMValue == -1) { endOfBPMValue = chunkToCheck.Length; }
+        if (endOfBPMValue == -1) return;
+        int lengthOfBPMValue = endOfBPMValue - indexAfterBPM;
+        string allegedBPMValue = chunkToCheck.Substring(indexAfterBPM, lengthOfBPMValue);
 
-            if (!Int32.TryParse(allegedBPMValue, out int theyWantedTheHighway)) { return; } //they're happier there, today
+        if (!Int32.TryParse(allegedBPMValue, out int theyWantedTheHighway)) { return; } //they're happier there, today
 
-            int foundBPMValue = Int32.Parse(allegedBPMValue);
+        int foundBPMValue = Int32.Parse(allegedBPMValue);
 
-            if (gameMusicBankBPMs.Contains(foundBPMValue)) { return; };
+        if (gameMusicBankBPMs.Contains(foundBPMValue)) { return; };
 
-            if (!customBPMs.Contains(foundBPMValue))
-            {
-                customBPMs.Add(foundBPMValue);
-            }
-        }*/
+        if (!customBPMs.Contains(foundBPMValue))
+        {
+            customBPMs.Add(foundBPMValue);
+        }
+    }*/
 
-        
+
 
         /// <summary>
         /// Returns an int of a custom BPM # found in a chunk of code. Returns -1 if it can't be found, or 0 it's not a custom BPM
@@ -3854,12 +3854,12 @@ namespace MetalManager
 
         private void songInfoModified(object sender, EventArgs e)
         {
-            
+
             //this function runs automatically when any text box gets changed in organizer
             TextBox calledTextbox = sender as TextBox;
             string m_or_b = calledTextbox.Name.Substring(0, 1).ToLower();
 
-            if(m_or_b == "m" && MLNameBox.Enabled == false)
+            if (m_or_b == "m" && MLNameBox.Enabled == false)
             {
                 return;
             }
@@ -3924,7 +3924,7 @@ namespace MetalManager
             if (!originalLine.Contains(":"))
             {
                 //we can't split it
-                
+
                 return returnString;
             }
 
@@ -3933,7 +3933,7 @@ namespace MetalManager
             //trim left side
             //original
 
-            
+
             return returnString;
         }
 
@@ -4009,7 +4009,7 @@ namespace MetalManager
                 if (bTrueBankPath.Text != storedOriginalInfo_b[5]
                     && bossFightTextBoxes[0].Enabled)
                     return true;
-                
+
             }
 
             return modified;
@@ -4023,8 +4023,8 @@ namespace MetalManager
                     return true;
                 else
                     return false;
-                
-            } else if(m_or_b == "b")
+
+            } else if (m_or_b == "b")
             {
                 if (bTrueBankPath.Text == storedOriginalInfo_b[5])
                 {
@@ -4050,7 +4050,7 @@ namespace MetalManager
         {
             //retrieves the info for one level's custom music, isolated to main or boss music; this is used for making the Set List
 
-            
+
             if (fullJson.Substring(0, 2) == "<>")
             {
                 fullJson = fullJson.Substring(2);
@@ -4059,7 +4059,7 @@ namespace MetalManager
             if (fullJson.Contains("\t")) { fullJson = fullJson.Replace("\t", ""); } //I'm just going to do this now
 
             int indexOfLevelInfo = fullJson.IndexOf(Level); //appears as, for example, "LevelName" : "Voke"
-            
+
             if (indexOfLevelInfo == -1)
             {
                 //this level is not in the JSON file
@@ -4083,7 +4083,7 @@ namespace MetalManager
 
             if (indexOfLevelInfoEnd == -1) return null;
             string fullLevelInfo = fullJson.Substring(indexOfLevelInfo, indexOfLevelInfoEnd - indexOfLevelInfo);
-            
+
 
 
 
@@ -4092,12 +4092,12 @@ namespace MetalManager
 
             if (m_or_b == "b") goto BossChecker;
 
-            
+
 
 
             //check if we have MainMusic info in this level
             if (indexOfMainLevelMusic == -1) return null;
-            
+
 
             //if we got this far, we DO have a MainMusic entry for this level
 
@@ -4127,9 +4127,9 @@ namespace MetalManager
             string fullBossMusicInfo = fullLevelInfo.Substring(indexOfBossFightMusic);
             string[] songInfoB = getCustomInfoFromChunk(fullBossMusicInfo);
             return songInfoB;
-            
-            
-            
+
+
+
         }
 
         /// <summary>
@@ -4139,7 +4139,7 @@ namespace MetalManager
         /// <returns></returns>
         private string[] getCustomInfoFromChunk(string chunk)
         {
-            string[] lbls = { "Bank", "Event", "LowHealthBeatEvent", "BeatInputOffset", "BPM", "bankPath" }; 
+            string[] lbls = { "Bank", "Event", "LowHealthBeatEvent", "BeatInputOffset", "BPM", "bankPath" };
 
             List<string> customInfo = new List<string>();
             for (int i = 0; i < lbls.Length; i++)
@@ -4147,7 +4147,7 @@ namespace MetalManager
 
                 int indexOfSongInfo = chunk.IndexOf(lbls[i]); //For example, this finds "Bank"
 
-                if (indexOfSongInfo == -1){ customInfo.Add(""); continue; }//if we can't find the info for something, return an empty string(getNewLevelInfoLines will be fine for bankPath)
+                if (indexOfSongInfo == -1) { customInfo.Add(""); continue; }//if we can't find the info for something, return an empty string(getNewLevelInfoLines will be fine for bankPath)
 
 
                 int indexOfSongInfoSeperator = chunk.IndexOf(':', indexOfSongInfo); //This finds the index of the next : after the label. What's after this colon is our value we want
@@ -4308,7 +4308,7 @@ namespace MetalManager
                 indexOfBossFightMusic = fullLevelInfo.IndexOf("\"MainMusic\"");
             }*/
 
-            
+
 
             string[] songLabels = songInfoLabels;
 
@@ -4350,7 +4350,7 @@ namespace MetalManager
                 indexofMainMusicEnd = fullLevelInfo.Length;
             }
 
-            
+
             if (indexofMainMusicEnd == -1)
             {
                 indexofMainMusicEnd = fullLevelInfo.Length;
@@ -4482,7 +4482,7 @@ namespace MetalManager
                         songInfo = songInfo.Substring(0, 1).ToUpper() + songInfo.Substring(1); //goes from c:/ to C:/
                         songInfo = "bankPath: " + songInfo;
                         mBankPathLabel.Text = songInfo;
-                        
+
                         //mBankPathLabel.Visible = true;
                     }
                 } else
@@ -4558,7 +4558,7 @@ namespace MetalManager
             int bossMusicLength = indexofBossMusicEnd - indexOfBossFightMusic;
 
             string fullBossMusicInfo = fullLevelInfo.Substring(indexOfBossFightMusic, bossMusicLength);
-            
+
 
             int indexOfBossBankPath = fullBossMusicInfo.IndexOf("bankPath");
             for (int i = 0; i < songLabels.Length; i++)
@@ -4660,7 +4660,7 @@ namespace MetalManager
                         songInfo = shaveSurroundingQuotesAndSpaces(songInfo); //this needs to be before we add "bankPath":
                         songInfo = "bankPath: " + songInfo;
                         bBankPathLabel.Text = songInfo;
-                        
+
 
                         //bBankPathLabel.Visible = true;
                     }
@@ -4716,26 +4716,26 @@ namespace MetalManager
 
             string LvlNameCapd = allLevelNames[zeroIndexLevel].Substring(0, 1).ToUpper() + allLevelNames[zeroIndexLevel].Substring(1).ToLower(); //voke->Voke
             string newJson = getJsonWithInjection(fullSongJsonInfo, LvlNameCapd, m_or_b, newInfo);
-            
+
 
             newJson = newJson.Replace("\n\n", "\n"); //having too many returns is easy. having not enough is stupid
-            
+
             newJson = fixAllCommas(newJson);
-            
+
 
             bool newJsonHasErrors = verifyNoErrors(newJson.ToString());
             if (newJsonHasErrors)
             {
                 //MessageBox.Show("The updated info could not be saved: errors were found in Json's formatting when attempting to save. Please check the formatting of your new information.");
                 //Clipboard.SetText(newJson);
-                
+
                 askToSendAttemptedSaveToDebug(newJson);
-                
+
                 //MessageBox.Show("New Json:\n" + newJson);
                 return false;
             }
 
-            if(skipBackupCreator) goto EditJson;
+            if (skipBackupCreator) goto EditJson;
 
             if (!possibleOgFolder.Exists) Directory.CreateDirectory(possibleOriginalFolder); //if the directory already exists, this shouldn't do anything<-BULLSHIT!!
 
@@ -4773,7 +4773,7 @@ namespace MetalManager
         //if Original file already exists, and we skipped the last if statement, all we need to do is edit our already-made Json
         EditJson:
 
-            
+
 
             try
             {
@@ -4786,7 +4786,7 @@ namespace MetalManager
                     MessageBox.Show("An error occured when saving game's customsongs.json. :(");
                 } else
                 {
-                   // MessageBox.Show("This mods folder:\n" + thisModsFolder);
+                    // MessageBox.Show("This mods folder:\n" + thisModsFolder);
                     MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
                 }
                 return false;
@@ -4809,7 +4809,7 @@ namespace MetalManager
             }
 
 
-            
+
             string possibleOriginalFolder = thisModsFolder + "\\" + "_Original";
             DirectoryInfo possibleOgFolder = new DirectoryInfo(@possibleOriginalFolder);
             string possibleOriginalJson = thisModsFolder + "\\" + "_Original\\customsongs.json";
@@ -4836,7 +4836,7 @@ namespace MetalManager
                         string destinationFile = possibleOriginalFolder + "\\customsongs.json";
                         //string destinationFile = possibleOriginalFolder;
                         try
-                        { 
+                        {
                             File.Copy(filename, destinationFile); //copy the original customsongs.json to the "Original" folder
                         }
                         catch
@@ -4850,18 +4850,18 @@ namespace MetalManager
 
             }
 
-            SaveJson:
+        SaveJson:
 
             try
             {
-                File.WriteAllText(thisModsFolder+"\\customsongs.json", newJson);
+                File.WriteAllText(thisModsFolder + "\\customsongs.json", newJson);
             }
             catch
             {
                 //MessageBox.Show("This mods folder:\n" + thisModsFolder);
                 MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
             }
-            
+
         }
 
 
@@ -4972,12 +4972,12 @@ namespace MetalManager
             }
 
 
-            for(int i=0; i< lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].Contains(LevelCapped) && !foundLevel)
                 {
                     foundLevel = true;
-                    fullLevelBlock += lines[i-1] + "\n";
+                    fullLevelBlock += lines[i - 1] + "\n";
                     fullLevelBlock += lines[i] + "\n";
                     continue;
                 }
@@ -4999,7 +4999,7 @@ namespace MetalManager
                     break;
             }
 
-            
+
             return fullLevelBlock;
         }
 
@@ -5149,7 +5149,7 @@ namespace MetalManager
 
             //check if level exists in JSON
             //MessageBox.Show("New Nugget: \n" + newLevelInfoNugget);
-            
+
             int selectedLevelInt = getSelectedLevel_OrganizerInjector(); //zero-based index, gives us what level we're selecting in Organizer
             string selectedLevelNameCapped = allLevelNames[selectedLevelInt].Substring(0, 1).ToUpper() + allLevelNames[selectedLevelInt].Substring(1).ToLower(); //voke->Voke
 
@@ -5161,11 +5161,11 @@ namespace MetalManager
                 //the level we're editing had info in the JSON already
                 //replace the info
                 string replacementBlock = replaceInfoForExistingLevel(fullJson, Level, m_or_b, newLevelInfoNugget); //make a chunk that has new level info
-                
+
                 replacementBlock = replacementBlock.Replace("/n/n", "/n"); //we're going to get rid of all double-returns...
 
                 string originalBlock = getTrueFullLevelBlock(fullJson, Level); //used to be getTRUEFullInfoForLevel(fullJson, Level);
-                
+
                 //originalBlock = originalBlock.Replace("\r", "");
                 //string originalBlock = getFullInfoForLevel(fullJson, Level); //find the original chunk of the level info
                 //return originalBlock;
@@ -5180,10 +5180,10 @@ namespace MetalManager
                 string returnString = fullJson;
                 //returnString = returnString.Replace("\r", "");
                 //string testString = fullJson;
-                
-                
+
+
                 returnString = returnString.Replace(originalBlock, replacementBlock); //replace the original chunk with the new level info chunk
-                
+
 
 
                 //if (!returnString.Contains(originalBlock)) { MessageBox.Show("We couldn't find the original block in the JSON file"); }
@@ -5224,8 +5224,8 @@ namespace MetalManager
         {
             Button dltBtn = sender as Button;
             string m_or_b = dltBtn.Name.Substring(0, 1).ToLower();
-            
-            if(AttemptToDeleteMusic(m_or_b) == true)
+
+            if (AttemptToDeleteMusic(m_or_b) == true)
             {
                 //delete successful! reload Organizer page
                 int dontChangeLevel = getSelectedLevel_OrganizerInjector(); //gives us whatever level Organizer is selected on for its song
@@ -5263,7 +5263,7 @@ namespace MetalManager
             if (m_or_b == "m") MusicString = "Main";
             else MusicString = "Boss";
 
-            string message = "Are you sure you want to delete the "+ MusicString + " Music on ";
+            string message = "Are you sure you want to delete the " + MusicString + " Music on ";
             message += capFirst(allLevelNames[lvlInt]);
             message += " for " + modName + "?";
 
@@ -5312,7 +5312,7 @@ namespace MetalManager
                 return false;
             }
 
-            
+
             //check if we should make a backup of json
             if (organizer_restoreJson.Visible || modName == "game's current info") goto EditJson;
 
@@ -5353,7 +5353,7 @@ namespace MetalManager
 
             }
 
-            EditJson:
+        EditJson:
 
             try
             {
@@ -5371,13 +5371,13 @@ namespace MetalManager
                     MessageBox.Show("An error occured when saving Json file. A backup of it should be found in song's directory.");
                 }
                 return false;
-                
+
             }
 
             return true;
 
         }
-        
+
 
 
         private string getJsonWithDeletedMusic(string fullJson, int levelInt, string m_or_b)
@@ -5386,7 +5386,7 @@ namespace MetalManager
             string levelName = capFirst(allLevelNames[levelInt]);
             string originalLevelBlock = getTrueFullLevelBlock(fullJson, levelName);
             string newLevelBlock = "";
-            if(m_or_b == "m")
+            if (m_or_b == "m")
             {
                 //we're deleting Main Music
 
@@ -5439,7 +5439,7 @@ namespace MetalManager
                     returnString = fullJson.Replace(originalLevelBlock, "");
                 }
             }
-            else 
+            else
             {
                 //we're deleting Boss Music
 
@@ -5452,13 +5452,13 @@ namespace MetalManager
                     int foundCurlyClose = 0;
                     foreach (string line in lvlChunkLines)
                     {
-                        if(line.Contains("}") && !line.Contains("{"))
+                        if (line.Contains("}") && !line.Contains("{"))
                             foundCurlyClose++;
-                         else
+                        else
                             foundCurlyClose = 0;
-                        
 
-                        if(foundCurlyClose == 2)
+
+                        if (foundCurlyClose == 2)
                         {
                             //we're on the level closer, take it and end this
                             newLevelBlock += line + "\n";
@@ -5555,7 +5555,7 @@ namespace MetalManager
             string fixedText = "";
 
             bool squareBracketFound = false;
-            for(int i=0; i<lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].Contains("]"))
                 {
@@ -5566,7 +5566,7 @@ namespace MetalManager
 
 
 
-                
+
                 //we're also going to fix any bpms that don't get their bankPaths properly put in
                 string lineNoWhtSpc = NormalizeWhiteSpace(lines[i], true);
                 if (lineNoWhtSpc.Contains("\"BPM\":"))
@@ -5595,7 +5595,7 @@ namespace MetalManager
                         {
                             fixedText += lines[i] + "\n";
                         }
-                        
+
                     }
                     continue; //dont do more work if this was BPM
                 }
@@ -5631,7 +5631,7 @@ namespace MetalManager
                         }
 
 
-                    } else if (lines[i-1].Contains("}") && !lines[i-1].Contains("{"))
+                    } else if (lines[i - 1].Contains("}") && !lines[i - 1].Contains("{"))
                     {
                         //previous line also contains } closers,
                         //we're on the level closing line
@@ -5665,13 +5665,13 @@ namespace MetalManager
         {
             string fixedText = "";
             int indexOfSquareBracket = fullText.IndexOf("]");
-            if(indexOfSquareBracket == -1)
+            if (indexOfSquareBracket == -1)
             {
                 //MessageBox.Show("No square bracket found");
                 return fullText;
             }
             int indxLastLvlsClsngCurly = fullText.LastIndexOf("}", indexOfSquareBracket);
-            if(fullText.Substring(indxLastLvlsClsngCurly+1, 1) == ",")
+            if (fullText.Substring(indxLastLvlsClsngCurly + 1, 1) == ",")
             {
                 //we have an unneeded comma, remove it
                 fixedText = fullText.Substring(0, indxLastLvlsClsngCurly + 1) + fullText.Substring(indxLastLvlsClsngCurly + 2);
@@ -5801,7 +5801,7 @@ namespace MetalManager
             //this code takes a JSON and changes only the individual lines for a level that already exists
             //MessageBox.Show("New Level info: " + newLevelInfoNugget);
             string returnString = "";
-            
+
 
             string fullSongJsonInfo = fullJson;
             string fullInfo = getTrueFullLevelBlock(fullSongJsonInfo, Level);//level must be capped; this gives us the chunk of the level with all the whitespace and linebreaks
@@ -5812,7 +5812,7 @@ namespace MetalManager
             {
                 levelChunkLines = fullInfo.Split('\r'); //all of a sudden the program keeps crashing when this isn't here... hmmmmmm......
             }
-            
+
 
             //first line is { ... index 0
             //second line is "LevelName" : "Stygia", index 1
@@ -5854,13 +5854,13 @@ namespace MetalManager
 
                         lineWereOn++;
                     }
-                    
+
                     if (newLevelInfoLines.Length == 5)
                     {
                         //we did not have a bankPath being added. if we had one, make it blank
                         if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
                         {
-                            
+
                             levelChunkLines[lineWereOn] = "";
                             lineWereOn++;
                         }
@@ -5895,10 +5895,10 @@ namespace MetalManager
                     //now we add the rest of our old chunk; lineWereOn should still have us at "BossMusic":
                     for (int i = lineWereOn; i < levelChunkLines.Length; i++)
                     {
-                        returnString += levelChunkLines[i]+"\n";
+                        returnString += levelChunkLines[i] + "\n";
                         lineWereOn = i;
                     }
-                    
+
                     return returnString; //we want to back out of this now, so we don't hit the foreach loop at the end
                     //there was probably a better way to do this, but I'm tired damnit
 
@@ -5946,13 +5946,13 @@ namespace MetalManager
                         levelChunkLines[lineWereOn] = newLevelInfoLines[i];
                         lineWereOn++;
                     }
-                    
+
                     if (newLevelInfoLines.Length == 5)
                     {
                         //we did not have a bankPath being added. if we had one, make it blank
                         if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
                         {
-                            
+
                             levelChunkLines[lineWereOn] = "";
                             lineWereOn++;
                         }
@@ -6003,7 +6003,7 @@ namespace MetalManager
                                     //we don't have a bank path in here, we need to stop this code before it hits the code to replace the line
 
                                     lineToAddBankpath = lineWereOn;
-                                    
+
                                     continue;
                                 }
 
@@ -6013,13 +6013,13 @@ namespace MetalManager
 
                             lineWereOn++;
                         }
-                        
+
                         if (newLevelInfoLines.Length == 5)
                         {
                             //we did not have a bankPath being added. if we had one, make it blank
                             if (levelChunkLines[lineWereOn].Contains("\"bankPath\""))
                             {
-                                
+
                                 levelChunkLines[lineWereOn] = "";
                                 lineWereOn++;
                             }
@@ -6060,12 +6060,12 @@ namespace MetalManager
                 //if (line != null && line != "") <-used to be
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    
+
                     returnString += line + '\n'; //I don't get how Join works
                 }
             }
 
-            
+
             //this gives me an extra return after BPM for replacing Boss Music with a Bankpath
 
             return returnString;
@@ -6338,7 +6338,7 @@ namespace MetalManager
             TextBox[] mainLevelTextBoxes = { MLNameBox, MLEventBox, MLLHBEBox, MLOffsetBox, MLBPMBox };
             TextBox[] bossFightTextBoxes = { BFNameBox, BFEventBox, BFLHBEBox, BFOffsetBox, BFBPMBox };
 
-            
+
             string copyString = "";
             string separator = "\n"; //y'gotta keep 'em separated
 
@@ -6400,15 +6400,15 @@ namespace MetalManager
             {
                 levelInfoSplit[i] = levelInfoSplit[i].Replace("\"" + labels[i] + "\"", ""); //gets rid of the label and its surrounding quotes
 
-                if(labels[i] == "bankPath")
+                if (labels[i] == "bankPath")
                 {
                     //we're supposed to have a colon for bankPath (ie: bankPath: M:/steam/common/etc./), but we don't want the one from "bankPath":
                     int numberOfColons = levelInfoSplit[i].Split(':').Length - 1;
-                    if(numberOfColons > 1)
+                    if (numberOfColons > 1)
                     {
                         int indexOfFirstColon = levelInfoSplit[i].IndexOf(":");
-                        levelInfoSplit[i] = levelInfoSplit[i].Substring(indexOfFirstColon+1); //we erase everything before the first colon
-                    }              
+                        levelInfoSplit[i] = levelInfoSplit[i].Substring(indexOfFirstColon + 1); //we erase everything before the first colon
+                    }
 
                 } else
                 {
@@ -6416,7 +6416,7 @@ namespace MetalManager
                     levelInfoSplit[i] = levelInfoSplit[i].Replace(":", ""); //gets rid of the colon that was after our label
                 }
 
-                
+
 
                 if (i == 3 || i == 4)
                 {
@@ -6488,7 +6488,7 @@ namespace MetalManager
                 }
 
                 if (levelInfoSplit.Length < 7) { return; }//it will be 6 if we didn't have a bank path; it'll be 5 if the user copied and pasted something [without a bankpath]
-                if (!levelInfoSplit[5].Contains(":\\")) {  return; }//if they user somehow copied something that doesn't have, for example, C:/, R:/, D:/, then don't let it be pasted
+                if (!levelInfoSplit[5].Contains(":\\")) { return; }//if they user somehow copied something that doesn't have, for example, C:/, R:/, D:/, then don't let it be pasted
                 //if we got this far, we have something copied for our bankPath field
                 mTrueBankPath.Text = shaveSurroundingQuotesAndSpaces(levelInfoSplit[5]);
                 string shortPath = levelInfoSplit[5];
@@ -6508,7 +6508,7 @@ namespace MetalManager
                 if (!verifyFileExists(mTrueBankPath.Text)) {
                     //could not verify the file exists
                     bankPathRedAlert(mBankPathLabel);
-                }else
+                } else
                 {
                     warnUserIfBadBankPath(mBankPathLabel);
                 }
@@ -6577,7 +6577,7 @@ namespace MetalManager
         {
             //this resets the colors of the level buttons in Organizer; resetting their colors and making them Disabled (before a level is selected)
             Button[] LevelButtons = { L1Settings, L2Settings, L3Settings, L4Settings, L5Settings, L6Settings, L7Settings, L8Settings, L0Settings };
-            
+
             if (!enableButtons) goto resetLButtons;
 
             for (int i = 0; i < LevelButtons.Length; i++)
@@ -6599,7 +6599,7 @@ namespace MetalManager
                 LevelButtons[i].ForeColor = Color.Black;
                 LevelButtons[i].Enabled = false;
             }
-            foreach(TextBox tbox in allOrganizerTextboxes)
+            foreach (TextBox tbox in allOrganizerTextboxes)
             {
                 tbox.Enabled = false;
             }
@@ -6792,7 +6792,7 @@ namespace MetalManager
                     //we didn't get a b from the last call, but it could still be right after that (it doesn't look like 4b, but it could look like 4mb)
                     if (indexOfConsideredLevel >= supportedLvlString.Length - 2)
                     { ////testFindJson.Text += "no support on lvl" + zeroBasedLevel; 
-                          continue;
+                        continue;
                     }//supportedLvlString.Length - 2 would be here -> 12345b6mb7*mb 12345b6m*b7 (it can't be 12345b6mb*7b, or the last 'if' would have seen it)
                     //^this ensures we're not hitting looking for the last level while it has no support
                     //4m5m6
@@ -7197,7 +7197,7 @@ namespace MetalManager
                         //if we just checked a checkbox and its ComboBox has something we don't recognize, we don't want it in the box anymore
                         mainCBox[lvlNum].Text = "";
                     }
-                    
+
                     //setSongSelectionArray(mainCBox[lvlNum]);
                     ////testFindJson.Text += ".ssFC.";
                 } else if (id == "b")
@@ -7306,7 +7306,7 @@ namespace MetalManager
                     //compare to mains
                     if (currentSetListIndexes_main[boxIDNum] == selectedSong)
                     {
-                        
+
                         //our selected song matches our current JSON's song; don't do a check, and make the GrabLvl button text say " "
                         mainCheckBoxes[boxIDNum].Checked = false;
                         enableGrabLvlButton(cBox, " ");
@@ -8137,6 +8137,12 @@ namespace MetalManager
                 else
                 {
                     //if we're here, then we're looking at BeatInputOffset or BPM, both are number-only variables
+                    
+                    if (IsValueANumber(valueNS.Trim()) == false)
+                    {
+                        lineFormatErrors.Add("numFormat");
+                    }
+                    /*
                     if (Decimal.TryParse(valueNS.Trim(), out decimal hi))
                     {
                         //the value is a number
@@ -8145,7 +8151,7 @@ namespace MetalManager
                     {
                         //the value is NOT a number
                         lineFormatErrors.Add("numFormat");
-                    }
+                    }*/
                 }
             }
             return lineFormatErrors.ToArray();
@@ -8493,7 +8499,7 @@ namespace MetalManager
             return true; //our colon is directly after our needle, return true!
         }
 
-        
+
         private bool modSupportsLevel(int modIndex, int Level, string m_or_b)
         {
             ////testFindJson.Text += "MSLCalled: (" + modIndex + ", " + Level + ", " + m_or_b + ")";
@@ -8513,7 +8519,7 @@ namespace MetalManager
 
             if (levelInfoIndex == -1)
             { ////testFindJson.Text += "ERROR OCCURED, no levelInfo found in string"; 
-                        return result;
+                return result;
             }//this shouldn't ever happen, but just in case
             if (levelInfoIndex == supportedLvlString.Length - 1) return result; //if it has no support on last number, then we're at the last character
 
@@ -8550,7 +8556,7 @@ namespace MetalManager
                 //or it could be ..6mb7 (meaning NOTHING is there)
                 if (levelInfoIndex >= supportedLvlString.Length - 2)
                 { ////testFindJson.Text += " D4 ";
-                            return result;
+                    return result;
                 }
                 string checkForNumStr = supportedLvlString.Substring(levelInfoIndex + 1, 1);
 
@@ -8732,7 +8738,7 @@ namespace MetalManager
 
             for (int i = 0; i < numberOfLevels; i++)
             {
-                
+
                 string capitalizeLevelName = "\"" + allLevelNames[i].Substring(0, 1).ToUpper() + allLevelNames[i].Substring(1) + "\"";
                 int indexOfLevelInfo = fullJson.IndexOf(capitalizeLevelName);
 
@@ -8751,7 +8757,7 @@ namespace MetalManager
                 }
 
 
-                    int indexOfLevelInfoEnd = fullJson.IndexOf("} }", indexOfLevelInfo);
+                int indexOfLevelInfoEnd = fullJson.IndexOf("} }", indexOfLevelInfo);
                 if (indexOfLevelInfoEnd == -1)
                 {
                     //we have a problem, try to fix it
@@ -8764,8 +8770,8 @@ namespace MetalManager
                 }
 
 
-                if (indexOfLevelInfoEnd == -1) { MessageBox.Show("BOOBOO");  return -1; }//we found start of a level, but couldn't find } }, there must be formatting errors
-                
+                if (indexOfLevelInfoEnd == -1) { MessageBox.Show("BOOBOO"); return -1; }//we found start of a level, but couldn't find } }, there must be formatting errors
+
                 //at this point, we have information for whatever level this is
 
                 string fullLevelInfo = fullJson.Substring(indexOfLevelInfo, indexOfLevelInfoEnd - indexOfLevelInfo);
@@ -8800,7 +8806,7 @@ namespace MetalManager
                     //wtf? We have an entry for the level but don't have any info for main level or boss fight?
                     LevelButtons[i].BackColor = Color.RosyBrown;
                 }
-                
+
             }
 
 
@@ -8829,9 +8835,9 @@ namespace MetalManager
         bool blockListBoxSelIndexChng = false;
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (organizerBlockSongInfoReset) { organizerBlockSongInfoReset = false;  return; }//we're resetting our ListBox order, don't change anything
-            if (currentListSelection == listBox1.SelectedIndex){ return; } //we didn't change anything, block this
-            
+            if (organizerBlockSongInfoReset) { organizerBlockSongInfoReset = false; return; }//we're resetting our ListBox order, don't change anything
+            if (currentListSelection == listBox1.SelectedIndex) { return; } //we didn't change anything, block this
+
 
             if (blockListBoxSelIndexChng)
             {
@@ -8840,8 +8846,8 @@ namespace MetalManager
                 ////testFindJson.Text += "BLOCKED!";
                 return;
             }
-            
-            
+
+
 
             if (!Organizer_checkAndAlertUnsavedChanges(true, "selctedINdxChange"))
             {
@@ -8882,8 +8888,8 @@ namespace MetalManager
             organizer_restoreJson.Visible = false;//reset this either way
             restoredLabel.Visible = false;
             string slctdItmName = ((ListItem)listBox1.SelectedItem).Name;
-            
-            string slctdItmPath = ((ListItem)listBox1.SelectedItem).Path; 
+
+            string slctdItmPath = ((ListItem)listBox1.SelectedItem).Path;
             string possibleOriginal = slctdItmPath.Replace("customsongs.json", "_Original\\customsongs.json"); //looks for, ie: DuHast/_Original/customsongs.json
             if (File.Exists(possibleOriginal))
             {
@@ -8915,12 +8921,12 @@ namespace MetalManager
                 resetSongOriginalInfo("");
 
                 organizer_enableLevelButtons(false);
-                
+
                 return;
             }
 
             //if we got this far, song isn't suspended. if the debug warning and button were visible, hide them
-            if(org_modHasErrorsLbl.Visible || Org_OpenSongInDebug.Visible) { org_modHasErrorsLbl.Hide(); Org_OpenSongInDebug.Hide(); }
+            if (org_modHasErrorsLbl.Visible || Org_OpenSongInDebug.Visible) { org_modHasErrorsLbl.Hide(); Org_OpenSongInDebug.Hide(); }
 
 
             enableOrganizerFields(); //enables the text boxes; does nothing if they're already enabled
@@ -8951,15 +8957,15 @@ namespace MetalManager
                 {
                     levelToGoto = 8;
                 }
-            } else if(org_selectIndexLevelChoice == "supported")
+            } else if (org_selectIndexLevelChoice == "supported")
             {
                 levelToGoto = firstLevelSupportedIndex;
-            } else if(org_selectIndexLevelChoice == "none")
+            } else if (org_selectIndexLevelChoice == "none")
             {
                 levelToGoto = getSelectedLevel_OrganizerInjector();
             }
 
-            
+
             if (levelToGoto == -1) levelToGoto = 0; //set it to Voke if it screwed up somehow
             //firstLevelSupportedIndex = 0;
             //if(we have a setting that tells us to select the first level, not first supported level) firstLevelSupportedIndex = 0;
@@ -9055,16 +9061,16 @@ namespace MetalManager
         public void JitterBugMove()
         {
             int[] newLoc = randomJitter(debugOriginalLoc[0], debugOriginalLoc[1]);
-            debugLabel.Left = debugOriginalLoc[0]+newLoc[0];
-            debugLabel.Top = debugOriginalLoc[1]+newLoc[1];
+            debugLabel.Left = debugOriginalLoc[0] + newLoc[0];
+            debugLabel.Top = debugOriginalLoc[1] + newLoc[1];
         }
         int maxJitterbugs = 7;
-        int currentJitterbugs = 0; 
+        int currentJitterbugs = 0;
         public void JitterBug(object sender, EventArgs e)
         {
             JitterBugMove();
             currentJitterbugs++;
-            if(currentJitterbugs >= maxJitterbugs)
+            if (currentJitterbugs >= maxJitterbugs)
             {
                 Timer jitterTimer = sender as Timer;
                 jitterTimer.Stop();
@@ -9095,7 +9101,7 @@ namespace MetalManager
         {
             if (phase == 0)
             {
-                successLabel.Top = 316+20;
+                successLabel.Top = 316 + 20;
                 successLabel.Visible = true;
                 Phase2Ticking = 0;
                 curColor = 0;
@@ -9109,23 +9115,23 @@ namespace MetalManager
                 tabControl1.Focus();
                 phase++;
                 return;
-            } else if(phase == 1)
+            } else if (phase == 1)
             {
-                if(successLabel.Top > 316)
+                if (successLabel.Top > 316)
                 {
                     successLabel.Top -= slideInSpeed;
                 }
-                if(successLabel.Top <= 316)
+                if (successLabel.Top <= 316)
                 {
                     successLabel.Top = 316;
                     phase++;
                 }
                 return;
-            } else if(phase == 2)
+            } else if (phase == 2)
             {
 
                 Phase2Ticking++;
-                if(Phase2Ticking >= 70)
+                if (Phase2Ticking >= 70)
                 {
                     saveCurrSLButton.Text = "Save Current Set List";
                     saveCurrSLButton.Enabled = true;
@@ -9135,10 +9141,10 @@ namespace MetalManager
             }
             else if (phase == 3)
             {
-                
+
                 successLabel.Top -= slideOutSpeed;
                 curColor += fadeOutSpeed;
-                if(curColor >= 255)
+                if (curColor >= 255)
                 {
                     successLabel.Visible = false;
 
@@ -9154,7 +9160,7 @@ namespace MetalManager
                     successLabel.ForeColor = c;
                     curColor += fadeOutSpeed;
                 }
-                
+
             }
         }
         private Timer bTimer;
@@ -9188,7 +9194,7 @@ namespace MetalManager
             else if (phase == 1)
             {
 
-                
+
                 if (restoredLabel.Top > 22)
                 {
                     restoredLabel.Top -= slideInSpeed;
@@ -9577,15 +9583,15 @@ namespace MetalManager
         }
 
 
-        
+
 
         //this is storing our location positions for each ModLvlButton
         int[] modMRadioPosX = { 286, 286, 286, 286, 565, 565, 565, 565, 286 };
-        int[] modMRadioPosY = {  58, 132, 206, 280,  58, 132, 206, 301, 58};
-        int[] modBRadioPosX = { 286, 286, 286, 286, 565, 565, 565};
-        int[] modBRadioPosY = { 105, 178, 251, 324, 105, 175, 251};
-      int[] modMwTRadioPosY = {  107, 179, 252, 325,  58, 132, 206, 301, 58 }; //M with Tutorial
-      int[] modBwTRadioPosY = {  154, 226, 299, 372, 105, 175, 251 }; //B with Tutorial
+        int[] modMRadioPosY = { 58, 132, 206, 280, 58, 132, 206, 301, 58 };
+        int[] modBRadioPosX = { 286, 286, 286, 286, 565, 565, 565 };
+        int[] modBRadioPosY = { 105, 178, 251, 324, 105, 175, 251 };
+        int[] modMwTRadioPosY = { 107, 179, 252, 325, 58, 132, 206, 301, 58 }; //M with Tutorial
+        int[] modBwTRadioPosY = { 154, 226, 299, 372, 105, 175, 251 }; //B with Tutorial
         int tutRadioButtonY = 19;
 
         private void setModLvlButtonColors(string supportedLevelsString, string m_or_b, bool resetImg = false)
@@ -9594,9 +9600,9 @@ namespace MetalManager
             //this doesn't actually set "colors", it just disables/enables the buttons
 
             RadioButton[] modLvlButtons = { VokeRadioButtonM1, StygiaRadioButtonM1, YhelmRadioButtonM1, IncaustisRadioButtonM1, GehennaRadioButtonM1, NihilRadioButtonM1, AcheronRadioButtonM1, SheolRadioButtonM1 };
-            
+
             //first disable all the radio buttons
-            for(int mB = 0; mB < modLvlButtons.Length; mB++)
+            for (int mB = 0; mB < modLvlButtons.Length; mB++)
             {
                 modLvlButtons[mB].Enabled = false;
 
@@ -9612,12 +9618,12 @@ namespace MetalManager
             int queriedLevel = -1;
 
             int L = 0;
-            while(L < supportedLevelsString.Length)
+            while (L < supportedLevelsString.Length)
             {
                 string nextChar = supportedLevelsString.Substring(L, 1);
 
                 //why can't switch statements use variables??
-                
+
 
                 if (!Int32.TryParse(nextChar, out int j))
                 {
@@ -9651,11 +9657,11 @@ namespace MetalManager
                     case "7":
                         queriedLevel = 7;
                         break;
-                    
+
 
                 }
 
-                SupportLetter:
+            SupportLetter:
 
 
                 if (m_or_b == "m" && nextChar == "m")
@@ -9669,7 +9675,7 @@ namespace MetalManager
                 L++;
             }
 
-            
+
 
 
         }
@@ -9692,19 +9698,19 @@ namespace MetalManager
             whichComboBox -= 1;
             if (senderButtonName.Substring(0, 2) == "ML")
             {
-                
+
                 modIndex = mainCBox[whichComboBox].FindStringExact(mainCBox[whichComboBox].Text);
                 ////testFindJson.Text += "mainCBox[whichComboBox].Text: " + mainCBox[whichComboBox].Text;
             } else if (senderButtonName.Substring(0, 2) == "BF")
             {
                 modIndex = bossCBox[whichComboBox].FindStringExact(bossCBox[whichComboBox].Text);
             }
-            
 
-            
-            
-            
-            
+
+
+
+
+
             return modIndex;
         }
 
@@ -9730,7 +9736,7 @@ namespace MetalManager
 
             string cBoxName = cBox.Name;
             //ie mainCombo1
-            string modLvlNumStr = cBoxName.Substring(cBoxName.Length-1, 1);
+            string modLvlNumStr = cBoxName.Substring(cBoxName.Length - 1, 1);
             int whichLvl = Int32.Parse(modLvlNumStr);
             whichLvl -= 1;
 
@@ -9756,9 +9762,9 @@ namespace MetalManager
 
             //this function just sets the location of our RadioPanel, by finding out which button called it
 
-            RadioButton[] rButtons = { VokeRadioButtonM1, StygiaRadioButtonM1, YhelmRadioButtonM1, IncaustisRadioButtonM1, GehennaRadioButtonM1, NihilRadioButtonM1, AcheronRadioButtonM1, SheolRadioButtonM1};
+            RadioButton[] rButtons = { VokeRadioButtonM1, StygiaRadioButtonM1, YhelmRadioButtonM1, IncaustisRadioButtonM1, GehennaRadioButtonM1, NihilRadioButtonM1, AcheronRadioButtonM1, SheolRadioButtonM1 };
             //reset all radio button selections to not be selected
-            for(int r=0; r<rButtons.Length; r++)
+            for (int r = 0; r < rButtons.Length; r++)
             {
                 rButtons[r].Checked = false;
             }
@@ -9810,7 +9816,7 @@ namespace MetalManager
                 {
                     ML1RadioPanel.Location = new Point(modBRadioPosX[whichLvl], modBRadioPosY[whichLvl]);
                 }
-                
+
             }
 
 
@@ -9847,7 +9853,7 @@ namespace MetalManager
                 }
                 SetList_DebugLabel2.Text += " Music info instead.";
 
-                
+
                 SetList_DebugLabel1.Visible = true;
                 SetList_DebugLabel2.Visible = true;
                 if (csSupLvls[selectedMod].Contains("8m"))
@@ -9861,7 +9867,7 @@ namespace MetalManager
         private void resetSetListDebugLabel(string onlyIfItSaysThis = "", int whichLabel = 0)
         {
             Label[] setListDebugLabels = { SetList_DebugLabel1, SetList_DebugLabel2, SetList_DebugLabel3 };
-            if(onlyIfItSaysThis == "")
+            if (onlyIfItSaysThis == "")
             {
                 setListDebugLabels[whichLabel].Text = "";
             }
@@ -9878,7 +9884,7 @@ namespace MetalManager
             {
                 debugLabel.Visible = false;
                 debugLabel.Left = 604;
-            } else if(debugLabel.Text == onlyIfItSaysThis)
+            } else if (debugLabel.Text == onlyIfItSaysThis)
             {
                 debugLabel.Visible = false;
                 debugLabel.Text = "";
@@ -9892,26 +9898,26 @@ namespace MetalManager
             CheckBox[] bossCheckBoxes = { checkb1, checkb2, checkb3, checkb4, checkb5, checkb6, checkb7 };
 
             string whichLevelStr = whatCalledUsName.Substring(2, 1); //ML1, BF2
-            if(whichLevelStr == "i" || whichLevelStr == "s")
+            if (whichLevelStr == "i" || whichLevelStr == "s")
             {
                 whichLevelStr = whatCalledUsName.Substring(whatCalledUsName.Length - 1, 1);
             }
             int whichLevel = Int32.Parse(whichLevelStr);
             whichLevel -= 1;
-            if(whatCalledUsName.Substring(0,1).ToLower() == "m")
+            if (whatCalledUsName.Substring(0, 1).ToLower() == "m")
             {
-                
+
                 mainCheckBoxes[whichLevel].Checked = isChecked;
             } else if (whatCalledUsName.Substring(0, 1).ToLower() == "b")
             {
-                
+
                 bossCheckBoxes[whichLevel].Checked = isChecked;
             }
         }
 
         public void selectModTutorial()
         {
-            if(SetList_DebugLabel3.Text != "Press the T key to select the Tutorial level info" || !SetList_DebugLabel3.Visible)
+            if (SetList_DebugLabel3.Text != "Press the T key to select the Tutorial level info" || !SetList_DebugLabel3.Visible)
             {
                 return;
             }
@@ -10046,7 +10052,7 @@ namespace MetalManager
             int xLocation = ML1RadioPanel.Location.X;
             int yLocation = ML1RadioPanel.Location.Y;
 
-            for(int m=0; m<modMRadioPosY.Length; m++)
+            for (int m = 0; m < modMRadioPosY.Length; m++)
             {
                 if (tsm_showTutSetList.Checked)
                 {
@@ -10073,7 +10079,7 @@ namespace MetalManager
                         }
 
                     }
-                }else if (yLocation == modMRadioPosY[m])
+                } else if (yLocation == modMRadioPosY[m])
                 {
                     //show Tutorial on set list isn't checked
 
@@ -10097,7 +10103,7 @@ namespace MetalManager
             {
                 if (tsm_showTutSetList.Checked)
                 {
-                    
+
                     if (yLocation == modBwTRadioPosY[b])
                     {
                         if (xLocation == modBRadioPosX[b])
@@ -10133,7 +10139,7 @@ namespace MetalManager
                 }
             }
 
-            
+
         }
 
         private void LevelTextBoxesGroup_MouseOver(object sender, EventArgs e)
@@ -10150,7 +10156,7 @@ namespace MetalManager
 
         private void supportedLevelsGroup_MouseOver(object sender, EventArgs e)
         {
-            if(listBox1.SelectedIndex == -1)
+            if (listBox1.SelectedIndex == -1)
             {
                 //if (debugLabel.Text == "No song selected!" && debugLabel.Visible) ShakeLabel(debugLabel);
                 debugLabel.Left = 604;
@@ -10179,12 +10185,12 @@ namespace MetalManager
                 ////testFindJson.Text += "Shift";
                 switchToMainOrBossSelection(grabLvlButton);
                 grabLvlSelectSwitched = true;
-            } else if(e.KeyCode == Keys.T)
+            } else if (e.KeyCode == Keys.T)
             {
                 selectModTutorial();
 
             }
-            
+
         }
         private void modGrabLvl_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -10194,7 +10200,7 @@ namespace MetalManager
             {
                 //shift was pressed
 
-                
+
                 switchToMainOrBossSelection(grabLvlButton);
             }
 
@@ -10208,7 +10214,7 @@ namespace MetalManager
             {
                 //shift was released
 
-                
+
                 switchToMainOrBossSelection(grabLvlButton, true);
                 grabLvlSelectSwitched = false;
             }
@@ -10227,14 +10233,14 @@ namespace MetalManager
             Image bImg = radioButton3.Image;
             Image mImg = radioButton5.Image;
 
-            string glbID = grabLvlButton.Name.Substring(0,1); //the name will be, for example, ML1ModLvlButton, ML2ModLvlButton, BF3ModLvlButton
+            string glbID = grabLvlButton.Name.Substring(0, 1); //the name will be, for example, ML1ModLvlButton, ML2ModLvlButton, BF3ModLvlButton
             glbID = glbID.ToLower(); //we want this for setModLvlButtonColors
 
             //first, a for loop to change the backgrounds, to show user we're selecting the alternative choice
             for (int l = 0; l < modLvlButtons.Length; l++)
             {
                 if (backToNorm) { modLvlButtons[l].Image = null; continue; } //if we're just changing the buttons back to normal, we don't care what button called us
-                
+
                 //see if we were being called by a Main music button or Boss music button
                 if (glbID == "m")
                 {
@@ -10246,7 +10252,7 @@ namespace MetalManager
                 }
             }
 
-            
+
             //this is copied from the ML1...click code. I should just isolate it as its own function.
             //this code looks for the the mod we have selected next to the button we just pressed (grabLvlButton)
             //from there, it looks through its "supported levels" string, and enables/disables the buttons accordingly
@@ -10265,7 +10271,7 @@ namespace MetalManager
                 {
                     setModLvlButtonColors(csSupLvls[selectedMod], "b"); //we don't want it back to normal, so get the alternative
                 }
-                
+
             } else if (glbID == "b")
             {
                 //we clicked a Boss music button to bring up this radio panel
@@ -10293,7 +10299,7 @@ namespace MetalManager
             CheckBox[] mainCheckBoxes = { checkm1, checkm2, checkm3, checkm4, checkm5, checkm6, checkm7, checkm8, checkm9 };
             CheckBox[] bossCheckBoxes = { checkb1, checkb2, checkb3, checkb4, checkb5, checkb6, checkb7 };
 
-            for (int m=0; m<mainCBox.Length; m++)
+            for (int m = 0; m < mainCBox.Length; m++)
             {
                 if (!clearExisting)
                 {
@@ -10330,7 +10336,7 @@ namespace MetalManager
 
         private void RevertOldInfoIntoSetList()
         {
-            
+
             ComboBox[] mainCBox = { mainCombo1, mainCombo2, mainCombo3, mainCombo4, mainCombo5, mainCombo6, mainCombo7, mainCombo8, mainCombo9 };
             ComboBox[] bossCBox = { bossCombo1, bossCombo2, bossCombo3, bossCombo4, bossCombo5, bossCombo6, bossCombo7 };
             CheckBox[] mainCheckBoxes = { checkm1, checkm2, checkm3, checkm4, checkm5, checkm6, checkm7, checkm8, checkm9 };
@@ -10402,7 +10408,7 @@ namespace MetalManager
                     mainCheckBoxes[m].Checked = true;
                 }
 
-                
+
             }
 
             for (int b = 0; b < bossCBox.Length; b++)
@@ -10436,9 +10442,9 @@ namespace MetalManager
         private bool setListCheckForUnsavedChanges()
         {
             CheckBox[] allChx = { checkm1, checkm2, checkm3, checkm4, checkm5, checkm6, checkm7, checkm8, checkm9, checkb1, checkb2, checkb3, checkb4, checkb5, checkb6, checkb7 };
-            foreach(CheckBox chk in allChx)
+            foreach (CheckBox chk in allChx)
             {
-                if(chk.Checked)
+                if (chk.Checked)
                 {
                     return true;
                 }
@@ -10451,10 +10457,10 @@ namespace MetalManager
         private void loadMusicBankList()
         {
             customMusicBankCombo.Items.Clear();//clear it if it had anything in it
-            for (int i=0; i< SongsWithCustomMusicBanks.Count; i++)
+            for (int i = 0; i < SongsWithCustomMusicBanks.Count; i++)
             {
                 string nameToAdd = SongsWithCustomMusicBanks[i].Name;
-                if (nameToAdd.Substring(nameToAdd.Length-1, 1) == "s")
+                if (nameToAdd.Substring(nameToAdd.Length - 1, 1) == "s")
                 {
                     nameToAdd += "'";
                 } else
@@ -10477,7 +10483,7 @@ namespace MetalManager
                 showGetLHLibrary(true);
             }
 
-            
+
             if (gameDir == null)
             {
                 AddDefaultMusicBank();
@@ -10539,7 +10545,7 @@ namespace MetalManager
             } else
             {
                 customMusicBankCombo.Enabled = true; //we have something in here, enable it
-                if(customMusicBankCombo.Items[0].ToString() != "Game's Default .Bank"
+                if (customMusicBankCombo.Items[0].ToString() != "Game's Default .Bank"
                     && customMusicBankCombo.Items[0].ToString() != "The Library's .Bank")
                 {
                     //if we don't have 
@@ -10597,7 +10603,7 @@ namespace MetalManager
         {
             //this is ran when the program first loads
             DisableAllInputs();
-            
+
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "MetalManager.exe.config"))
             {
                 ConfigCreator.CreateConfig();
@@ -10614,7 +10620,7 @@ namespace MetalManager
             if (mmLoading) return;
             textChanged = false;
         }
-        
+
         private void ComboTextChanged(object sender, EventArgs e)
         {
             if (mmLoading) return;
@@ -10649,7 +10655,7 @@ namespace MetalManager
             Button saveButtonHit = sender as Button;
             string m_or_b = saveButtonHit.Name.Substring(0, 1);
 
-            if(AttemptToSaveLevel_Organizer(m_or_b) == true)
+            if (AttemptToSaveLevel_Organizer(m_or_b) == true)
             {
                 //successful save! reset organizer page
 
@@ -10751,7 +10757,7 @@ namespace MetalManager
         StartInjection:
 
             int levelWereSelecting = levelNum;
-            if(levelWereSelecting == -1)
+            if (levelWereSelecting == -1)
             {
                 levelWereSelecting = getSelectedLevel_OrganizerInjector();
             }
@@ -10763,9 +10769,9 @@ namespace MetalManager
             string injection = getNewLevelInfoLines(LvlNameCapd, m_or_b, bankText, eventText, lowHealthText, offsetText, bpmText, bankPathText);
 
 
-            if(SaveLevelInfo_Organizer(levelWereSelecting, m_or_b, injection) == true)
+            if (SaveLevelInfo_Organizer(levelWereSelecting, m_or_b, injection) == true)
             {
-                if(m_or_b == "m")
+                if (m_or_b == "m")
                 {
                     mSaveLevelInfo.Enabled = false;
                 } else
@@ -10777,7 +10783,7 @@ namespace MetalManager
             {
                 return false;
             }
-            
+
         }
 
         private void BankPathTextboxUnfocus(object sender, EventArgs e)
@@ -10817,7 +10823,7 @@ namespace MetalManager
             }
         }
 
-        
+
 
         private void closeBankPathfuckgoback(TextBox whichBankPathBox)
         {
@@ -10852,7 +10858,7 @@ namespace MetalManager
                     bankPathRedAlert(mBankPathLabel);
                 } else
                 {
-                    
+
                     warnUserIfBadBankPath(mBankPathLabel);
                 }
             } else if (whichBankPathBox.Name.Substring(0, 1) == "b")
@@ -10950,7 +10956,7 @@ namespace MetalManager
             return false;
         }
 
-        
+
 
 
         private void closeBankPathAndApply(TextBox whichBankPathBox)
@@ -10970,13 +10976,13 @@ namespace MetalManager
             DisplayPath = pathShortener(DisplayPath, 40);
             DisplayPath = shaveSurroundingQuotesAndSpaces(DisplayPath); //this needs to be before we add "bankPath":
             DisplayPath = "bankPath: " + DisplayPath;
-            
 
-            if (whichBankPathBox.Name.Substring(0,1) == "m")
+
+            if (whichBankPathBox.Name.Substring(0, 1) == "m")
             {
 
                 mBankPathTextbox.Visible = false;
-                
+
                 if (mBankPathTextbox.Text == "")
                 {
                     //we put nothing in the box, as if we don't want this field; take away the info, and the label, so user doesn't think we need it
@@ -11005,7 +11011,7 @@ namespace MetalManager
                 }
                 bTrueBankPath.Text = shaveSurroundingQuotesAndSpaces(bBankPathTextbox.Text);
                 bBankPathLabel.Text = DisplayPath;
-                if(!verifyFileExists(bTrueBankPath.Text))
+                if (!verifyFileExists(bTrueBankPath.Text))
                 {
                     bankPathRedAlert(bBankPathLabel);
                 }
@@ -11021,7 +11027,7 @@ namespace MetalManager
             if (!MLNameBox.Enabled) return; //if MLNameBox isn't enabled, none of the textboxes are; meaning we don't have anything selected yet, don't allow this
 
             string m_or_b = labelDoubleclicked.Name.Substring(0, 1);
-            if(m_or_b == "m")
+            if (m_or_b == "m")
             {
                 mBankPathTextbox.Visible = true;
                 mBankPathTextbox.Text = shaveSurroundingQuotesAndSpaces(mTrueBankPath.Text);
@@ -11067,7 +11073,7 @@ namespace MetalManager
         }
 
 
-        
+
 
         private void fixMyShit(object sender, EventArgs e)
         {
@@ -11083,7 +11089,7 @@ namespace MetalManager
             string returnString = "";
             string[] lines = clipboardText.Split('\n');
             string[] fixedlines = new string[lines.Length];
-            for (int i=0; i<lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 string theLine = lines[i];
                 int indexOfLowHealth = theLine.IndexOf("LowHealth");
@@ -11105,7 +11111,7 @@ namespace MetalManager
 
                 fixedlines[i] = returnLine;
             }
-            foreach(string line in fixedlines)
+            foreach (string line in fixedlines)
             {
                 returnString += line + "\n";
             }
@@ -11117,7 +11123,7 @@ namespace MetalManager
         private void showCsSupports()
         {
             string msg = "";
-            foreach(string supportString in csSupLvls)
+            foreach (string supportString in csSupLvls)
             {
                 msg += supportString + '\n';
             }
@@ -11177,8 +11183,16 @@ namespace MetalManager
             {
                 debugger.Icon = this.Icon;
                 debugger.MyParentForm = this;
+                debugger.StartPosition = FormStartPosition.CenterParent;
                 if (debugger.ShowDialog() == DialogResult.OK)
                 {
+                    if (forceRecheckClicked)
+                    {
+                        ForceRecheckAllMods();
+                        return;
+                    }
+
+
                     string cleanJson = debugger.CleanedJson;
                     string jsonSongPath = debugger.DebuggedSongPath;
                     if (cleanJson != null)
@@ -11198,9 +11212,11 @@ namespace MetalManager
             string sName = ((ListItem)listBox1.SelectedItem).Name;
             string sPath = ((ListItem)listBox1.SelectedItem).Path;
 
-            using (DebugForm debugger = new DebugForm("song:"+sName+"|"+sPath))
+            using (DebugForm debugger = new DebugForm("song:" + sName + "|" + sPath))
             {
+                debugger.Icon = this.Icon;
                 debugger.MyParentForm = this;
+                debugger.StartPosition = FormStartPosition.CenterParent;
                 if (debugger.ShowDialog() == DialogResult.OK)
                 {
                     string cleanJson = debugger.CleanedJson;
@@ -11213,14 +11229,14 @@ namespace MetalManager
                         clearSongInfoBoxes();
                         organizer_enableLevelButtons();
                         enableOrganizerFields();
-                        
+
 
                         string songJsonInfo = cleanJson;
 
-                        
+
                         int levelToGoto = -1;
                         int firstLevelSupportedIndex = setSupportedLevelColors(songJsonInfo);//sets level button colors, and gets first supported level
-                        
+
                         if (org_selectIndexLevelChoice == "first")
                         {
                             levelToGoto = 0;
@@ -11240,13 +11256,13 @@ namespace MetalManager
 
                         if (levelToGoto == -1) levelToGoto = 0; //set it to Voke if it screwed up somehow
 
-                        
+
                         SetSelectedLevelColors(levelToGoto);
-                        
+
                         string firstShownLvlNm = allLevelNames[levelToGoto]; //gets name of level we're going to
                         firstShownLvlNm = capFirst(firstShownLvlNm); //capitalize said level
                         setSpecificLevelInfo_Org(songJsonInfo, firstShownLvlNm); //resets values to have given level's info
-                        
+
                         resetSongOriginalInfo("");
                         org_modHasErrorsLbl.Visible = false;
                         Org_OpenSongInDebug.Visible = false;
@@ -11254,7 +11270,7 @@ namespace MetalManager
                         int slctIndxAgain = listBox1.FindStringExact(sName);
                         listBox1.SelectedIndex = slctIndxAgain;
                         currentListSelection = listBox1.SelectedIndex;
-                        
+
                     }
                 }
             }
@@ -11282,11 +11298,12 @@ namespace MetalManager
         /// </summary>
         private void SendAttemptedSaveToDebug(string attemptedJson)
         {
-            
+
 
             using (DebugForm debugger = new DebugForm("(.saveAttmpt.)|" + attemptedJson))
             {
                 debugger.MyParentForm = this;
+                debugger.StartPosition = FormStartPosition.CenterParent;
                 debugger.ShowDialog();
                 /* We don't need this, right..?
                 if (ebugger.ShowDialog(); == DialogResult.OK)
@@ -11303,6 +11320,7 @@ namespace MetalManager
             using (DebugForm debugger = new DebugForm("mandatory"))
             {
                 debugger.MyParentForm = this;
+                debugger.StartPosition = FormStartPosition.CenterParent;
                 if (debugger.ShowDialog() == DialogResult.OK)
                 {
                     MessageBox.Show("Got an OK from Debugger");
@@ -11315,10 +11333,12 @@ namespace MetalManager
 
         private void debugButtonDialogueBox()
         {
+            //the hell is this??
             using (DebugForm debugger = new DebugForm("nah"))
             {
                 debugger.Icon = this.Icon;
                 debugger.MyParentForm = this;
+                debugger.StartPosition = FormStartPosition.CenterParent;
                 if (debugger.ShowDialog() == DialogResult.OK)
                 {
                     //////testFindJson.Text = debugger.TheValue; I don't think we need this
@@ -11330,7 +11350,7 @@ namespace MetalManager
         {
             List<ListItem> songsList = new List<ListItem>();
 
-            foreach(ListItem song in listBox1.Items)
+            foreach (ListItem song in listBox1.Items)
             {
                 songsList.Add(song);
             }
@@ -11367,7 +11387,7 @@ namespace MetalManager
             {
                 return;
             }
-            
+
             GetModsFolder();
             RepeatStartup();
         }
@@ -11423,6 +11443,34 @@ namespace MetalManager
             }*/
 
             tabControl1.Enabled = enabled;
+        }
+
+
+        /// <summary>
+        /// Parsing Numbers does not work for all users, so instead, this strips down the value of a number to make sure nothing 
+        /// exists after verifying one dot, one dash, and removing all numbers
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public bool IsValueANumber(string val)
+        {
+            string newVal = val.Trim();
+            int dotCount = newVal.Split('.').Length - 1;
+            if (dotCount > 1) return false;
+
+            //check for negative numbers, and only one dash
+            if (newVal.Substring(0, 1) == "-") newVal = newVal.Substring(1);
+            if (newVal.Contains("-")) return false;
+
+            newVal = newVal.Replace(".", "");
+            newVal = newVal.Replace("0", "").Replace("1", "").Replace("2", "").Replace("3", "").Replace("4", "").Replace("5", "").Replace("6", "").Replace("7", "").Replace("8", "").Replace("9", "");
+            if (string.IsNullOrWhiteSpace(newVal))
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
         }
 
 
@@ -12777,8 +12825,6 @@ namespace MetalManager
                 return null;
             }
 
-
-
             return newSetList;
         }
 
@@ -13076,9 +13122,9 @@ namespace MetalManager
                     string fullCurrJson = getCurrentCustomsongsJson(false);
                     Clipboard.SetText(fullCurrJson);
                     Text_NotifyAnim("Copied to clipboard!");
+                    return;
                 }
             }
-
 
             string newJson = MakeSetList();
             if(newJson == null)
@@ -13240,11 +13286,11 @@ namespace MetalManager
         /// <summary>
         /// Is supposed to be a replica of FormShown. I don't know why I don't rename it and just put it in FormShown
         /// </summary>
-        private void RepeatStartup()
+        private void RepeatStartup(string summoner = null)
         {
             mmLoading = true;
 
-            OpenErrorGatekeeperDialogue();
+            OpenErrorGatekeeperDialogue(summoner);
             SetMMSettingsFromConfig();
             setFileMenuSelections();//sets our file menu selections, based on if we have game and mod directory set
 
@@ -13719,6 +13765,8 @@ namespace MetalManager
         "Taking a bullet for JB", "Remembering, before we forget", "Dropping plates"};
 
 
+        List<string> unsuccessfulMoveAttempts = new List<string>();
+
         private void BfGWorkerMain_DoWork(object sender, DoWorkEventArgs e)
         {
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WatchForCancel);
@@ -13726,6 +13774,7 @@ namespace MetalManager
 
             string[] newToThePit = e.Argument as string[]; //this won't get called if this was empty
 
+            unsuccessfulMoveAttempts = new List<string>();
 
             for (int i = 0; i < newToThePit.Length; i++)
             {
@@ -13735,37 +13784,42 @@ namespace MetalManager
 
                 BfGWorkerMain.ReportProgress(i+1);
 
+                //before we try to copy anything or check its FileInfo, make sure the file actually exists
+                if (!File.Exists(newToThePit[i]))
+                {
+                    //the file we were about to try to copy somewhere does not exist...
+                    unsuccessfulMoveAttempts.Add(newToThePit[i].Split('\\').Last());
+                    continue;
+                }
 
                 string newBankDestination = gameDir.ToString() + "\\" + newToThePit[i].Split('\\').Last();
                 if (File.Exists(newBankDestination))
                 {
-                    if(!verifyMatchingFileSizes(newToThePit[i], newBankDestination))
+
+                    if (!verifyMatchingFileSizes(newToThePit[i], newBankDestination))
                     {
-                        File.Copy(newToThePit[i], newBankDestination);
+                        try
+                        {
+                            File.Copy(newToThePit[i], newBankDestination);
+                        }
+                        catch
+                        {
+                            unsuccessfulMoveAttempts.Add(newToThePit[i].Split('\\').Last());
+                        }
                     }
 
                 } else
                 {
-                    File.Copy(newToThePit[i], newBankDestination);
+                    try
+                    {
+                        File.Copy(newToThePit[i], newBankDestination);
+                    }
+                    catch
+                    {
+                        unsuccessfulMoveAttempts.Add(newToThePit[i].Split('\\').Last());
+                    }
                 }
-                
 
-                /* Apparently it isn't necessary or wise to do this
-                try
-                {
-                  string newBankDestination = gameDir.ToString() + "\\" + newToThePit[i].Split('\\').Last();
-                    File.Copy(newToThePit[i], newBankDestination);  
-                }
-                catch (Exception ex)
-                {
-                    string errorCode = ex.Message;
-                    if (errorCode.Length > 500) errorCode = errorCode.Substring(0, 497) + "...";
-                    MessageBox.Show("The operation was halted because an error occured when trying to copy " + newToThePit[i].Split('\\').Last() + " to the StreamingAssets folder." +
-                        "\n" + errorCode);
-
-                    cancelBfGWorker();
-
-                }*/
 
                 if (BfGWorkerMain.CancellationPending)
                 {
@@ -14200,6 +14254,16 @@ namespace MetalManager
                 mmLoading = false;
                 return;
             }
+
+            if (unsuccessfulMoveAttempts.Count > 0)
+            {
+                string unsuccessfulMoveMessage = "Set List was successfully made, but the following .banks could not be found:";
+                foreach (string unsuccessfulBank in unsuccessfulMoveAttempts)
+                {
+
+                }
+            }
+
             if (SetList_DebugLabel2.Text == "Could not verify LowHealthBeatEvents")
             {
                 SetList_DebugLabel2.Text = "";
@@ -14514,6 +14578,63 @@ namespace MetalManager
             {
                 CustomBanksExplainLbl.Visible = false;
             }
+        }
+
+
+        public bool forceRecheckClicked = false;
+        private void ForceRecheckAllMods()
+        {
+            int prevNumberOfSongsWithErrors = ConfirmSuspendedSongs.Count; //numberOfModsWithErrors is used to know to put "No Custom Songs Found" on catalog. i don't wanna fuck with that
+
+            DisableAllInputs();
+            RepeatStartup("forceRecheck");
+            forceRecheckClicked = false;
+
+            int newNumOfSongsWithErrs = ConfirmSuspendedSongs.Count;
+
+            string purgedPlural = ""; string newErrSongsPlural = "";
+            string recheckMsg = "";
+            if (prevNumberOfSongsWithErrors == 0 && newNumOfSongsWithErrs == 0)
+            {
+                // no errors, and no errors before
+                recheckMsg += "no errors found!";
+                
+            } else if (prevNumberOfSongsWithErrors > 0 && newNumOfSongsWithErrs == 0)
+            {
+                // no errors, but had errors before
+                recheckMsg += "all suspended songs purged!";
+
+            }
+            else if(prevNumberOfSongsWithErrors == newNumOfSongsWithErrs)
+            {
+                //has errors, and it matches the same number as before
+                recheckMsg += "the same number of songs with errors remains.";
+            }
+            else if (prevNumberOfSongsWithErrors > newNumOfSongsWithErrs)
+            {
+                //has errors, but we have less than we did before
+                int purgedSongsCnt = prevNumberOfSongsWithErrors - newNumOfSongsWithErrs; //if we had 7 songs with errors, now have 4, we purged 3
+                string verbGrammar = ""; //we'll add an s to remain if there's only 1 song left
+                if (purgedSongsCnt > 1) purgedPlural = "s"; //we'll add an s if purged songs is more than 1
+                if (newNumOfSongsWithErrs > 1)
+                {
+                    newErrSongsPlural = "s"; //adding an s if new # of songs with errors is more than 1
+                } else
+                {
+                    verbGrammar = "s";
+                }
+                recheckMsg += "successfully removed " + purgedSongsCnt + " song" + purgedPlural + " from suspension. However, " + newNumOfSongsWithErrs + " song"+newErrSongsPlural+" with errors remain"+verbGrammar+" suspended.";
+            }
+            else if (prevNumberOfSongsWithErrors < newNumOfSongsWithErrs)
+            {
+                //has errors, and we have more than we did before (whether we had 0 or more before)
+                if (newNumOfSongsWithErrs > 1)
+                    newErrSongsPlural = "s"; //adding an s if new # of songs with errors is more than 1
+                
+                recheckMsg += "new errors have been detected in " + newNumOfSongsWithErrs + " song"+ newErrSongsPlural + ".";
+            }
+
+            MessageBox.Show("Force re-check complete: " + recheckMsg);
         }
     
     }

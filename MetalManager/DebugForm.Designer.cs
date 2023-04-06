@@ -38,6 +38,7 @@
             this.LineCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ErrorCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.dgJsonEditor = new System.Windows.Forms.DataGridView();
+            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.titleLabel = new System.Windows.Forms.Label();
             this.songTitleLabel = new System.Windows.Forms.Label();
@@ -60,13 +61,15 @@
             this.debugPasteBoxPanel = new System.Windows.Forms.Panel();
             this.debugGoButton = new System.Windows.Forms.Button();
             this.clearDebugTxtbx = new System.Windows.Forms.Button();
-            this.stringValueBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.debug_forceRecheckAllBtn = new System.Windows.Forms.Button();
+            this.debug_forceRecheckLabel = new System.Windows.Forms.Label();
+            this.debug_orLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgJsonEditor)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.debugSJBtnPanel.SuspendLayout();
             this.debugPasteBoxPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // jsonAnomalyList
@@ -141,6 +144,10 @@
             this.dgJsonEditor.TabIndex = 3;
             this.dgJsonEditor.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.JsonCellUpdate);
             this.dgJsonEditor.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgJsonEditor_RowPostPaint);
+            // 
+            // stringValueBindingSource
+            // 
+            this.stringValueBindingSource.DataSource = typeof(MetalManager.StringValue);
             // 
             // panel1
             // 
@@ -349,7 +356,7 @@
             this.debugVersionLabel.Name = "debugVersionLabel";
             this.debugVersionLabel.Size = new System.Drawing.Size(482, 16);
             this.debugVersionLabel.TabIndex = 22;
-            this.debugVersionLabel.Text = "Metal Manager Debug Panel v0.1.2  ";
+            this.debugVersionLabel.Text = "Metal Manager Debug Panel v0.1.3  ";
             this.debugVersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // debugPastebox
@@ -408,15 +415,52 @@
             this.clearDebugTxtbx.UseVisualStyleBackColor = true;
             this.clearDebugTxtbx.Click += new System.EventHandler(this.clearDebugPastebox);
             // 
-            // stringValueBindingSource
+            // debug_forceRecheckAllBtn
             // 
-            this.stringValueBindingSource.DataSource = typeof(MetalManager.StringValue);
+            this.debug_forceRecheckAllBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.debug_forceRecheckAllBtn.Location = new System.Drawing.Point(144, 74);
+            this.debug_forceRecheckAllBtn.Margin = new System.Windows.Forms.Padding(0);
+            this.debug_forceRecheckAllBtn.Name = "debug_forceRecheckAllBtn";
+            this.debug_forceRecheckAllBtn.Size = new System.Drawing.Size(153, 24);
+            this.debug_forceRecheckAllBtn.TabIndex = 26;
+            this.debug_forceRecheckAllBtn.Text = "Force Re-check for all Songs";
+            this.debug_forceRecheckAllBtn.UseVisualStyleBackColor = true;
+            this.debug_forceRecheckAllBtn.Visible = false;
+            this.debug_forceRecheckAllBtn.Click += new System.EventHandler(this.forceErrRecheck_click);
+            this.debug_forceRecheckAllBtn.MouseLeave += new System.EventHandler(this.forceErrRecheck_MouseOut);
+            this.debug_forceRecheckAllBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.forceErrRecheck_MouseOver);
+            // 
+            // debug_forceRecheckLabel
+            // 
+            this.debug_forceRecheckLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.debug_forceRecheckLabel.Location = new System.Drawing.Point(237, 13);
+            this.debug_forceRecheckLabel.Name = "debug_forceRecheckLabel";
+            this.debug_forceRecheckLabel.Size = new System.Drawing.Size(273, 30);
+            this.debug_forceRecheckLabel.TabIndex = 27;
+            this.debug_forceRecheckLabel.Text = "Reloads Mods folder, and forces validation re-check\r\nfor errors in each customson" +
+    "gs.json for ALL Mods.";
+            this.debug_forceRecheckLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.debug_forceRecheckLabel.Visible = false;
+            // 
+            // debug_orLabel
+            // 
+            this.debug_orLabel.AutoSize = true;
+            this.debug_orLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.debug_orLabel.Location = new System.Drawing.Point(105, 81);
+            this.debug_orLabel.Name = "debug_orLabel";
+            this.debug_orLabel.Size = new System.Drawing.Size(40, 13);
+            this.debug_orLabel.TabIndex = 28;
+            this.debug_orLabel.Text = "... or ...";
+            this.debug_orLabel.Visible = false;
             // 
             // DebugForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1089, 450);
+            this.Controls.Add(this.debug_forceRecheckAllBtn);
+            this.Controls.Add(this.debug_orLabel);
+            this.Controls.Add(this.debug_forceRecheckLabel);
             this.Controls.Add(this.debugCopyAllLines);
             this.Controls.Add(this.debugSongSelectCombo);
             this.Controls.Add(this.debugPastebox);
@@ -441,11 +485,11 @@
             this.Text = "Debug";
             this.Load += new System.EventHandler(this.DebugFormLoad);
             ((System.ComponentModel.ISupportInitialize)(this.dgJsonEditor)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).EndInit();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.debugSJBtnPanel.ResumeLayout(false);
             this.debugPasteBoxPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.stringValueBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -480,5 +524,8 @@
         private System.Windows.Forms.Button debugGoButton;
         private System.Windows.Forms.Button clearDebugTxtbx;
         private System.Windows.Forms.Button debugCopyAllLines;
+        private System.Windows.Forms.Button debug_forceRecheckAllBtn;
+        private System.Windows.Forms.Label debug_forceRecheckLabel;
+        private System.Windows.Forms.Label debug_orLabel;
     }
 }

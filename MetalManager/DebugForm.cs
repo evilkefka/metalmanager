@@ -3015,6 +3015,11 @@ namespace MetalManager
                 else
                 {
                     //if we're here, then we're looking at BeatInputOffset or BPM, both are number-only variables
+                    if (MyParentForm.IsValueANumber(valueNS.Trim()) == false)
+                    {
+                        lineFormatErrors.Add("numFormat");
+                    }
+                    /*
                     if (Decimal.TryParse(valueNS.Trim(), out decimal hi))
                     {
                         //the value is a number
@@ -3023,7 +3028,7 @@ namespace MetalManager
                     {
                         //the value is NOT a number
                         lineFormatErrors.Add("numFormat");
-                    }
+                    }*/
                 }
             }
             return lineFormatErrors.ToArray();
@@ -3354,6 +3359,8 @@ namespace MetalManager
             debugPasteBoxPanel.Visible = false;
             debugSongSelectCombo.Visible = false;
             debugCopyAllLines.Visible = false;
+            debug_forceRecheckAllBtn.Visible = false;
+            debug_orLabel.Visible = false;
             jsonAnomalyList.Enabled = true;
 
             suspendSongButton.Visible = true;
@@ -3375,6 +3382,8 @@ namespace MetalManager
             pathLabel.Text = "No file path";
             debugCopyAllLines.Visible = true;
             jsonAnomalyList.Enabled = true;
+            debug_forceRecheckAllBtn.Visible = false;
+            debug_orLabel.Visible = false;
 
             Debug_PastedSong(pasteboxJson);
             setJsonAnomTextAfterScan();
@@ -3452,6 +3461,8 @@ namespace MetalManager
                 debugPasteBoxPanel.Visible = true;
                 debugSongSelectCombo.Visible = true;
                 debugCopyAllLines.Visible = false;
+                debug_forceRecheckAllBtn.Visible = true;
+                debug_orLabel.Visible = true;
 
                 debug_undrJsonAnomLbl.Text = "Awaiting input. Please select a song or Copy+Paste your customsongs.json into the textbox.";
 
@@ -5066,7 +5077,22 @@ namespace MetalManager
             }
         }
 
-        
+        private void forceErrRecheck_click(object sender, EventArgs e)
+        {
+            MyParentForm.forceRecheckClicked = true;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void forceErrRecheck_MouseOver(object sender, MouseEventArgs e)
+        {
+            debug_forceRecheckLabel.Visible = true;
+        }
+
+        private void forceErrRecheck_MouseOut(object sender, EventArgs e)
+        {
+            debug_forceRecheckLabel.Visible = false;
+        }
     }
 
     public class JsonLineList

@@ -51,7 +51,7 @@
             this.startupMMInfoLabel.Name = "startupMMInfoLabel";
             this.startupMMInfoLabel.Size = new System.Drawing.Size(111, 13);
             this.startupMMInfoLabel.TabIndex = 3;
-            this.startupMMInfoLabel.Text = "Metal Manager v0.1.2";
+            this.startupMMInfoLabel.Text = "Metal Manager v0.1.3";
             // 
             // pictureBox1
             // 

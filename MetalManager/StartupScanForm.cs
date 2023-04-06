@@ -18,9 +18,11 @@ namespace MetalManager
 {
     public partial class StartupScanForm : Form
     {
-        public StartupScanForm()
+        string summoner = null;
+        public StartupScanForm(string whatSummonsMe = null)
         {
             InitializeComponent();
+            summoner = whatSummonsMe;
         }
 
         public Form1 MyParentForm;
@@ -111,18 +113,36 @@ namespace MetalManager
 
                 //go through the songs in our config
                 for (int i = 0; i < CurrCustomSongsInConfig.Count; i++)
-                {
+                { 
+
                     string[] CnfgSongInfo = CurrCustomSongsInConfig[i];
                     errTrack += "b" + i + " " + CnfgSongInfo[0];
 
+                    //check if a song in Mods folder already exists in config
                     if (CnfgSongInfo[0] == ModDirSongInfo[0])
                     {
+                        
                         //The names of a songs match
+
+                        //we'll see if the paths were the same and the Last Write Time match, to see if we need to rewrite them while we're here
                         bool PathsMatch = CnfgSongInfo[1] == ModDirSongInfo[1];
                         bool LWTMatch = CnfgSongInfo[2] == ModDirSongInfo[2];
                         if (!PathsMatch || !LWTMatch)
                         {
                             //our Path or LastWriteTime don't match, we want to rewrite this and tell it to be scanned
+                            EditSongInConfigFile(ModDirSongInfo[0], ModDirSongInfo[1], ModDirSongInfo[2], "");
+                            SongsToBeScanned.Add(ModDirSongInfo);
+                            SongsToDeleteFromConfig[i] = null; //blank out this song from our delete List
+                            goto FoundDecision; //break out of the for loop, and check next song in Mods directory
+                        }
+
+                        //we're about to start deciding what to do with each song: scan it or ignore it
+
+
+                        //if this was called by "force recheck all errors", make everything what it was before and set it to a blank error result
+                        //if there were also abnormalities in the Path or LWT, we wanted that fixed, which is why this comes after
+                        if (summoner != null && summoner == "forceRecheck")
+                        {
                             EditSongInConfigFile(ModDirSongInfo[0], ModDirSongInfo[1], ModDirSongInfo[2], "");
                             SongsToBeScanned.Add(ModDirSongInfo);
                             SongsToDeleteFromConfig[i] = null; //blank out this song from our delete List
@@ -634,9 +654,9 @@ namespace MetalManager
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("CustomSongsConfig/Customsongs");
             } 
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("It's failing here");
+                MessageBox.Show("Failure to remove song from config:\n"+ex.Message);
             }
         }
 
@@ -2016,6 +2036,13 @@ namespace MetalManager
                 else
                 {
                     //if we're here, then we're looking at BeatInputOffset or BPM, both are number-only variables
+
+                    if (IsValueANumber(valueNS.Trim()) == false)
+                    {
+                        lineFormatErrors.Add("numFormat");
+                        return false;
+                    }
+                    /*
                     if (Decimal.TryParse(valueNS.Trim(), out decimal hi))
                     {
                         //the value is a number
@@ -2025,7 +2052,7 @@ namespace MetalManager
                         //the value is NOT a number
                         lineFormatErrors.Add("numFormat");
                         return false;
-                    }
+                    }*/
                 }
             }
             return true;
@@ -2435,6 +2462,34 @@ namespace MetalManager
             if (e.KeyCode == Keys.Escape)
             {
                 cancelBfGWorker();
+            }
+        }
+
+        /// <summary>
+        /// Parsing Numbers does not work for all users, so instead, this strips down the value of a number to make sure nothing 
+        /// exists after verifying one dot, one dash, and removing all numbers. Should be an exact copy from Form1
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        private bool IsValueANumber(string val)
+        {
+            string newVal = val.Trim();
+            int dotCount = newVal.Split('.').Length - 1;
+            if (dotCount > 1) return false;
+
+            //check for negative numbers, and only one dash
+            if (newVal.Substring(0, 1) == "-") newVal = newVal.Substring(1);
+            if (newVal.Contains("-")) return false;
+
+            newVal = newVal.Replace(".", "");
+            newVal = newVal.Replace("0", "").Replace("1", "").Replace("2", "").Replace("3", "").Replace("4", "").Replace("5", "").Replace("6", "").Replace("7", "").Replace("8", "").Replace("9", "");
+            if (string.IsNullOrWhiteSpace(newVal))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
